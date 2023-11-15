@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 
 import { SignIn, HomePage, LandingPage, SignUp } from './pages';
+import { PageError } from "./components";
 
 import './App.css';
 
@@ -12,6 +13,7 @@ function App() {
       <Route path="/sign-up" element={<SignUp />} />
       <Route path="/sign-in" element={<SignIn />} />
       <Route path="/home-page" element={<HomePage />} />
+      <Route path="/error" element={<PageError />} />
     </Routes>
   );
 }
