@@ -25,7 +25,7 @@ import { UserUpdateProfileRequestDto } from './dto/user-update-profile-request.d
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   @Post('signup')
-  @HttpCode(200)
+  @HttpCode(201)
   userSignup(@Body() userSignupRequestDto: UserSignupRequestDto) {
     return this.usersService.userSignup(userSignupRequestDto);
   }
@@ -57,5 +57,15 @@ export class UsersController {
       response,
       request,
     );
+  }
+
+  @Post('logout')
+  @HttpCode(200)
+  async logout(@Res({ passthrough: true }) response: Response) {
+    response.clearCookie('jwt');
+
+    return {
+      message: 'success',
+    };
   }
 }

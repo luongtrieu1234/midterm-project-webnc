@@ -72,6 +72,7 @@ export class UsersService {
 
     return {
       message: 'success',
+      jwt: jwt,
     };
   }
 
