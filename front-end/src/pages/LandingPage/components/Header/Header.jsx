@@ -5,6 +5,21 @@ import 'primeicons/primeicons.css';
         
 
 const Header = () => {
+
+  // Logic
+
+  const handleClickSignUp = (event) => {
+    // Chuyển đến trang Sign Up
+    window.location.href = "/sign-up";
+  };
+
+  const handleClickSignIn = (event) => {
+    // Chuyển đến trang Sign Up
+    window.location.href = "/sign-in";
+  };
+
+  // End Logic
+
     return (
       <div>
         <div className="card flex flex-wrap justify-content-center mt-5 gap-8">
@@ -19,8 +34,9 @@ const Header = () => {
             <Button label="Contact" link />
           </div>
           <div className="card flex flex-wrap justify-content-center gap-5 ml-8" >
-            <Button label="Sign Up" outlined />
-            <Button label="Sign In" raised />
+            <Button label="Sign Up" outlined  onClick = {handleClickSignUp}>
+            </Button>
+            <Button label="Sign In" raised onClick = {handleClickSignIn}/>
           </div>
         </div>
       </div>
