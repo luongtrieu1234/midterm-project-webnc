@@ -14,7 +14,6 @@ import { Response, Request } from 'express';
 
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './interfaces/user.interface';
 import { UserSignupRequestDto } from './dto/user-signup-request.dto';
 import { UserLoginRequestDto } from './dto/user-login-request.dto';
 import { UserUpdateProfileRequestDto } from './dto/user-update-profile-request.dto';
