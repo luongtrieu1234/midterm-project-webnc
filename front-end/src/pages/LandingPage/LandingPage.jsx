@@ -2,10 +2,17 @@
 /* eslint-disable react/style-prop-object */
 import React from 'react';
 
+import Header from './components/Header/Header';
+import Body from './components/Body/Body';
+import Footer from './components/Footer/Footer';
+
+
 const LandingPage = () => {
     return (
         <div>
-            Landing Page
+            <Header/>
+            <Body/>
+            <Footer/>
         </div>
     );
 };

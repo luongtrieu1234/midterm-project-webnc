@@ -1,51 +1,55 @@
+/* eslint-disable no-undef */
 /* eslint-disable react/style-prop-object */
 /* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
-import './SignIn.css';
+import { useState } from 'react';
+
+import { Button } from 'primereact/button';
+import { InputText } from 'primereact/inputtext';    
+import { Checkbox } from "primereact/checkbox";
+import { Link } from 'react-router-dom';
+        
 
 const SignIn = () => {
+
+    // Logic 
+    const [checked, setChecked] = useState(false);
+    // End Logic
+
     return (
         <div>
-            <section className="img">
-                <div class="flex flex-col font-bold items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-                    <div class="w-full bg-white rounded-lg shadow  md:mt-0 sm:max-w-md xl:p-0 ">
-                    <p class=" mt-6 text-2xl font-bold text-center text-gray-900">
-                        Sign In
-                    </p>
-                        <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-                            <h1 class="text-xl  leading-tight tracking-tight text-gray-700 md:text-2xl ">
-                                Sign in to your account
-                            </h1>
-                            <form class="space-y-4 md:space-y-6" action="#">
-                                <div>
-                                    <label for="email" class="block mb-2 text-sm font-medium text-gray-900 ">Your email</label>
-                                    <input type="email" name="email" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 " required=""/>
-                                </div>
-                                <div>
-                                    <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Password</label>
-                                    <input type="password" name="password" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 d" required=""/>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-start">
-                                        <div class="flex items-center h-5">
-                                            <input id="remember" aria-describedby="remember" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 " required=""/>
-                                        </div>
-                                        <div class="ml-3 text-sm">
-                                            <label for="remember" class="text-gray-500 ">Remember me</label>
-                                        </div>
-                                    </div>
-                                    <a  class="text-sm font-medium text-primary-600 hover:underline ">Forgot password?</a>
-                                </div>
-                                <button type="submit" class="w-full h-10 text-white bg-blue-500 hover:bg-blue-700 rounded-lg" >Sign in</button>
-                                <p class="text-sm font-light text-gray-500 ">
-                                    Don’t have an account yet? <a href="/sign-up" class="font-medium text-blue-600">Sign up</a>
-                                </p>
-                            </form>
+            <div className="flex align-items-center justify-content-center mt-10">
+                <div className="surface-card p-4 shadow-2 border-round w-full lg:w-6">
+                    <div className="text-center mb-5">
+                        <i className="pi pi-user mb-3" style={{ fontSize: '2.5rem', color: 'var(--primary-color)' }}></i>
+                        <div className="text-900 text-3xl font-medium mb-3">Sign In</div>
+                    </div>
+
+                    <div>
+                        <label htmlFor="email" className="block text-900 font-medium mb-2">Email</label>
+                        <InputText id="email" type="text" placeholder="Email address" className="w-full mb-3" />
+
+                        <label htmlFor="password" className="block text-900 font-medium mb-2">Password</label>
+                        <InputText id="password" type="password" placeholder="Password" className="w-full mb-3" />
+
+                        <div className="flex align-items-center justify-content-between mb-6">
+                            <div className="flex align-items-center">
+                                <Checkbox id="rememberme" onChange={e => setChecked(e.checked)} checked={checked} className="mr-2" />   
+                                <label htmlFor="rememberme">Remember me</label>
+                            </div>
+                            <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">Forgot your password?</a>
+                        </div>
+
+                        <Button label="Sign In" icon="pi pi-user" className="w-full"/>
+
+                        <div className="text-center mt-5">
+                            <span className="text-600 font-medium line-height-3">Don't have an account?</span>
+                            <Link to = "/sign-up" className="font-medium no-underline ml-2 text-blue-500 cursor-pointer">Sign Up</Link>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
         </div>
     );
 };
