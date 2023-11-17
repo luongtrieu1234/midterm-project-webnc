@@ -47,6 +47,8 @@ const SignUp = () => {
         if (response.status === 200 || response.status === 201) {
             show('Form submitted successfully');
             console.log('success');
+            // Redirect to signin page
+            window.location.href = '/sign-in';
             reset();
         } else {
             show('Form submission failed', 'error');
