@@ -1,10 +1,16 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from 'react';
+import React, { useRef, useState  } from 'react';
+
+import { useForm, Controller } from 'react-hook-form';
+
+// import axios from 'axios'; // Import Axios library
 
 import { Button } from 'primereact/button';
-import { InputText } from 'primereact/inputtext';    
+import { classNames } from 'primereact/utils';
+import { Toast } from 'primereact/toast';
+import { InputText } from "primereact/inputtext";
+    
 import { Link } from 'react-router-dom';
-
 const SignUp = () => {
 
     // Logic 
@@ -29,7 +35,7 @@ const SignUp = () => {
                         <label htmlFor="password" className="block text-900 font-medium mb-2">Password</label>
                         <InputText id="password" type="password" placeholder="Password" className="w-full mb-3" />
 
-                        <Button label="Sign Up" icon="pi pi-user" className="w-full mt-5" />
+                        <Button label="Sign Up" icon="pi pi-user" type="submit" className="w-full mt-5" />
 
                         <div className="text-center mt-5">
                             <span className="text-600 font-medium line-height-3">Do have an account?</span>

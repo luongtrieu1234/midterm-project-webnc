@@ -24,7 +24,7 @@ const Header = () => {
       <div>
         <div className="card flex flex-wrap justify-content-center mt-5 gap-8 text-gray">
           <div className="card flex flex-wrap justify-content-center gap-3 ml-6" >
-            <i className="pi pi-qrcode" style={{ fontSize: '2.5rem', color: '#0000CD' }}></i>
+            <i className="pi pi-qrcode text-blue-500" style={{ fontSize: '2.5rem' }}></i>
           </div>
           <div className="card flex flex-wrap justify-content-center gap-3 ml-8 ">
             <Button label="Home" link />
