@@ -38,14 +38,11 @@ const SignUp = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post(
-        'https://be-midterm-project-webnc.onrender.com/users/signup',
-        {
-          fullname: data.fullname,
-          email: data.email,
-          password: data.password,
-        }
-      );
+      const response = await axios.post('http://localhost:5000/users/signup', {
+        fullname: data.fullname,
+        email: data.email,
+        password: data.password,
+      });
       setLoading(false); // Start loading state
 
       if (response.status === 200 || response.status === 201) {

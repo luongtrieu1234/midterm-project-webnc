@@ -11,9 +11,7 @@ import { JwtModule } from '@nestjs/jwt';
   imports: [
     UserModule,
     NestjsConfigModule.forRoot({ isGlobal: true }),
-    MongooseModule.forRoot(
-      'mongodb+srv://admin1:admin1@cluster0.1npefek.mongodb.net/midterm',
-    ),
+    MongooseModule.forRoot('mongodb+srv://admin1:admin1@cluster0.1npefek.mongodb.net/midterm'),
     JwtModule,
     // ConfigModule,
   ],
