@@ -16,11 +16,21 @@ const Header = () => {
           <i className='pi pi-qrcode' style={{ fontSize: '2.5rem', color: '#0000CD' }}></i>
         </div>
         <div className='card flex flex-wrap justify-content-center gap-3 ml-8 '>
-          <Button label='Home' link />
-          <Button label='About' link />
-          <Button label='Course' link />
-          <Button label='Blog' link />
-          <Button label='Contact' link />
+          <Link to='/home-page'>
+            <Button label='Home' link />
+          </Link>
+          <Link to='/'>
+            <Button label='About' link />
+          </Link>
+          <Link to='/'>
+            <Button label='Course' link />
+          </Link>
+          <Link to='/'>
+            <Button label='Blog' link />
+          </Link>
+          <Link to='/'>
+            <Button label='Contact' link />
+          </Link>
         </div>
         <div className='card flex flex-wrap justify-content-center gap-5 ml-8'>
           <Link to='/sign-up'>
