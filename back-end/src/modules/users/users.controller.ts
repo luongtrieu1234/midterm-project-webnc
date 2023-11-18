@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  Patch,
-  Post,
-  Query,
-  Req,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Patch, Post, Query, Req, Res } from '@nestjs/common';
 import { ApiConsumes, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Response, Request } from 'express';
 
@@ -50,11 +40,7 @@ export class UsersController {
     @Res({ passthrough: true }) response: Response,
     @Req() request: Request,
   ) {
-    return this.usersService.userUpdateProfile(
-      userUpdateProfileRequestDto,
-      response,
-      request,
-    );
+    return this.usersService.userUpdateProfile(userUpdateProfileRequestDto, response, request);
   }
 
   @Post('logout')
@@ -65,5 +51,11 @@ export class UsersController {
     return {
       message: 'success',
     };
+  }
+
+  @Get('')
+  @HttpCode(200)
+  userHomePage(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
+    return this.usersService.userHomePage(request, response);
   }
 }
