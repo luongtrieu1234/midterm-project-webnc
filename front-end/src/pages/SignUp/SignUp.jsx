@@ -3,6 +3,8 @@ import React, { useRef, useState  } from 'react';
 
 import { useForm, Controller } from 'react-hook-form';
 
+import { Link } from 'react-router-dom';
+
 import axios from 'axios'; // Import Axios library
 
 import { Button } from 'primereact/button';
@@ -10,7 +12,9 @@ import { classNames } from 'primereact/utils';
 import { Toast } from 'primereact/toast';
 import { InputText } from "primereact/inputtext";
     
-import { Link } from 'react-router-dom';
+import Loading from '../../components/Loading/Loading';
+
+
 const SignUp = () => {
 
     // Logic 
@@ -36,8 +40,11 @@ const SignUp = () => {
     } = useForm({ defaultValues });
   
     const onSubmit = async (data) => {
+
+        setLoading(true); // Start loading state
+
         try {
-        const response = await axios.post('https://be-midterm-project-webnc.onrender.com/users/signup', {
+        const response = await axios.post('http://localhost:5000/users/signup', {
             fullname: data.fullname,
             email: data.email,
             password: data.password,
@@ -70,7 +77,7 @@ const SignUp = () => {
     // End Logic
 
     return (
-        <div>
+        <div className='mt-6'>
             <div className="flex align-items-center justify-content-center mt-10">
                 <div className="surface-card p-4 shadow-2 border-round w-full lg:w-6">
                     <div className="text-center mb-5">
