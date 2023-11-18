@@ -40,9 +40,7 @@ export class UsersService {
   ) {}
   async userSignup(userSignupRequestDto: UserSignupRequestDto) {
     const currentUser = await this.userModel.findOne({
-      where: {
-        email: userSignupRequestDto.email,
-      },
+      email: userSignupRequestDto.email,
     });
     if (currentUser) {
       throw new BadRequestException('Email already signed up');
@@ -91,9 +89,6 @@ export class UsersService {
 
   async userProfile(request: Request) {
     try {
-      // const cookie = request.cookies['jwt'];
-      // console.log(`check cookies ${cookie}`);
-
       const [type, token] = request.headers.authorization?.split(' ') ?? [];
       type === 'Bearer' ? token : undefined;
       console.log(`check token ${token}`);
