@@ -61,10 +61,7 @@ export class UsersService {
     return user;
   }
 
-  async userLogin(
-    userLoginRequestDto: UserLoginRequestDto,
-    response: Response,
-  ) {
+  async userLogin(userLoginRequestDto: UserLoginRequestDto, response: Response) {
     const user = await this.userModel.findOne({
       where: {
         email: userLoginRequestDto.email,
