@@ -1,7 +1,9 @@
 .img {
-  background-image: url("../../../../assets/Images/education.jpeg");
-}
-
-.bgr {
-  background-color: blue;
+  background-image: url("../../../../assets/Images/background2.gif");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 48%;
+  width: 150%;
+  height: 300px; /* Chiều cao tùy ý */
 }

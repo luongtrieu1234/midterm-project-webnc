@@ -7,7 +7,7 @@ const Body = () => {
     <div className='gap-6'>
       <hr className='my-3 mx-8 border-top-1 border-bottom-none border-300' />
 
-      <div className='grid grid-nogutter surface-0 text-800 my-5'>
+      <div className='grid grid-nogutter surface-0 text-800 my-5 mx-8'>
         <div className='col-12 md:col-6 p-6 text-center md:text-left flex align-items-center '>
           <section>
             <span className='block text-6xl font-bold mb-1'>The best online</span>
@@ -23,14 +23,10 @@ const Body = () => {
             <Button label='Live Demo' type='button' className='p-button-outlined' />
           </section>
         </div>
-        <div className='col-12 md:col-6 overflow-hidden'>
-          <img
-            alt=''
-            className='md:ml-auto block md:h-full img'
-            style={{ clipPath: 'polygon(0% 0, 100% 0%, 100% 100%, 0 100%)' }}
-          />
-        </div>
+        <div className='col-12 md:col-6 overflow-hidden mt-8 img'></div>
       </div>
+
+      <hr className='my-8 mx-8 border-top-1 border-bottom-none border-300' />
 
       <hr className='my-8 mx-8 border-top-1 border-bottom-none border-300' />
 

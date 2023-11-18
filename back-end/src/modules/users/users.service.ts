@@ -5,7 +5,6 @@ import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -137,7 +136,7 @@ export class UsersService {
         _id: data['id'],
       });
       console.log(`check user ${JSON.stringify(user)}`);
-      const { password, ...result } = user;
+
       await user.updateOne({ ...userUpdateProfileRequestDto });
     } catch (e) {
       throw new UnauthorizedException();
