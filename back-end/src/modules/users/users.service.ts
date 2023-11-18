@@ -142,4 +142,22 @@ export class UsersService {
       throw new UnauthorizedException();
     }
   }
+
+  async userHomePage(request: Request, response: Response) {
+    try {
+      const [type, token] = request.headers.authorization?.split(' ') ?? [];
+      type === 'Bearer' ? token : undefined;
+      console.log(`check token ${token}`);
+
+      const data = await this.jwtService.verifyAsync(token);
+
+      if (!data) {
+        throw new UnauthorizedException('Access token error');
+      }
+
+      return { message: 'success' };
+    } catch (e) {
+      throw new UnauthorizedException('Access token does not exist');
+    }
+  }
 }
