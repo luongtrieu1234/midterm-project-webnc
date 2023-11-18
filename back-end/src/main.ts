@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
   app.enableCors({
-    origin: 'https://midterm-project-webnc.vercel.app',
+    origin: 'http://localhost:3000',
     credentials: true,
   });
   setupSwagger(app);
