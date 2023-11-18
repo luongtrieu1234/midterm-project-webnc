@@ -1,4 +1,5 @@
-import Loading from './Loading/Loading';
-import PageError from './PageError/PageError';
+import Loading from './Loading';
+import PageError from './PageError';
+import NotLogged from './NotLogged';
 
-export { Loading, PageError };
+export { Loading, PageError, NotLogged };

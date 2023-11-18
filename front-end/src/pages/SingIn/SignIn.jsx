@@ -11,11 +11,13 @@ import { classNames } from 'primereact/utils';
 import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
 import { Checkbox } from 'primereact/checkbox';
+// import Loading from '../../components/Loading';
 
 const SignIn = () => {
   // Logic
   const [checked, setChecked] = useState(false);
 
+  // eslint-disable-next-line no-unused-vars
   const [loading, setLoading] = useState(false);
 
   const toast = useRef(null);
@@ -46,7 +48,7 @@ const SignIn = () => {
       setLoading(false); // Start loading state
 
       if (response.status === 200) {
-        show('Form submitted successfully');
+        show('Form submitted successfully', 'success');
         console.log('success');
 
         const token = response?.data.jwt; // Assuming the token is returned in response.data.jwt
@@ -76,7 +78,9 @@ const SignIn = () => {
   };
 
   // End Logic
-
+  // if (loading) {
+  //   return <Loading />;
+  // }
   return (
     <div>
       <div

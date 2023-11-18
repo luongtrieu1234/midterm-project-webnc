@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 
 import { useForm, Controller } from 'react-hook-form';
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import axios from 'axios'; // Import Axios library
 
@@ -10,14 +10,13 @@ import { Button } from 'primereact/button';
 import { classNames } from 'primereact/utils';
 import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
-
-// import Loading from '../../components/Loading/Loading';
+// import Loading from '../../components/Loading';
 
 const SignUp = () => {
-  // Logic
-  // End Logic
+  const navigate = useNavigate();
 
   // Logic
+  // eslint-disable-next-line no-unused-vars
   const [loading, setLoading] = useState(false);
 
   const toast = useRef(null);
@@ -51,10 +50,10 @@ const SignUp = () => {
       setLoading(false); // Start loading state
 
       if (response.status === 200 || response.status === 201) {
-        show('Form submitted successfully');
+        show('Form submitted successfully', 'success');
         console.log('success');
         // Redirect to signin page
-        window.location.href = '/sign-in';
+        navigate('/sign-in');
         reset();
       } else {
         show('Form submission failed', 'error');
@@ -74,6 +73,9 @@ const SignUp = () => {
     );
   };
   // End Logic
+  // if (loading) {
+  //   return <Loading />;
+  // }
 
   return (
     <div>
