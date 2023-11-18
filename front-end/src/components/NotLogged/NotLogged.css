@@ -1,0 +1,165 @@
+* {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+}
+
+#notlogged {
+  position: relative;
+  height: 100vh;
+  background: #f0f8ff;
+}
+
+#notlogged .notlogged {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.notlogged {
+  max-width: 767px;
+  width: 100%;
+  line-height: 1.4;
+  padding: 110px 40px;
+  text-align: center;
+  background: #fff;
+  -webkit-box-shadow: 0 15px 15px -10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 15px 15px -10px rgba(0, 0, 0, 0.1);
+}
+
+.notlogged .notlogged-403 {
+  position: relative;
+  height: 180px;
+}
+
+.notlogged .notlogged-403 h1 {
+  font-family: "Roboto", sans-serif;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  font-size: 165px;
+  font-weight: 700;
+  margin: 0px;
+  color: blue;
+  text-transform: uppercase;
+}
+
+.notlogged .notlogged-403 h1 > span {
+  color: blue;
+}
+
+.notlogged h2 {
+  font-family: "Roboto", sans-serif;
+  font-size: 22px;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: #151515;
+  margin-top: 0px;
+  margin-bottom: 25px;
+}
+
+.notlogged .notlogged-search {
+  position: relative;
+  max-width: 320px;
+  width: 100%;
+  margin: auto;
+}
+
+.notlogged .notlogged-search > input {
+  font-family: "Roboto", sans-serif;
+  width: 100%;
+  height: 50px;
+  padding: 3px 65px 3px 30px;
+  color: #151515;
+  font-size: 16px;
+  background: transparent;
+  border: 2px solid #fff8dc;
+  border-radius: 40px;
+  -webkit-transition: 0.2s all;
+  transition: 0.2s all;
+}
+
+.notlogged .notlogged-search > input:focus {
+  border-color: #00b7ff;
+}
+
+.notlogged .notlogged-search > button {
+  position: absolute;
+  right: 15px;
+  top: 5px;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.notlogged .notlogged-search > button > span {
+  width: 15px;
+  height: 15px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%) rotate(-45deg);
+  -ms-transform: translate(-50%, -50%) rotate(-45deg);
+  transform: translate(-50%, -50%) rotate(-45deg);
+  margin-left: -3px;
+}
+
+.notlogged .notlogged-search > button > span:after {
+  position: absolute;
+  content: "";
+  width: 10px;
+  height: 10px;
+  left: 0px;
+  top: 0px;
+  border-radius: 50%;
+  border: 4px solid #c5c5c5;
+  -webkit-transition: 0.2s all;
+  transition: 0.2s all;
+}
+
+.notlogged-search > button > span:before {
+  position: absolute;
+  content: "";
+  width: 4px;
+  height: 10px;
+  left: 7px;
+  top: 17px;
+  border-radius: 2px;
+  background: #c5c5c5;
+  -webkit-transition: 0.2s all;
+  transition: 0.2s all;
+}
+
+.notlogged .notlogged-search > button:hover > span:after {
+  border-color: #00b7ff;
+}
+
+.notlogged .notlogged-search > button:hover > span:before {
+  background-color: #00b7ff;
+}
+
+@media only screen and (max-width: 767px) {
+  .notlogged h2 {
+    font-size: 18px;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .notlogged .notfound-404 h1 {
+    font-size: 141px;
+  }
+}

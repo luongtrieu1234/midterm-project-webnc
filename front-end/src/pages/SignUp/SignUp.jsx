@@ -2,6 +2,8 @@ import React, { useRef, useState } from 'react';
 
 import { useForm, Controller } from 'react-hook-form';
 
+import { Link } from 'react-router-dom';
+
 import axios from 'axios'; // Import Axios library
 
 import { Button } from 'primereact/button';
@@ -9,7 +11,8 @@ import { classNames } from 'primereact/utils';
 import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
 
-import { Link } from 'react-router-dom';
+// import Loading from '../../components/Loading/Loading';
+
 const SignUp = () => {
   // Logic
   // End Logic
@@ -37,6 +40,8 @@ const SignUp = () => {
   } = useForm({ defaultValues });
 
   const onSubmit = async (data) => {
+    setLoading(true); // Start loading state
+
     try {
       const response = await axios.post('http://localhost:5000/users/signup', {
         fullname: data.fullname,
