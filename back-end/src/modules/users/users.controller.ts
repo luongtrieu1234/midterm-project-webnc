@@ -13,7 +13,6 @@ import { ApiConsumes, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Response, Request } from 'express';
 
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UserSignupRequestDto } from './dto/user-signup-request.dto';
 import { UserLoginRequestDto } from './dto/user-login-request.dto';
 import { UserUpdateProfileRequestDto } from './dto/user-update-profile-request.dto';

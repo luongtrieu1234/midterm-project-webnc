@@ -99,7 +99,6 @@ let UsersService = class UsersService {
                 _id: data['id'],
             });
             console.log(`check user ${JSON.stringify(user)}`);
-            const { password, ...result } = user;
             await user.updateOne({ ...userUpdateProfileRequestDto });
         }
         catch (e) {

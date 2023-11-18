@@ -26,5 +26,35 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
-], UserUpdateProfileRequestDto.prototype, "email", void 0);
+], UserUpdateProfileRequestDto.prototype, "gender", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Date)
+], UserUpdateProfileRequestDto.prototype, "dob", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UserUpdateProfileRequestDto.prototype, "phone", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UserUpdateProfileRequestDto.prototype, "address", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], UserUpdateProfileRequestDto.prototype, "job", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: [String], isArray: true }),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], UserUpdateProfileRequestDto.prototype, "hobby", void 0);
 //# sourceMappingURL=user-update-profile-request.dto.js.map
