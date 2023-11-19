@@ -1,15 +1,10 @@
 import React from 'react';
 import avt from './avt.jpg';
-
 import { Button } from 'primereact/button';
 import 'primeicons/primeicons.css';
 import { Link } from 'react-router-dom';
 
 const Header = () => {
-  // Logic
-
-  // End Logic
-
   return (
     <div>
       <div className='card flex flex-wrap justify-content-center mt-5 gap-8 text-gray'>
@@ -39,7 +34,7 @@ const Header = () => {
               <img src={avt} alt='' className='w-3rem border-circle' />
             </div>
           </Link>
-          <Link to='/sign-up'>
+          <Link to='/'>
             <Button label='Sign Out' outlined />
           </Link>
         </div>
