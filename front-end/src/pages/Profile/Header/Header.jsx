@@ -12,10 +12,10 @@ const Header = () => {
   useEffect(() => {
     // Retrieve data from local storage on component mount
     const token = localStorage.getItem('token');
-
+    console.log('token:', token);
     // Update state with the retrieved data
     setToken(token);
-  }, []);
+  });
   // End Logic
 
   return (
