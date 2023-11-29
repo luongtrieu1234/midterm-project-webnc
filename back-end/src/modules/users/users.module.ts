@@ -8,19 +8,25 @@ import { User } from './users.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from './users.model';
+import { AuthModule } from 'src/others/auth/auth.module';
+import { MailModule } from 'src/others/mail/mail.module';
+import { SharedService } from 'src/others/auth/shared.service';
 
 @Module({
   imports: [
     // DatabaseModule,
+    AuthModule,
+    MailModule,
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     JwtModule.register({
-      secret: 'secret',
+      secret: 'secret-key',
       signOptions: { expiresIn: '1d' },
     }),
   ],
   controllers: [UsersController],
   providers: [
     UsersService,
+    SharedService,
     // ...usersProviders,
     // {
     //   provide: 'UserRepository',

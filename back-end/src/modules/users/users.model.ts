@@ -2,7 +2,7 @@ import * as mongoose from 'mongoose';
 
 export const UserSchema = new mongoose.Schema({
   email: { type: String, required: true },
-  password: { type: String, required: true },
+  password: { type: String, default: null },
   fullname: { type: String, default: '' }, // Set default value for fullname
   gender: { type: String, default: '' }, // Set default value for gender
   dob: { type: Date, default: null }, // Set default value for dob (you can set it to a specific date if needed)
