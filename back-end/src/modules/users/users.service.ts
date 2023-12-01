@@ -4,7 +4,7 @@ import { join } from 'path';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -52,15 +52,15 @@ export class UsersService {
     });
   }
 
-  async userSignup(userSignupRequestDto: UserSignupRequestDto) {
+  async userSignupRequest(userSignupRequestDto: UserSignupRequestDto) {
     const currentUser = await this.userModel.findOne({
       email: userSignupRequestDto.email,
     });
-    const emailToken = await this.authService.signVerifyToken(userSignupRequestDto.email);
-    await this.mailService.sendUserConfirmation('lexuantien07@gmail.com', emailToken);
     if (currentUser) {
       throw new BadRequestException('Email already signed up');
     }
+    const emailToken = await this.authService.signVerifyToken(userSignupRequestDto.email);
+    await this.mailService.sendUserConfirmation('lexuantien07@gmail.com', emailToken);
     const hashedPassword = await bcrypt.hash(userSignupRequestDto.password, 12);
 
     const user = await this.userModel.create({
@@ -72,6 +72,18 @@ export class UsersService {
     delete user.password;
 
     return user;
+  }
+
+  async userSignupActivate(isValid) {
+    const currentUser = await this.userModel.findOne({
+      email: isValid.email,
+    });
+    currentUser.active = true;
+    currentUser.save();
+    return {
+      message: 'Verify success',
+      statusCode: HttpStatus.OK,
+    };
   }
 
   async userLogin(userLoginRequestDto: UserLoginRequestDto, response: Response) {

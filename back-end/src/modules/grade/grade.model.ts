@@ -1,14 +1,14 @@
 import * as mongoose from 'mongoose';
 
 export const GradeSchema = new mongoose.Schema({
-  point: { type: String },
+  point: { type: Number },
   student: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   class: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 });
 
 export interface GradeModel {
-  id: string;
-  name: string;
+  id: number;
+  point: string;
   student: string[];
   class: string[];
 }

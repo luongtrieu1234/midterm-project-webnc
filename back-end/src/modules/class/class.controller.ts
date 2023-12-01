@@ -20,15 +20,33 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from '../../others/auth/auth.service';
 import { SharedService } from 'src/others/auth/shared.service';
 import { JwtService } from '@nestjs/jwt';
+import { CreateOrUpdateClassDto } from './dto/create-class.dto';
+import { Roles } from '../role/role.decorator';
+import { UserRole } from '../role/roles.enum';
+import { RoleGuard } from '../role/role.guard';
 
-@Controller('users')
-@ApiTags('users')
+@Controller('class')
+@ApiTags('class')
 @ApiSecurity('JWT-auth')
 export class ClassController {
   constructor(
-    private readonly usersService: ClassService,
+    private readonly classService: ClassService,
     private authService: AuthService,
     private sharedService: SharedService,
     private jwtService: JwtService,
   ) {}
+
+  @Post()
+  // @Roles(UserRole.TEACHER)
+  // @UseGuards(RoleGuard)
+  @HttpCode(201)
+  async createClass(@Body() createClassDto: CreateOrUpdateClassDto) {
+    return await this.classService.createClass(createClassDto);
+  }
+
+  @Patch('update')
+  @HttpCode(200)
+  async updateClass(@Body() updateClassDto: CreateOrUpdateClassDto) {
+    return await this.classService.updateClass(updateClassDto);
+  }
 }

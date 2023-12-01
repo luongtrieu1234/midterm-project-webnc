@@ -7,7 +7,7 @@ export class MailService {
   constructor(private mailerService: MailerService) {}
 
   async sendUserConfirmation(email: string, token: string) {
-    const url = `http://localhost:5000/users/confirm?token=${token}`;
+    const url = `http://localhost:5000/users/confirm-signup?token=${token}`;
 
     await this.mailerService.sendMail({
       to: email,
@@ -28,7 +28,7 @@ export class MailService {
   }
 
   async sendUserResetPassword(email: string, token: string) {
-    const url = `http://localhost:5000/users/confirm?token=${token}`;
+    const url = `http://localhost:5000/users/confirm-reset-password?token=${token}`;
 
     await this.mailerService.sendMail({
       to: email,
@@ -40,9 +40,9 @@ export class MailService {
         url,
       },
       html: `<p>Chào ${email},</p>
-      <p>Vui lòng click vào link bên dưới để kích hoạt tài khoản:</p>
+      <p>Vui lòng click vào link bên dưới để đặt lại mật khẩu:</p>
       <p>
-          <a href='${url}'>Kích hoạt</a>
+          <a href='${url}'>Reset password</a>
       </p>
       `,
     });

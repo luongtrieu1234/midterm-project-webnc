@@ -59,7 +59,7 @@ export class AuthService {
 
   async signAccessToken(user: UserModel): Promise<string> {
     const payload = {
-      id: user.id,
+      // id: user.id,
       email: user.email,
     };
 
