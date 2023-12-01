@@ -11,6 +11,7 @@ import { classNames } from 'primereact/utils';
 import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
 import { Checkbox } from 'primereact/checkbox';
+import Google from '../Google/Google';
 // import Loading from '../../components/Loading';
 
 const SignIn = () => {
@@ -183,6 +184,8 @@ const SignIn = () => {
               </div>
             </div>
           </form>
+
+          <Google />
         </div>
       </div>
     </div>
