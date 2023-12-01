@@ -96,6 +96,10 @@ const SignIn = () => {
             ></i>
             <div className='text-900 text-3xl font-medium mb-3'>Sign In</div>
           </div>
+          <div className='text-center mb-5'>
+            {/* <div className='text-900 text-3xl font-medium mb-3'>Login with</div> */}
+            <Google />
+          </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className='flex flex-column gap-2'>
             <Toast ref={toast} />
@@ -165,9 +169,12 @@ const SignIn = () => {
                   />
                   <label htmlFor='rememberme'>Remember me</label>
                 </div>
-                <a className='font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer'>
+                <Link
+                  to='/search-email'
+                  className='font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer'
+                >
                   Forgot your password?
-                </a>
+                </Link>
               </div>
 
               <Button label='Sign In' icon='pi pi-user' type='submit' className='w-full' />
@@ -183,8 +190,6 @@ const SignIn = () => {
               </div>
             </div>
           </form>
-
-          <Google />
         </div>
       </div>
     </div>

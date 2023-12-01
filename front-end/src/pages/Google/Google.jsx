@@ -86,7 +86,13 @@ const Google = () => {
     <form onSubmit={handleSubmit(onSubmit)} className='flex flex-column gap-2'>
       <Toast ref={toast} />
       <div>
-        <Button label='Login with Google' icon='pi pi-user' type='submit' className='w-full' />
+        <Button
+          label='Login with Google'
+          icon='pi pi-user'
+          type='submit'
+          className='w-full'
+          severity='warning'
+        />
       </div>
     </form>
   );
