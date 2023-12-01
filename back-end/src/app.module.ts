@@ -12,6 +12,8 @@ import { MailModule } from './others/mail/mail.module';
 import { ClassModule } from './modules/class/class.module';
 import { RoleModule } from './modules/role/role.module';
 import { GradeModule } from './modules/grade/grade.module';
+import { APP_GUARD } from '@nestjs/core';
+import { RoleGuard } from './modules/role/role.guard';
 // import { ConfigModule } from './config/config.module';
 
 @Module({
@@ -28,6 +30,15 @@ import { GradeModule } from './modules/grade/grade.module';
     // ConfigModule,
   ],
   controllers: [AppController],
-  providers: [AppService, GoogleStrategy, FacebookStrategy],
+  providers: [
+    AppService,
+    GoogleStrategy,
+    FacebookStrategy,
+
+    {
+      provide: APP_GUARD,
+      useClass: RoleGuard,
+    },
+  ],
 })
 export class AppModule {}

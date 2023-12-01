@@ -27,6 +27,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
 import { UserModel } from './users.model';
 import { InjectModel } from '@nestjs/mongoose';
+import { UserConfirmCodeDto } from './dto/user-confirm-code.dto';
 
 @Controller('users')
 @ApiTags('users')
@@ -193,11 +194,16 @@ export class UsersController {
   // }
   @Post('/reset-request')
   async resetPasswordRequest(@Body() userResetPasswordRequestDto: UserResetPasswordRequestDto) {
-    await this.usersService.resetPasswordRequest(userResetPasswordRequestDto);
+    return await this.usersService.resetPasswordRequest(userResetPasswordRequestDto);
   }
 
   @Post('/reset')
   async resetPassword(@Body() userResetPasswordDto: UserResetPasswordDto) {
-    await this.usersService.resetPassword(userResetPasswordDto);
+    return await this.usersService.resetPassword(userResetPasswordDto);
+  }
+
+  @Post('/confirm-code')
+  async confirmCodeMail(@Body() code: UserConfirmCodeDto) {
+    return await this.usersService.verifyCodeEmail(code);
   }
 }

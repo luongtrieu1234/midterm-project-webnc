@@ -71,7 +71,7 @@ export class AuthService {
       email: user,
     };
 
-    return this.jwtService.sign(payload);
+    return await this.jwtService.sign(payload);
   }
 
   async confirmVerifyToken(token) {

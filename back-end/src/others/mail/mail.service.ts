@@ -40,11 +40,13 @@ export class MailService {
         url,
       },
       html: `<p>Chào ${email},</p>
-      <p>Vui lòng click vào link bên dưới để đặt lại mật khẩu:</p>
+      <p>Vui lòng nhập mã xác nhận bên dưới để đặt lại mật khẩu:</p>
       <p>
-          <a href='${url}'>Reset password</a>
+          <b>${token}</b>
       </p>
       `,
     });
+
+    return { message: 'success' };
   }
 }
