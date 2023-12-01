@@ -88,14 +88,14 @@ export class UsersService {
     }
 
     const jwt1 = await this.jwtService.signAsync({ id: user.id });
-    const jwt2 = await this.authService.signAccessToken(user);
+    const jwt = await this.authService.signAccessToken(user);
 
     // response.cookie('jwt', jwt, { httpOnly: true });
 
     return {
       message: 'success',
       jwt1: jwt1,
-      jwt2: jwt2,
+      jwt: jwt,
     };
   }
 
@@ -112,10 +112,10 @@ export class UsersService {
       if (!data) {
         throw new UnauthorizedException('Access token error');
       }
-      console.log(`check data ${JSON.stringify(data['id'])}`);
+      console.log(`check data ${JSON.stringify(data['email'])}`);
 
       const user = await this.userModel.findOne({
-        _id: data['id'],
+        email: data['email'],
       });
       console.log(`check user ${JSON.stringify(user)}`);
       const { password, ...result } = user;
@@ -142,7 +142,7 @@ export class UsersService {
       }
 
       const user = await this.userModel.findOne({
-        _id: data['id'],
+        email: data['email'],
       });
       console.log(`check user ${JSON.stringify(user)}`);
 
@@ -190,6 +190,7 @@ export class UsersService {
       result = rest;
     }
     const currentUser = await this.findUserByEmail(req.user.email);
+    console.log('check user login google ', currentUser);
     const accessToken = await this.authService.signAccessToken(currentUser);
 
     return {

@@ -88,8 +88,15 @@ export class UsersController {
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
-  googleAuthRedirect(@Req() req) {
-    return this.usersService.googleLogin(req);
+  async googleAuthRedirect(@Req() req, @Res() res) {
+    // return 'sss';
+    // return this.usersService.googleLogin(req);
+
+    const googleLoginResponse = await this.usersService.googleLogin(req);
+    const redirectUrl = `http://localhost:3000/sign-in-google?jwt=${googleLoginResponse.accessToken}`;
+
+    return res.redirect(redirectUrl);
+    // return googleLoginResponse;
   }
 
   // @Get('facebook')
@@ -117,10 +124,12 @@ export class UsersController {
       this.sharedService.setToken(query.token);
       return {
         message: 'Verify successfully',
+        statusCode: HttpStatus.OK,
       };
     }
     return {
       message: 'Verify fail',
+      statusCode: HttpStatus.BAD_REQUEST,
     };
   }
 
