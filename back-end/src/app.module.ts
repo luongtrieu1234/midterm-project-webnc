@@ -12,7 +12,6 @@ import { MailModule } from './others/mail/mail.module';
 import { ClassModule } from './modules/class/class.module';
 import { RoleModule } from './modules/role/role.module';
 import { GradeModule } from './modules/grade/grade.module';
-// import { ConfigModule } from './config/config.module';
 
 @Module({
   imports: [
@@ -22,10 +21,12 @@ import { GradeModule } from './modules/grade/grade.module';
     RoleModule,
     GradeModule,
     MailModule,
-    NestjsConfigModule.forRoot({ isGlobal: true }),
+    NestjsConfigModule.forRoot({
+      envFilePath: ['.env', '.env.pro'],
+      isGlobal: true,
+    }),
     MongooseModule.forRoot('mongodb+srv://admin1:admin1@cluster0.1npefek.mongodb.net/midterm'),
     JwtModule,
-    // ConfigModule,
   ],
   controllers: [AppController],
   providers: [AppService, GoogleStrategy, FacebookStrategy],

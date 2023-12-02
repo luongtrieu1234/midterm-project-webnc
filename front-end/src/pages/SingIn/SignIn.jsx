@@ -4,7 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 
 import { Link } from 'react-router-dom';
 
-import axios from 'axios'; // Import Axios library
+import axios from 'axios';
 
 import { Button } from 'primereact/button';
 import { classNames } from 'primereact/utils';
@@ -12,7 +12,7 @@ import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
 import { Checkbox } from 'primereact/checkbox';
 import Google from '../Google/Google';
-// import Loading from '../../components/Loading';
+import { ButtonLoginFacebook } from './conponents';
 
 const SignIn = () => {
   // Logic
@@ -54,7 +54,6 @@ const SignIn = () => {
         console.log('success');
 
         const token = response?.data.jwt; // Assuming the token is returned in response.data.jwt
-
         // Save token to localStorage
         localStorage.setItem('token', token);
 
@@ -79,10 +78,6 @@ const SignIn = () => {
     );
   };
 
-  // End Logic
-  // if (loading) {
-  //   return <Loading />;
-  // }
   return (
     <div>
       <div
@@ -184,8 +179,13 @@ const SignIn = () => {
               </div>
             </div>
           </form>
-
-          <Google />
+          <div className='text-center'>
+            <div className='my-2'>Or login with</div>
+            <div className='flex justify-content-center align-items-center'>
+              <ButtonLoginFacebook />
+              <Google />
+            </div>
+          </div>
         </div>
       </div>
     </div>

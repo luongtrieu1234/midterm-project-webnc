@@ -210,6 +210,46 @@ export class UsersService {
     };
   }
 
+  async facebookLogin(user) {
+    if (!user) {
+      throw new BadRequestException('No user from Facebook');
+    }
+
+    console.log('check facebook user ', user);
+    const userExits = await this.findUserByEmail(user.email);
+    let result = null;
+    if (!userExits) {
+      // throw new BadRequestException('User not found');
+      const fullname = `${user.firstName} ${user.lastName}`;
+      const newUser = await this.userModel.create({
+        fullname: fullname,
+        email: user.email,
+      });
+
+      const { password, ...rest } = newUser;
+      result = rest;
+    }
+    const currentUser = await this.findUserByEmail(user.email);
+    console.log('check user login facebook ', currentUser);
+    const accessToken = await this.authService.signAccessToken(currentUser);
+
+    return {
+      message: 'User information from facebook',
+      user: {
+        email: currentUser.email,
+        password: currentUser.password,
+        fullname: currentUser.fullname,
+        gender: currentUser.gender,
+        dob: currentUser.dob,
+        phone: currentUser.phone,
+        address: currentUser.address,
+        job: currentUser.job,
+        hobby: currentUser.hobby,
+      },
+      accessToken: accessToken,
+    };
+  }
+
   async verifyEmail(query) {
     console.log('check query service ', JSON.stringify(query));
     const isValid = await this.authService.confirmVerifyToken(query.token);
