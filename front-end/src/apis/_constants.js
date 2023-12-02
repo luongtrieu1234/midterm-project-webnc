@@ -3,4 +3,5 @@ export const USER = {
   SIGNUP: '/users/signup',
   ME: '/users/me',
   UPDATE: '/users/update',
+  LOGIN_FACEBOOK: '/users/facebook',
 };
