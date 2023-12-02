@@ -92,10 +92,9 @@ const SignIn = () => {
             ></i>
             <div className='text-900 text-3xl font-medium mb-3'>Sign In</div>
           </div>
-          <div className='text-center mb-5'>
-            {/* <div className='text-900 text-3xl font-medium mb-3'>Login with</div> */}
+          {/* <div className='text-center mb-5'>
             <Google />
-          </div>
+          </div> */}
 
           <form onSubmit={handleSubmit(onSubmit)} className='flex flex-column gap-2'>
             <Toast ref={toast} />
