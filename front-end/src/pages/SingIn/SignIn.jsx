@@ -85,12 +85,12 @@ const SignIn = () => {
         style={{ backgroundColor: 'rgba(0,0,0,0.05)' }}
       >
         <div className='surface-card p-4 shadow-2 border-round w-full lg:w-6'>
-          <div className='text-center mb-5'>
+          <div className='text-center mb-3'>
             <i
               className='pi pi-user mb-3'
               style={{ fontSize: '2.5rem', color: 'var(--primary-color)' }}
             ></i>
-            <div className='text-900 text-3xl font-medium mb-3'>Sign In</div>
+            <div className='text-900 text-3xl font-medium mb-2'>Sign In</div>
           </div>
           {/* <div className='text-center mb-5'>
             <Google />
@@ -154,7 +154,7 @@ const SignIn = () => {
               )}
             />
             <div>
-              <div className='flex align-items-center justify-content-between mb-6'>
+              <div className='flex align-items-center justify-content-between mb-3'>
                 <div className='flex align-items-center'>
                   <Checkbox
                     id='rememberme'
@@ -174,7 +174,7 @@ const SignIn = () => {
 
               <Button label='Sign In' icon='pi pi-user' type='submit' className='w-full' />
 
-              <div className='text-center mt-5'>
+              <div className='text-center mt-3'>
                 <span className='text-600 font-medium line-height-3'>Don't have an account?</span>
                 <Link
                   to='/sign-up'
@@ -185,10 +185,11 @@ const SignIn = () => {
               </div>
             </div>
           </form>
-          <div className='text-center'>
+          <hr className='mx-2 border-left-1 border-bottom-none border-100 mt-3' />
+          <div className='text-center mt-3 mb-5'>
             <div className='my-2'>Or login with</div>
-            <div className='flex justify-content-center align-items-center'>
-              <ButtonLoginFacebook />
+            <div className='flex justify-content-center align-items-center mt-3 gap-3'>
+              <ButtonLoginFacebook></ButtonLoginFacebook>
               <Google />
             </div>
           </div>
