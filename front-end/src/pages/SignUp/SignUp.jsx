@@ -53,7 +53,7 @@ const SignUp = () => {
         show('Form submitted successfully', 'success');
         console.log('success');
         // Redirect to signin page
-        navigate('/sign-in');
+        navigate('/confirm-code-sign-up');
         reset();
       } else {
         show('Form submission failed', 'error');
@@ -106,6 +106,7 @@ const SignUp = () => {
                 <>
                   <label
                     htmlFor={field.name}
+                    // @ts-ignore
                     className={classNames({ 'p-error': errors.value })}
                   ></label>
                   <span className='p-float-label'>

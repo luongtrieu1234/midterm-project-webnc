@@ -7,6 +7,7 @@ import Google from './Google/Google';
 import SearchEmail from './SearchEmail';
 import ResetPassword from './ResetPassword';
 import ConfirmCode from './ConfirmCode';
+import ConfirmCodeSignUp from './ConfirmCodeSignUp';
 
 export {
   HomePage,
@@ -18,4 +19,5 @@ export {
   SearchEmail,
   ResetPassword,
   ConfirmCode,
+  ConfirmCodeSignUp,
 };

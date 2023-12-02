@@ -11,6 +11,7 @@ import {
   SearchEmail,
   ResetPassword,
   ConfirmCode,
+  ConfirmCodeSignUp,
 } from './pages';
 import { PageError, Loading, NotLogged } from './components';
 
@@ -32,6 +33,7 @@ function App() {
       <Route path='/search-email' element={<SearchEmail />} />
       <Route path='/reset-password' element={<ResetPassword />} />
       <Route path='/confirm-code' element={<ConfirmCode />} />
+      <Route path='/confirm-code-sign-up' element={<ConfirmCodeSignUp />} />
       <Route path='/me' element={<Profile />} />
       <Route path='/loading' element={<Loading />} />
       {token && <Route path='/home-page' element={<HomePage />} />}
