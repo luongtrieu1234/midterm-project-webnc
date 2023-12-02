@@ -60,8 +60,13 @@ export class UsersService {
     if (currentUser) {
       throw new BadRequestException('Email already signed up');
     }
+    const codeMail = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log(codeMail);
+    this.sharedService.setCode(codeMail);
+    // const emailToken = await this.authService.signVerifyToken(userResetPasswordRequestDto.email);
     const emailToken = await this.authService.signVerifyToken(userSignupRequestDto.email);
-    await this.mailService.sendUserConfirmation('luongtrieudev@gmail.com', emailToken);
+    this.sharedService.setToken(emailToken);
+    await this.mailService.sendUserConfirmation('lexuantien07@gmail.com', codeMail);
     const hashedPassword = await bcrypt.hash(userSignupRequestDto.password, 12);
 
     const user = await this.userModel.create({
@@ -75,14 +80,23 @@ export class UsersService {
     return user;
   }
 
-  async userSignupActivate(isValid) {
-    const currentUser = await this.userModel.findOne({
-      email: isValid.email,
+  async userSignupActivate() {
+    const token = this.sharedService.getToken();
+    // if (!token) {
+    //   throw new BadRequestException('Confirmation fail');
+    // }
+    const data = await this.jwtService.verifyAsync(token);
+    if (!data) {
+      throw new UnauthorizedException();
+    }
+    const user = await this.userModel.findOne({
+      email: data['email'],
     });
-    currentUser.active = true;
-    currentUser.save();
+    console.log(`check user resetPassword ${JSON.stringify(user)}`);
+    user.active = true;
+    user.save();
     return {
-      message: 'Verify success',
+      message: 'success',
       statusCode: HttpStatus.OK,
     };
   }
@@ -244,11 +258,11 @@ export class UsersService {
       throw new BadRequestException('Email not found');
     }
     const codeMail = Math.floor(100000 + Math.random() * 900000).toString();
-    // console.log(Math.floor(100000 + Math.random() * 900000));
+    console.log(codeMail);
     this.sharedService.setCode(codeMail);
     const emailToken = await this.authService.signVerifyToken(userResetPasswordRequestDto.email);
     this.sharedService.setToken(emailToken);
-    await this.mailService.sendUserResetPassword('luongtrieudev@gmail.com', codeMail);
+    await this.mailService.sendUserResetPassword('lexuantien07@gmail.com', codeMail);
     return {
       message: 'success',
       status: HttpStatus.OK,
@@ -259,8 +273,11 @@ export class UsersService {
     console.log('check query service ', code.code);
 
     const token = this.sharedService.getCode();
+    if (!token) {
+      throw new BadRequestException('Code expired');
+    }
     if (token !== code.code) {
-      throw new BadRequestException('Confirmation fail');
+      throw new BadRequestException('Code confirmation fail');
     }
     return {
       message: 'Verify success',

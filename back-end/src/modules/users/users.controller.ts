@@ -48,43 +48,43 @@ export class UsersController {
     return this.usersService.userSignupRequest(userSignupRequestDto);
   }
 
-  // @Patch('activate')
-  // @HttpCode(201)
-  // userSignup(@Body() userSignupRequestDto: UserSignupRequestDto) {
-  //   return this.usersService.userSignup(userSignupRequestDto);
-  // }
-
-  @Get('/confirm-signup')
-  async verifyEmailSignUp(@Query() query) {
-    console.log('check query controller verifyEmailSignUp ', JSON.stringify(query));
-    // return await this.usersService.verifyEmail(query.token);
-    // console.log('check query service ', JSON.stringify(query));
-    // const isValid = await this.authService.confirmVerifyToken();
-    const isValid = await this.jwtService.verifyAsync(query.token);
-    if (isValid) {
-      console.log('isValid');
-      // const currentUser = await this.userModel.findOne({
-      //   email: isValid.email,
-      // });
-      // currentUser.active = true;
-      // currentUser.save();
-
-      // return {
-      //   message: 'Verify success',
-      //   statusCode: HttpStatus.OK,
-      // };
-      return await this.usersService.userSignupActivate(isValid);
-      // this.sharedService.setToken(query.token);
-      // return {
-      //   message: 'Verify successfully',
-      //   statusCode: HttpStatus.OK,
-      // };
-    }
-    return {
-      message: 'Verify fail',
-      statusCode: HttpStatus.BAD_REQUEST,
-    };
+  @Post('activate')
+  @HttpCode(201)
+  async userSignup() {
+    return await this.usersService.userSignupActivate();
   }
+
+  // @Get('/confirm-signup')
+  // async verifyEmailSignUp(@Query() query) {
+  //   console.log('check query controller verifyEmailSignUp ', JSON.stringify(query));
+  //   // return await this.usersService.verifyEmail(query.token);
+  //   // console.log('check query service ', JSON.stringify(query));
+  //   // const isValid = await this.authService.confirmVerifyToken();
+  //   const isValid = await this.jwtService.verifyAsync(query.token);
+  //   if (isValid) {
+  //     console.log('isValid');
+  //     // const currentUser = await this.userModel.findOne({
+  //     //   email: isValid.email,
+  //     // });
+  //     // currentUser.active = true;
+  //     // currentUser.save();
+
+  //     // return {
+  //     //   message: 'Verify success',
+  //     //   statusCode: HttpStatus.OK,
+  //     // };
+  //     return await this.usersService.userSignupActivate(isValid);
+  //     // this.sharedService.setToken(query.token);
+  //     // return {
+  //     //   message: 'Verify successfully',
+  //     //   statusCode: HttpStatus.OK,
+  //     // };
+  //   }
+  //   return {
+  //     message: 'Verify fail',
+  //     statusCode: HttpStatus.BAD_REQUEST,
+  //   };
+  // }
 
   @Post('login')
   @HttpCode(200)

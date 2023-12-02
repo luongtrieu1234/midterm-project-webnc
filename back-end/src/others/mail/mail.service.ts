@@ -19,10 +19,11 @@ export class MailService {
         url,
       },
       html: `<p>Chào ${email},</p>
-      <p>Vui lòng click vào link bên dưới để xác nhận:</p>
+      <p>Vui lòng nhập mã xác nhận bên dưới để kích hoạt tài khoản:</p>
       <p>
-          <a href='${url}'>Kích hoạt</a>
+        <b>${token}</b>
       </p>
+      <p>Mã xác nhận có hiệu lực trong vòng 15 phút</p>
       `,
     });
   }
@@ -44,6 +45,7 @@ export class MailService {
       <p>
           <b>${token}</b>
       </p>
+      <p>Mã xác nhận có hiệu lực trong vòng 15 phút</p>
       `,
     });
 
