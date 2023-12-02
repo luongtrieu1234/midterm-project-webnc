@@ -4,7 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 
 import { Link } from 'react-router-dom';
 
-import axios from 'axios'; // Import Axios library
+import axios from 'axios';
 
 import { Button } from 'primereact/button';
 import { classNames } from 'primereact/utils';
@@ -12,7 +12,7 @@ import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
 import { Checkbox } from 'primereact/checkbox';
 import Google from '../Google/Google';
-// import Loading from '../../components/Loading';
+import { ButtonLoginFacebook } from './conponents';
 
 const SignIn = () => {
   // Logic
@@ -42,7 +42,8 @@ const SignIn = () => {
   const onSubmit = async (data) => {
     setLoading(true); // Start loading state
     try {
-      const response = await axios.post('http://localhost:5000/users/login', {
+      // eslint-disable-next-line no-undef
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/login`, {
         email: data.email,
         password: data.password,
       });
@@ -53,7 +54,6 @@ const SignIn = () => {
         console.log('success');
 
         const token = response?.data.jwt; // Assuming the token is returned in response.data.jwt
-
         // Save token to localStorage
         localStorage.setItem('token', token);
 
@@ -78,10 +78,6 @@ const SignIn = () => {
     );
   };
 
-  // End Logic
-  // if (loading) {
-  //   return <Loading />;
-  // }
   return (
     <div>
       <div
@@ -96,10 +92,9 @@ const SignIn = () => {
             ></i>
             <div className='text-900 text-3xl font-medium mb-3'>Sign In</div>
           </div>
-          <div className='text-center mb-5'>
-            {/* <div className='text-900 text-3xl font-medium mb-3'>Login with</div> */}
+          {/* <div className='text-center mb-5'>
             <Google />
-          </div>
+          </div> */}
 
           <form onSubmit={handleSubmit(onSubmit)} className='flex flex-column gap-2'>
             <Toast ref={toast} />
@@ -190,6 +185,13 @@ const SignIn = () => {
               </div>
             </div>
           </form>
+          <div className='text-center'>
+            <div className='my-2'>Or login with</div>
+            <div className='flex justify-content-center align-items-center'>
+              <ButtonLoginFacebook />
+              <Google />
+            </div>
+          </div>
         </div>
       </div>
     </div>

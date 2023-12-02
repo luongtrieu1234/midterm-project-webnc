@@ -42,7 +42,8 @@ const SignUp = () => {
     setLoading(true); // Start loading state
 
     try {
-      const response = await axios.post('http://localhost:5000/users/signup', {
+      // eslint-disable-next-line no-undef
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/signup`, {
         fullname: data.fullname,
         email: data.email,
         password: data.password,
