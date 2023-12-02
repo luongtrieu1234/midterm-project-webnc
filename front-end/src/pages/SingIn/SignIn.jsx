@@ -16,6 +16,7 @@ import { ButtonLoginFacebook } from './conponents';
 
 const SignIn = () => {
   // Logic
+
   const [checked, setChecked] = useState(false);
 
   // eslint-disable-next-line no-unused-vars
@@ -61,7 +62,7 @@ const SignIn = () => {
         setTimeout(() => {
           window.location.href = '/home-page';
           reset();
-        }, 4000);
+        }, 2000);
       } else {
         show('Form submission failed', 'error');
         console.log('no success');

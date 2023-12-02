@@ -27,7 +27,7 @@ function ConfirmCode() {
   };
   const handleEnterClick = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/users/confirm-code', {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/confirm-code`, {
         code,
       });
       console.log('response: ', response.data);
@@ -35,7 +35,7 @@ function ConfirmCode() {
         showSuccess();
         setTimeout(() => {
           navigate('/reset-password');
-        }, 4000);
+        }, 2000);
       } else {
         console.log('error: ', response.data.message);
         showError();

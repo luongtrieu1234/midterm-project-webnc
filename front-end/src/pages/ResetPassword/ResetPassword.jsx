@@ -37,7 +37,7 @@ function ResetPassword() {
     }
     console.log('Passwords match');
     try {
-      const response = await axios.post('http://localhost:5000/users/reset', {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/reset`, {
         password,
         passwordConfirmed,
       });
@@ -47,7 +47,7 @@ function ResetPassword() {
         showSuccess();
         setTimeout(() => {
           navigate('/sign-in');
-        }, 4000);
+        }, 2000);
       } else {
         console.log('Password has not been reset');
         showError();

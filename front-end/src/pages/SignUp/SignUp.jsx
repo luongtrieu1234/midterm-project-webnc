@@ -51,19 +51,18 @@ const SignUp = () => {
       setLoading(false); // Start loading state
 
       if (response.status === 200 || response.status === 201) {
-        show('Form submitted successfully', 'success');
-        console.log('success');
+        show('Sign up successfully', 'success');
         // Redirect to signin page
         setTimeout(() => {
           navigate('/confirm-code-sign-up');
           reset();
-        }, 4000);
+        }, 2000);
       } else {
-        show('Form submission failed', 'error');
+        show('Sign up failed', 'error');
         console.log('no success');
       }
     } catch (error) {
-      show('Form submission failed', 'error');
+      show('Server Error', 'error');
       console.log('no success catch');
     }
   };
