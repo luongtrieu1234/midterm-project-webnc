@@ -59,7 +59,7 @@ export class AuthService {
 
   async signAccessToken(user: UserModel): Promise<string> {
     const payload = {
-      id: user.id,
+      // id: user.id,
       email: user.email,
     };
 
@@ -71,7 +71,7 @@ export class AuthService {
       email: user,
     };
 
-    return this.jwtService.sign(payload);
+    return await this.jwtService.sign(payload);
   }
 
   async confirmVerifyToken(token) {

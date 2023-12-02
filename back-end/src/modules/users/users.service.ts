@@ -4,7 +4,7 @@ import { join } from 'path';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { HttpCode, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -31,6 +31,7 @@ import { MailService } from '../../others/mail/mail.service';
 import { UserResetPasswordRequestDto } from './dto/user-reset-passowrd-request.dto';
 import { UserResetPasswordDto } from './dto/user-reset-passowrd.dto';
 import { SharedService } from 'src/others/auth/shared.service';
+import { UserConfirmCodeDto } from './dto/user-confirm-code.dto';
 
 @Injectable()
 export class UsersService {
@@ -52,15 +53,20 @@ export class UsersService {
     });
   }
 
-  async userSignup(userSignupRequestDto: UserSignupRequestDto) {
+  async userSignupRequest(userSignupRequestDto: UserSignupRequestDto) {
     const currentUser = await this.userModel.findOne({
       email: userSignupRequestDto.email,
     });
-    const emailToken = await this.authService.signVerifyToken(userSignupRequestDto.email);
-    await this.mailService.sendUserConfirmation('lexuantien07@gmail.com', emailToken);
     if (currentUser) {
       throw new BadRequestException('Email already signed up');
     }
+    const codeMail = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log(codeMail);
+    this.sharedService.setCode(codeMail);
+    // const emailToken = await this.authService.signVerifyToken(userResetPasswordRequestDto.email);
+    const emailToken = await this.authService.signVerifyToken(userSignupRequestDto.email);
+    this.sharedService.setToken(emailToken);
+    await this.mailService.sendUserConfirmation('lexuantien07@gmail.com', codeMail);
     const hashedPassword = await bcrypt.hash(userSignupRequestDto.password, 12);
 
     const user = await this.userModel.create({
@@ -72,6 +78,27 @@ export class UsersService {
     delete user.password;
 
     return user;
+  }
+
+  async userSignupActivate() {
+    const token = this.sharedService.getToken();
+    // if (!token) {
+    //   throw new BadRequestException('Confirmation fail');
+    // }
+    const data = await this.jwtService.verifyAsync(token);
+    if (!data) {
+      throw new UnauthorizedException();
+    }
+    const user = await this.userModel.findOne({
+      email: data['email'],
+    });
+    console.log(`check user resetPassword ${JSON.stringify(user)}`);
+    user.active = true;
+    user.save();
+    return {
+      message: 'success',
+      statusCode: HttpStatus.OK,
+    };
   }
 
   async userLogin(userLoginRequestDto: UserLoginRequestDto, response: Response) {
@@ -270,24 +297,52 @@ export class UsersService {
     if (!user) {
       throw new BadRequestException('Email not found');
     }
-
+    const codeMail = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log(codeMail);
+    this.sharedService.setCode(codeMail);
     const emailToken = await this.authService.signVerifyToken(userResetPasswordRequestDto.email);
-    await this.mailService.sendUserConfirmation('lexuantien07@gmail.com', emailToken);
-
+    this.sharedService.setToken(emailToken);
+    await this.mailService.sendUserResetPassword('lexuantien07@gmail.com', codeMail);
     return {
-      success: 'success',
+      message: 'success',
+      status: HttpStatus.OK,
     };
   }
 
+  async verifyCodeEmail(code: UserConfirmCodeDto) {
+    console.log('check query service ', code.code);
+
+    const token = this.sharedService.getCode();
+    if (!token) {
+      throw new BadRequestException('Code expired');
+    }
+    if (token !== code.code) {
+      throw new BadRequestException('Code confirmation fail');
+    }
+    return {
+      message: 'Verify success',
+      statusCode: HttpStatus.OK,
+    };
+
+    // const isValid = await this.authService.confirmVerifyToken(query.token);
+    // if (isValid)
+    //   return {
+    //     message: 'Verify success',
+    //   };
+    // return {
+    //   message: 'Verify fail',
+    // };
+  }
+
   async resetPassword(userResetPasswordDto: UserResetPasswordDto) {
+    const token = this.sharedService.getToken();
+    // if (!token) {
+    //   throw new BadRequestException('Confirmation fail');
+    // }
     if (userResetPasswordDto.password !== userResetPasswordDto.passwordConfirmed) {
       throw new BadRequestException('Confirmed password not match');
     }
     const hashedPassword = await bcrypt.hash(userResetPasswordDto.password, 12);
-    const token = this.sharedService.getToken();
-    if (!token) {
-      throw new BadRequestException('Confirmation fail');
-    }
     const data = await this.jwtService.verifyAsync(token);
     if (!data) {
       throw new UnauthorizedException();
@@ -298,5 +353,9 @@ export class UsersService {
     console.log(`check user resetPassword ${JSON.stringify(user)}`);
 
     await user.updateOne({ password: hashedPassword });
+    return {
+      success: 'success',
+      statusCode: HttpStatus.OK,
+    };
   }
 }

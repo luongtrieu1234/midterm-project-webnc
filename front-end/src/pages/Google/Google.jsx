@@ -91,6 +91,8 @@ const Google = () => {
           icon='pi pi-google'
           type='submit'
           style={{ minWidth: '10rem', backgroundColor: '#D0463B' }}
+          className='w-full'
+          severity='warning'
         />
       </div>
     </form>

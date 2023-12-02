@@ -9,6 +9,7 @@ export const UserSchema = new mongoose.Schema({
   phone: { type: String, default: '' }, // Set default value for phone
   address: { type: String, default: '' }, // Set default value for address
   job: { type: String, default: '' }, // Set default value for job
+  active: { type: Boolean, default: false }, // Set default value for job
   hobby: { type: [String], default: [] }, // Set default value for hobby
   roles: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   deletedAt: { type: Date, default: null }, // Set default value for deletedAt
@@ -26,6 +27,7 @@ export interface UserModel {
   phone: string;
   address: string;
   job: string;
+  active: boolean;
   hobby: string[];
   roles: string;
   deletedAt: Date;

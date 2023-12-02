@@ -1,0 +1,84 @@
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { Button } from 'primereact/button';
+import { InputText } from 'primereact/inputtext';
+
+function ResetPassword() {
+  const navigate = useNavigate();
+  const [password, setPassword] = useState('');
+  const [passwordConfirmed, setPasswordConfirmed] = useState('');
+  const [message, setMessage] = useState('');
+  console.log(message);
+
+  const handleChangePassword = async () => {
+    if (password !== passwordConfirmed) {
+      setMessage('Passwords do not match');
+      console.log('Passwords do not match');
+      return;
+    }
+    console.log('Passwords match');
+    try {
+      const response = await axios.post('http://localhost:5000/users/reset', {
+        password,
+        passwordConfirmed,
+      });
+      setMessage('Password has been reset');
+      if (response.data.statusCode === 200) {
+        console.log('Password has been reset');
+        setTimeout(() => {
+          navigate('/sign-in');
+        }, 4000);
+      } else {
+        console.log('Password has not been reset');
+      }
+    } catch (error) {
+      setMessage('Error resetting password');
+    }
+  };
+  return (
+    <div className='mt-8'>
+      <div className='flex align-items-center justify-content-center'>
+        <div className='surface-card p-4 shadow-2 border-round w-full lg:w-6'>
+          <div className='mb-5'>
+            <div className='text-center text-900 text-3xl font-medium mb-3'>
+              Change New Password
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor='password' className='block text-900 font-medium mb-2'>
+              New Password
+            </label>
+            <InputText
+              id='password'
+              type='password'
+              placeholder='Password'
+              className='w-full mb-3'
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <label htmlFor='password' className='block text-900 font-medium mb-2'>
+              Confirm Password
+            </label>
+            <InputText
+              id='passwordConfirmed'
+              type='password'
+              placeholder='Confirm Password'
+              className='w-full mb-3'
+              value={passwordConfirmed}
+              onChange={(e) => setPasswordConfirmed(e.target.value)}
+            />
+
+            <div className='flex align-items-center justify-content-end mr-4'>
+              <Button label='Change' className='w-2' onClick={handleChangePassword} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default ResetPassword;
