@@ -21,7 +21,7 @@ function ConfirmCode() {
     toast.current.show({
       severity: 'error',
       summary: 'Error',
-      detail: 'confirm code error',
+      detail: 'Confirm code error',
       life: 5000,
     });
   };

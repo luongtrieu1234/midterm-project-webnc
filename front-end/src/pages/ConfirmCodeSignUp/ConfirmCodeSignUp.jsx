@@ -21,7 +21,7 @@ function ConfirmCodeSignUp() {
     toast.current.show({
       severity: 'error',
       summary: 'Error',
-      detail: 'confirm code error',
+      detail: 'Confirm code error',
       life: 5000,
     });
   };
@@ -42,6 +42,7 @@ function ConfirmCodeSignUp() {
       }
     } catch (error) {
       console.error(error);
+      showError();
     }
   };
   return (

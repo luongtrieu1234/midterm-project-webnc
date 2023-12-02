@@ -58,8 +58,10 @@ const SignIn = () => {
         localStorage.setItem('token', token);
 
         // Redirect to signin page
-        window.location.href = '/home-page';
-        reset();
+        setTimeout(() => {
+          window.location.href = '/home-page';
+          reset();
+        }, 4000);
       } else {
         show('Form submission failed', 'error');
         console.log('no success');

@@ -54,8 +54,10 @@ const SignUp = () => {
         show('Form submitted successfully', 'success');
         console.log('success');
         // Redirect to signin page
-        navigate('/confirm-code-sign-up');
-        reset();
+        setTimeout(() => {
+          navigate('/confirm-code-sign-up');
+          reset();
+        }, 4000);
       } else {
         show('Form submission failed', 'error');
         console.log('no success');
