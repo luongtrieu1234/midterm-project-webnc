@@ -9,8 +9,8 @@ CLIENT_URL =https://midterm-project-webnc.vercel.app
 
 GOOGLE_CLIENT_ID=878057134936-53mt04srm2up80uakl50e6s888rhkasd.apps.googleusercontent.com
 GOOGLE_SECRET=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
-APP_ID=988291435630033
-APP_SECRET=f7323b192657d6c226c5ee474d7a46a8
+APP_ID=1311303986158841
+APP_SECRET=41da472f29c6777d0450fce5bbdf624d
 # mail
 MAIL_HOST=smtp.gmail.com
 MAIL_USER=lexuantien07@gmail.com
