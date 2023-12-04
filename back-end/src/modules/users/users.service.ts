@@ -109,6 +109,9 @@ export class UsersService {
     if (!user) {
       throw new BadRequestException('Email not found');
     }
+    if (user.active !== true) {
+      throw new BadRequestException('Email has registered but not active');
+    }
 
     if (!(await bcrypt.compare(userLoginRequestDto.password, user.password))) {
       throw new BadRequestException('invalid credentials');
