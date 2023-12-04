@@ -358,4 +358,34 @@ export class UsersService {
       statusCode: HttpStatus.OK,
     };
   }
+
+  async verifyCodeEmailActivate(code: UserConfirmCodeDto) {
+    console.log('check query service ', code.code);
+
+    const token = this.sharedService.getCode();
+    if (!token) {
+      throw new BadRequestException('Code expired');
+    }
+    if (token !== code.code) {
+      throw new BadRequestException('Code confirmation fail');
+    }
+
+    const tokenUser = this.sharedService.getToken();
+    // if (!token) {
+    //   throw new BadRequestException('Confirmation fail');
+    // }
+    const data = await this.authService.confirmVerifyToken(tokenUser);
+    if (!data) {
+      throw new UnauthorizedException();
+    }
+    const user = await this.userModel.findOne({
+      email: data['email'],
+    });
+    user.active = true;
+    user.save();
+    return {
+      message: 'success',
+      statusCode: HttpStatus.OK,
+    };
+  }
 }

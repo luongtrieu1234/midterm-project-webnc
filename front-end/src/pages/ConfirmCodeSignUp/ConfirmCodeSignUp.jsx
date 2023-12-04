@@ -27,9 +27,12 @@ function ConfirmCodeSignUp() {
   };
   const handleEnterClick = async () => {
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/confirm-code`, {
-        code,
-      });
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/users/confirm-code-sign-up`,
+        {
+          code,
+        }
+      );
       console.log('response: ', response.data);
       if (response.data.statusCode === 200) {
         showSuccess();

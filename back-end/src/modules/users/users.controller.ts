@@ -203,4 +203,9 @@ export class UsersController {
   async confirmCodeMail(@Body() code: UserConfirmCodeDto) {
     return await this.usersService.verifyCodeEmail(code);
   }
+
+  @Post('/confirm-code-sign-up')
+  async confirmCodeMailSignup(@Body() code: UserConfirmCodeDto) {
+    return await this.usersService.verifyCodeEmailActivate(code);
+  }
 }
