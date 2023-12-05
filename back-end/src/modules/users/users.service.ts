@@ -66,7 +66,7 @@ export class UsersService {
     // const emailToken = await this.authService.signVerifyToken(userResetPasswordRequestDto.email);
     const emailToken = await this.authService.signVerifyToken(userSignupRequestDto.email);
     this.sharedService.setToken(emailToken);
-    await this.mailService.sendUserConfirmation('lexuantien07@gmail.com', codeMail);
+    await this.mailService.sendUserConfirmation(userSignupRequestDto.email, codeMail);
     const hashedPassword = await bcrypt.hash(userSignupRequestDto.password, 12);
 
     const user = await this.userModel.create({
@@ -260,6 +260,46 @@ export class UsersService {
     };
   }
 
+  async facebookLogin(user) {
+    if (!user) {
+      throw new BadRequestException('No user from Facebook');
+    }
+
+    console.log('check facebook user ', user);
+    const userExits = await this.findUserByEmail(user.email);
+    let result = null;
+    if (!userExits) {
+      // throw new BadRequestException('User not found');
+      const fullname = `${user.firstName} ${user.lastName}`;
+      const newUser = await this.userModel.create({
+        fullname: fullname,
+        email: user.email,
+      });
+
+      const { password, ...rest } = newUser;
+      result = rest;
+    }
+    const currentUser = await this.findUserByEmail(user.email);
+    console.log('check user login facebook ', currentUser);
+    const accessToken = await this.authService.signAccessToken(currentUser);
+
+    return {
+      message: 'User information from facebook',
+      user: {
+        email: currentUser.email,
+        password: currentUser.password,
+        fullname: currentUser.fullname,
+        gender: currentUser.gender,
+        dob: currentUser.dob,
+        phone: currentUser.phone,
+        address: currentUser.address,
+        job: currentUser.job,
+        hobby: currentUser.hobby,
+      },
+      accessToken: accessToken,
+    };
+  }
+
   async verifyEmail(query) {
     console.log('check query service ', JSON.stringify(query));
     const isValid = await this.authService.verifyToken(query.token);
@@ -285,7 +325,7 @@ export class UsersService {
     this.sharedService.setCode(codeMail);
     const emailToken = await this.authService.signVerifyToken(userResetPasswordRequestDto.email);
     this.sharedService.setToken(emailToken);
-    await this.mailService.sendUserResetPassword('lexuantien07@gmail.com', codeMail);
+    await this.mailService.sendUserResetPassword(userResetPasswordRequestDto.email, codeMail);
     return {
       message: 'success',
       status: HttpStatus.OK,

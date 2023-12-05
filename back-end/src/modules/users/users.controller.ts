@@ -145,10 +145,9 @@ export class UsersController {
     // return this.usersService.googleLogin(req);
 
     const googleLoginResponse = await this.usersService.googleLogin(req);
-    const redirectUrl = `http://localhost:3000/sign-in-google?jwt=${googleLoginResponse.accessToken}`;
+    const redirectUrl = `${process.env.CLIENT_URL}/sign-in-google?jwt=${googleLoginResponse.accessToken}`;
 
     return res.redirect(redirectUrl);
-    // return googleLoginResponse;
   }
 
   @Get('facebook')
@@ -157,12 +156,10 @@ export class UsersController {
 
   @Get('facebook/callback')
   @UseGuards(AuthGuard('facebook'))
-  async facebookLoginRedirect(@Req() req: Request) {
-    console.log(JSON.stringify(req));
-    return {
-      statusCode: HttpStatus.OK,
-      data: req.user,
-    };
+  async facebookLoginRedirect(@Req() req: Request, @Res() res: Response) {
+    const facebookLoginResponse = await this.usersService.facebookLogin(req.user);
+    const redirectUrl = `${process.env.CLIENT_URL}/sign-in-google?jwt=${facebookLoginResponse.accessToken}`;
+    return res.redirect(redirectUrl);
   }
 
   @Get('/confirm-reset-password')

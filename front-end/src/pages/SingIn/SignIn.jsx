@@ -4,7 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 
 import { Link } from 'react-router-dom';
 
-import axios from 'axios'; // Import Axios library
+import axios from 'axios';
 
 import { Button } from 'primereact/button';
 import { classNames } from 'primereact/utils';
@@ -12,10 +12,11 @@ import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
 import { Checkbox } from 'primereact/checkbox';
 import Google from '../Google/Google';
-// import Loading from '../../components/Loading';
+import { ButtonLoginFacebook } from './conponents';
 
 const SignIn = () => {
   // Logic
+
   const [checked, setChecked] = useState(false);
 
   // eslint-disable-next-line no-unused-vars
@@ -42,7 +43,8 @@ const SignIn = () => {
   const onSubmit = async (data) => {
     setLoading(true); // Start loading state
     try {
-      const response = await axios.post('http://localhost:5000/users/login', {
+      // eslint-disable-next-line no-undef
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/login`, {
         email: data.email,
         password: data.password,
       });
@@ -53,13 +55,14 @@ const SignIn = () => {
         console.log('success');
 
         const token = response?.data.jwt; // Assuming the token is returned in response.data.jwt
-
         // Save token to localStorage
         localStorage.setItem('token', token);
 
         // Redirect to signin page
-        window.location.href = '/home-page';
-        reset();
+        setTimeout(() => {
+          window.location.href = '/home-page';
+          reset();
+        }, 2000);
       } else {
         show('Form submission failed', 'error');
         console.log('no success');
@@ -78,10 +81,6 @@ const SignIn = () => {
     );
   };
 
-  // End Logic
-  // if (loading) {
-  //   return <Loading />;
-  // }
   return (
     <div>
       <div
@@ -89,17 +88,16 @@ const SignIn = () => {
         style={{ backgroundColor: 'rgba(0,0,0,0.05)' }}
       >
         <div className='surface-card p-4 shadow-2 border-round w-full lg:w-6'>
-          <div className='text-center mb-5'>
+          <div className='text-center mb-3'>
             <i
               className='pi pi-user mb-3'
               style={{ fontSize: '2.5rem', color: 'var(--primary-color)' }}
             ></i>
-            <div className='text-900 text-3xl font-medium mb-3'>Sign In</div>
+            <div className='text-900 text-3xl font-medium mb-2'>Sign In</div>
           </div>
-          <div className='text-center mb-5'>
-            {/* <div className='text-900 text-3xl font-medium mb-3'>Login with</div> */}
+          {/* <div className='text-center mb-5'>
             <Google />
-          </div>
+          </div> */}
 
           <form onSubmit={handleSubmit(onSubmit)} className='flex flex-column gap-2'>
             <Toast ref={toast} />
@@ -159,7 +157,7 @@ const SignIn = () => {
               )}
             />
             <div>
-              <div className='flex align-items-center justify-content-between mb-6'>
+              <div className='flex align-items-center justify-content-between mb-3'>
                 <div className='flex align-items-center'>
                   <Checkbox
                     id='rememberme'
@@ -179,7 +177,7 @@ const SignIn = () => {
 
               <Button label='Sign In' icon='pi pi-user' type='submit' className='w-full' />
 
-              <div className='text-center mt-5'>
+              <div className='text-center mt-3'>
                 <span className='text-600 font-medium line-height-3'>Don't have an account?</span>
                 <Link
                   to='/sign-up'
@@ -190,6 +188,14 @@ const SignIn = () => {
               </div>
             </div>
           </form>
+          <hr className='mx-2 border-left-1 border-bottom-none border-100 mt-3' />
+          <div className='text-center mt-3 mb-5'>
+            <div className='my-2'>Or login with</div>
+            <div className='flex justify-content-center align-items-center mt-3 gap-3'>
+              <ButtonLoginFacebook></ButtonLoginFacebook>
+              <Google />
+            </div>
+          </div>
         </div>
       </div>
     </div>

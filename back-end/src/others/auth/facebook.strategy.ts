@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, Profile, VerifyCallback } from 'passport-facebook';
+import { Strategy, Profile } from 'passport-facebook';
 
 import { config } from 'dotenv';
 
@@ -12,25 +12,22 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
     super({
       clientID: process.env.APP_ID,
       clientSecret: process.env.APP_SECRET,
-      callbackURL: 'http://127.0.0.1:5000/users/facebook/callback',
+      callbackURL: `${process.env.SERVER_URL}/users/facebook/callback`,
       scope: 'email',
 
       profileFields: ['emails', 'name'],
     });
   }
 
-  async validate(
-    accessToken: string,
-    refreshToken: string,
-    profile: Profile,
-    done: VerifyCallback,
-  ): Promise<VerifyCallback> {
+  async validate(accessToken: string, refreshToken: string, profile: Profile, done: any) {
     try {
-      const { photos, name, id } = profile;
+      const { photos, name, id, emails } = profile;
+      // console.log('FacebookStrategy-validate, profile:', profile);
 
       const user = {
         facebookId: id,
-        photo: photos[0].value,
+        // photo: photos[0].value,
+        email: emails[0].value,
         firstName: name.familyName,
         lastName: name.givenName,
         accessToken,

@@ -26,10 +26,12 @@ import { AuthGuardCustom } from './others/auth/auth.guard';
     RoleModule,
     GradeModule,
     MailModule,
-    NestjsConfigModule.forRoot({ isGlobal: true }),
+    NestjsConfigModule.forRoot({
+      envFilePath: ['.env', '.env.pro'],
+      isGlobal: true,
+    }),
     MongooseModule.forRoot('mongodb+srv://admin1:admin1@cluster0.1npefek.mongodb.net/midterm'),
     JwtModule,
-    // ConfigModule,
   ],
   controllers: [AppController],
   providers: [

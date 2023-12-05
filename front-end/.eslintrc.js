@@ -14,6 +14,8 @@ module.exports = {
     {
       env: {
         node: true,
+        browser: true,
+        es6: true,
       },
       files: ['.eslintrc.{js,cjs,jsx}'],
       parserOptions: {
@@ -26,6 +28,9 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: ['react'],
+  globals: {
+    process: 'readonly',
+  },
   rules: {
     indent: ['error', 2],
     // "linebreak-style": ["error", "unix"],

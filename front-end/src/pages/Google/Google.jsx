@@ -5,19 +5,11 @@ import { useForm } from 'react-hook-form';
 
 // import { Link } from 'react-router-dom';
 
-// import axios from 'axios'; // Import Axios library
-
 import { Button } from 'primereact/button';
-// import { classNames } from 'primereact/utils';
 import { Toast } from 'primereact/toast';
-// import { InputText } from 'primereact/inputtext';
-// import { Checkbox } from 'primereact/checkbox';
-// import Loading from '../../components/Loading';
 
 const Google = () => {
   // Logic
-  // const [checked, setChecked] = useState(false);
-
   // eslint-disable-next-line no-unused-vars
   const [loading, setLoading] = useState(false);
   // const [token, setToken] = useState('');
@@ -44,38 +36,12 @@ const Google = () => {
     password: '',
   };
 
-  const {
-    // control,
-    // formState: { errors },
-    handleSubmit,
-    // reset,
-  } = useForm({ defaultValues });
+  const { handleSubmit } = useForm({ defaultValues });
 
   const onSubmit = async () => {
     setLoading(true); // Start loading state
     try {
-      window.open('http://localhost:5000/users/google/', '_self', 'width=600,height=600');
-      // const response = await axios.get('http://localhost:5000/users/google', {
-      //   withCredentials: true,
-      // });
-      // setLoading(false)
-
-      // if (response.status === 200) {
-      //   show('Form submitted successfully', 'success');
-      //   console.log('success');
-
-      //   const token = response?.data.jwt; // Assuming the token is returned in response.data.jwt
-
-      //   // Save token to localStorage
-      //   localStorage.setItem('token', token);
-
-      // Redirect to signin page
-      // window.location.href = '/home-page';
-      //   reset();
-      // } else {
-      //   show('Form submission failed', 'error');
-      //   console.log('no success');
-      // }
+      window.open(`${process.env.REACT_APP_API_URL}/users/google`, '_self', 'width=600,height=600');
     } catch (error) {
       show('Form submission failed', 'error');
       console.log('no success catch', error);
@@ -87,9 +53,10 @@ const Google = () => {
       <Toast ref={toast} />
       <div>
         <Button
-          label='Login with Google'
-          icon='pi pi-user'
+          label='Google'
+          icon='pi pi-google'
           type='submit'
+          style={{ minWidth: '10rem', backgroundColor: '#D0463B' }}
           className='w-full'
           severity='warning'
         />

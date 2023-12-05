@@ -27,13 +27,15 @@ function SearchEmail() {
   };
   const handleNextClick = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/users/reset-request', { email });
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/reset-request`, {
+        email,
+      });
       console.log('response: ', response.data);
       if (response.data.status === 200) {
         showSuccess();
         setTimeout(() => {
           navigate('/confirm-code');
-        }, 4000);
+        }, 2000);
       } else {
         console.log('error: ', response.data.message);
         showError();

@@ -5,7 +5,7 @@ import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 
-function ConfirmCode() {
+function ConfirmCodeSignUp() {
   const navigate = useNavigate();
   const [code, setCode] = useState('');
   const toast = useRef(null);
@@ -34,7 +34,7 @@ function ConfirmCode() {
       if (response.data.statusCode === 200) {
         showSuccess();
         setTimeout(() => {
-          navigate('/reset-password');
+          navigate('/sign-in');
         }, 2000);
       } else {
         console.log('error: ', response.data.message);
@@ -42,6 +42,7 @@ function ConfirmCode() {
       }
     } catch (error) {
       console.error(error);
+      showError();
     }
   };
   return (
@@ -77,4 +78,4 @@ function ConfirmCode() {
   );
 }
 
-export default ConfirmCode;
+export default ConfirmCodeSignUp;

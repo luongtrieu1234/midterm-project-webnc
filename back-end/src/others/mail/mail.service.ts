@@ -7,7 +7,7 @@ export class MailService {
   constructor(private mailerService: MailerService) {}
 
   async sendUserConfirmation(email: string, token: string) {
-    const url = `http://localhost:5000/users/confirm-signup?token=${token}`;
+    const url = `${process.env.SERVER_URL}/users/confirm-signup?token=${token}`;
 
     await this.mailerService.sendMail({
       to: email,
@@ -29,7 +29,7 @@ export class MailService {
   }
 
   async sendUserResetPassword(email: string, token: string) {
-    const url = `http://localhost:5000/users/confirm-reset-password?token=${token}`;
+    const url = `${process.env.SERVER_URL}/users/confirm-reset-password?token=${token}`;
 
     await this.mailerService.sendMail({
       to: email,
