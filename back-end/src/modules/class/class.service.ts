@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -27,7 +27,7 @@ export class ClassService {
   constructor(
     // @Inject('UserRepository')
     // private readonly userRepository: typeof User,
-    private jwtService: JwtService,
+    // private jwtService: JwtService,
     private authService: AuthService,
     private mailService: MailService,
     private sharedService: SharedService,
@@ -35,8 +35,8 @@ export class ClassService {
     private readonly userModel: Model<UserModel>,
     @InjectModel('Class')
     private readonly classModel: Model<ClassModel>, // @InjectModel('User')
-  ) // private readonly userModel: Model<UserModel>,
-  {}
+    // private readonly userModel: Model<UserModel>,
+  ) {}
 
   async createClass(createClassDto: CreateOrUpdateClassDto) {
     const currentClass = await this.classModel.findOne({
@@ -53,6 +53,7 @@ export class ClassService {
   }
 
   async updateClass(updateClassDto: CreateOrUpdateClassDto) {
+    console.log('check updateClassDto ', updateClassDto);
     const currentClass = await this.classModel.findOne({
       name: updateClassDto.name,
     });
@@ -60,5 +61,47 @@ export class ClassService {
     if (!currentClass) {
       throw new BadRequestException('Class not found');
     }
+    if (updateClassDto.students) {
+      updateClassDto.students?.map(async (student) => {
+        const studentAdd = await this.userModel.findOne({
+          email: student.email,
+        });
+        if (studentAdd && !currentClass.students.includes(studentAdd._id.toString())) {
+          await currentClass.students.push(studentAdd._id.toString());
+          await currentClass.save();
+        }
+      });
+    }
+    if (updateClassDto.teachers) {
+      updateClassDto.teachers?.map(async (teacher) => {
+        const teacherAdd = await this.userModel.findOne({
+          email: teacher.email,
+        });
+        if (teacherAdd && !currentClass.teachers.includes(teacherAdd._id.toString())) {
+          await currentClass.teachers.push(teacherAdd._id.toString());
+          await currentClass.save();
+        }
+      });
+    }
+    const populatedClass = await this.classModel
+      .findById(currentClass._id)
+      .populate('students')
+      .populate('teachers')
+      .exec();
+    console.log('Populated Class:', populatedClass);
+
+    return {
+      message: 'success',
+      classes: populatedClass,
+      statusCode: HttpStatus.OK,
+    };
+  }
+
+  async getListClasses() {
+    return await this.classModel.find().populate('students').populate('teachers').exec();
+  }
+
+  async sendInvite() {
+    return 'a';
   }
 }

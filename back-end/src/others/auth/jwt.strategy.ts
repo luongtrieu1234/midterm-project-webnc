@@ -11,8 +11,8 @@ import { AuthService } from './auth.service';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    // @InjectModel('User')
-    // private readonly userModel: Model<UserModel>,
+    @InjectModel('User')
+    private readonly userModel: Model<UserModel>,
     private authSerVice: AuthService,
   ) {
     super({
@@ -21,7 +21,23 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any) {
-    return { userId: payload.sub, username: payload.username };
+  async validate(payload: any, done: VerifiedCallback): Promise<any> {
+    console.log('validate ', payload);
+    const user = await this.getUserByEmail(payload.email);
+    // const status = user?.status ?? '';
+    // if (status !== UserStatus.ACTIVE && status !== UserStatus.PENDING) {
+    //   return done(new HttpException({}, HttpStatus.UNAUTHORIZED), false);
+    // }
+    const context = {
+      user,
+    };
+    return done(null, user, payload.iat);
+    // return user;
+  }
+
+  private async getUserByEmail(email: string): Promise<UserModel> {
+    return await this.userModel.findOne({
+      email: email,
+    });
   }
 }

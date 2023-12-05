@@ -24,6 +24,7 @@ import { CreateOrUpdateClassDto } from './dto/create-class.dto';
 import { Roles } from '../role/role.decorator';
 import { UserRole } from '../role/roles.enum';
 import { RoleGuard } from '../role/role.guard';
+import { AuthGuardCustom } from 'src/others/auth/auth.guard';
 
 @Controller('class')
 @ApiTags('class')
@@ -32,11 +33,11 @@ export class ClassController {
   constructor(
     private readonly classService: ClassService,
     private authService: AuthService,
-    private sharedService: SharedService,
-    private jwtService: JwtService,
+    private sharedService: SharedService, // private jwtService: JwtService,
   ) {}
 
   @Post()
+  @UseGuards(AuthGuardCustom)
   // @Roles(UserRole.TEACHER)
   // @UseGuards(RoleGuard)
   @HttpCode(201)
@@ -45,8 +46,21 @@ export class ClassController {
   }
 
   @Patch('update')
+  @UseGuards(AuthGuardCustom)
   @HttpCode(200)
   async updateClass(@Body() updateClassDto: CreateOrUpdateClassDto) {
     return await this.classService.updateClass(updateClassDto);
+  }
+
+  @Get('all')
+  @HttpCode(200)
+  async getListClasses() {
+    return await this.classService.getListClasses();
+  }
+
+  @Post('invite')
+  @HttpCode(200)
+  async sendInvite() {
+    return await this.classService.sendInvite();
   }
 }

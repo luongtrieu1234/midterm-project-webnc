@@ -14,6 +14,8 @@ import { RoleModule } from './modules/role/role.module';
 import { GradeModule } from './modules/grade/grade.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RoleGuard } from './modules/role/role.guard';
+import { JwtStrategy } from './others/auth/jwt.strategy';
+import { AuthGuardCustom } from './others/auth/auth.guard';
 // import { ConfigModule } from './config/config.module';
 
 @Module({
@@ -34,11 +36,11 @@ import { RoleGuard } from './modules/role/role.guard';
     AppService,
     GoogleStrategy,
     FacebookStrategy,
-
-    {
-      provide: APP_GUARD,
-      useClass: RoleGuard,
-    },
+    JwtStrategy,
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AuthGuardCustom,
+    // },
   ],
 })
 export class AppModule {}

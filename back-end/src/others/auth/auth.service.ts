@@ -74,9 +74,9 @@ export class AuthService {
     return await this.jwtService.sign(payload);
   }
 
-  async confirmVerifyToken(token) {
+  async verifyToken(token) {
     try {
-      console.log(`check token `, token);
+      console.log(`check token verifyToken Auth`, token);
       return await this.jwtService.verifyAsync(token);
     } catch (err) {
       console.log('Error token ', err);

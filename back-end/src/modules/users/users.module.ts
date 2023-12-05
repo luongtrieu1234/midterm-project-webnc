@@ -18,10 +18,11 @@ import { SharedService } from 'src/others/auth/shared.service';
     AuthModule,
     MailModule,
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
-    JwtModule.register({
-      secret: 'secret-key',
-      signOptions: { expiresIn: '1d' },
-    }),
+    // JwtModule,
+    // JwtModule.register({
+    //   secret: 'secret-key',
+    //   signOptions: { expiresIn: '1d' },
+    // }),
   ],
   controllers: [UsersController],
   providers: [

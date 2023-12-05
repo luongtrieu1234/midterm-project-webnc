@@ -17,10 +17,10 @@ import { UserModel, UserSchema } from '../users/users.model';
     MailModule,
     UserModule,
     MongooseModule.forFeature([{ name: 'Class', schema: ClassSchema }]),
-    JwtModule.register({
-      secret: 'secret-key',
-      signOptions: { expiresIn: '1d' },
-    }),
+    // JwtModule.register({
+    //   secret: 'secret-key',
+    //   signOptions: { expiresIn: '1d' },
+    // }),
   ],
   controllers: [ClassController],
   providers: [ClassService, SharedService],
