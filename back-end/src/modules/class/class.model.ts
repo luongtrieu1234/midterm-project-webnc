@@ -2,8 +2,15 @@ import * as mongoose from 'mongoose';
 
 export const ClassSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  teachers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  students: [{
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    role: { type: mongoose.Schema.Types.ObjectId, ref: 'Role' }
+  }],
+  teachers: [{
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    role: { type: mongoose.Schema.Types.ObjectId, ref: 'Role' }
+  }],
   grades: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Grade' }],
   deletedAt: { type: Date, default: null }, // Set default value for deletedAt
   createdAt: { type: Date, default: Date.now }, // Set default value for createdAt to the current date and time
@@ -13,8 +20,9 @@ export const ClassSchema = new mongoose.Schema({
 export interface ClassModel {
   id: string;
   name: string;
-  students: string[];
-  teachers: string[];
+  owner: string;
+  students: { user: string; role: string }[];
+  teachers: { user: string; role: string }[];
   grades: number[];
   deletedAt: Date;
   createdAt: Date;

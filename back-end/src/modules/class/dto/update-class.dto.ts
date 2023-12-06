@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
@@ -12,18 +12,16 @@ class TeacherDto {
   @IsString()
   email: string;
 }
-export class CreateClassDto {
-  @ApiProperty()
+export class UpdateClassDto {
+  @ApiProperty({ required: true })
   @IsNotEmpty()
   readonly name: string;
 
   @ApiProperty({
-    // type: () => StudentDto,
-    // isArray: true,
-    type: [StudentDto],
+    type: () => StudentDto,
+    isArray: true,
     required: false,
   })
-  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => StudentDto)
@@ -34,7 +32,6 @@ export class CreateClassDto {
     isArray: true,
     required: false,
   })
-  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => TeacherDto)

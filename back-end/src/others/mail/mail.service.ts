@@ -11,7 +11,7 @@ export class MailService {
 
     await this.mailerService.sendMail({
       to: email,
-      // from: '"Support Team" <support@example.com>', // override default from
+      from: '"Support Team" <classroom@gmail.com>', // override default from
       subject: 'Welcome! Confirm your Email',
       context: {
         // ✏️ filling curly brackets with content
@@ -33,7 +33,7 @@ export class MailService {
 
     await this.mailerService.sendMail({
       to: email,
-      // from: '"Support Team" <support@example.com>', // override default from
+      from: '"Support Team" <classroom@gmail.com>', // override default from
       subject: 'Welcome! Confirm your Email',
       context: {
         // ✏️ filling curly brackets with content
@@ -44,6 +44,56 @@ export class MailService {
       <p>Vui lòng nhập mã xác nhận bên dưới để đặt lại mật khẩu:</p>
       <p>
           <b>${token}</b>
+      </p>
+      <p>Mã xác nhận có hiệu lực trong vòng 15 phút</p>
+      `,
+    });
+
+    return { message: 'success' };
+  }
+
+  async sendInvitationTeacher(email: string, token: string, className: string) {
+    const url = `${process.env.CLIENT_URL}/class/invitation?token=${token}`;
+
+    await this.mailerService.sendMail({
+      to: email,
+      from: '"Support Team" <classroom@gmail.com>', // override default from
+      subject: `Lời mời cùng dạy lớp: "${className}"`,
+      context: {
+        // ✏️ filling curly brackets with content
+        email: email,
+        url,
+      },
+      html: `<p>Chào ${email},</p>
+      <p>Bạn đã được mời cùng dạy</p>
+      <p>${className}</p>
+      <p>
+          <a href=${url}>Chấp nhận lời mời<a/>
+      </p>
+      <p>Mã xác nhận có hiệu lực trong vòng 15 phút</p>
+      `,
+    });
+
+    return { message: 'success' };
+  }
+
+  async sendInvitationStudent(email: string, token: string, className: string) {
+    const url = `${process.env.CLIENT_URL}/class/invitation?token=${token}`;
+
+    await this.mailerService.sendMail({
+      to: email,
+      from: '"Support Team" <classroom@gmail.com>', // override default from
+      subject: `Lời mời tham gia lớp học: "${className}"`,
+      context: {
+        // ✏️ filling curly brackets with content
+        email: email,
+        url,
+      },
+      html: `<p>Chào ${email},</p>
+      <p>Bạn đã được mời tham gia</p>
+      <p>${className}</p>
+      <p>
+          <a href=${url}>Chấp nhận lời mời<a/>
       </p>
       <p>Mã xác nhận có hiệu lực trong vòng 15 phút</p>
       `,

@@ -18,9 +18,12 @@ import {
 import { Response, Request } from 'express';
 import { MailService } from '../../others/mail/mail.service';
 import { SharedService } from 'src/others/auth/shared.service';
-import { CreateOrUpdateClassDto } from './dto/create-class.dto';
+import { CreateClassDto } from './dto/create-class.dto';
+import { UpdateClassDto } from './dto/update-class.dto';
 import { UserModel } from '../users/users.model';
 import { ClassModel } from './class.model';
+import { SendInvitationDto } from './dto/send-invitation.dto';
+import { RoleModel } from '../role/role.model';
 
 @Injectable()
 export class ClassService {
@@ -34,11 +37,12 @@ export class ClassService {
     @InjectModel('User')
     private readonly userModel: Model<UserModel>,
     @InjectModel('Class')
-    private readonly classModel: Model<ClassModel>, // @InjectModel('User')
-    // private readonly userModel: Model<UserModel>,
+    private readonly classModel: Model<ClassModel>,
+    @InjectModel('Role')
+    private readonly roleModel: Model<RoleModel>,
   ) {}
 
-  async createClass(createClassDto: CreateOrUpdateClassDto) {
+  async createClass(createClassDto: CreateClassDto) {
     const currentClass = await this.classModel.findOne({
       name: createClassDto.name,
     });
@@ -52,7 +56,7 @@ export class ClassService {
     return newClass;
   }
 
-  async updateClass(updateClassDto: CreateOrUpdateClassDto) {
+  async addUsersToClass(updateClassDto: UpdateClassDto) {
     console.log('check updateClassDto ', updateClassDto);
     const currentClass = await this.classModel.findOne({
       name: updateClassDto.name,
@@ -62,26 +66,43 @@ export class ClassService {
       throw new BadRequestException('Class not found');
     }
     if (updateClassDto.students) {
-      updateClassDto.students?.map(async (student) => {
+      const studentRole = await this.roleModel.findOne({
+        name: 'student'
+      });
+      const promises = updateClassDto.students?.map(async (student) => {
         const studentAdd = await this.userModel.findOne({
           email: student.email,
         });
-        if (studentAdd && !currentClass.students.includes(studentAdd._id.toString())) {
-          await currentClass.students.push(studentAdd._id.toString());
-          await currentClass.save();
+        if (studentAdd && !currentClass.students.some(existingStudent  => 
+          existingStudent.user.toString() === studentAdd._id.toString() &&
+          existingStudent.role.toString() === studentRole._id.toString()
+        )) {
+          currentClass.students.push({
+            user: studentAdd._id.toString(), role: studentRole._id.toString()
+          });
+          return currentClass.save();
         }
       });
+      await Promise.all(promises);
     }
     if (updateClassDto.teachers) {
-      updateClassDto.teachers?.map(async (teacher) => {
+      const teacherRole = await this.roleModel.findOne({
+        name: 'teacher'
+      });
+      const promises = updateClassDto.teachers?.map(async (teacher) => {
         const teacherAdd = await this.userModel.findOne({
           email: teacher.email,
         });
-        if (teacherAdd && !currentClass.teachers.includes(teacherAdd._id.toString())) {
-          await currentClass.teachers.push(teacherAdd._id.toString());
-          await currentClass.save();
+        if (teacherAdd && !currentClass.teachers.includes({
+          user: teacherAdd._id.toString(), role: teacherRole._id.toString()
+        })) {
+          currentClass.teachers.push({
+            user: teacherAdd._id.toString(), role: teacherRole._id.toString()
+          });
+          return currentClass.save();
         }
       });
+      await Promise.all(promises);
     }
     const populatedClass = await this.classModel
       .findById(currentClass._id)
@@ -101,7 +122,33 @@ export class ClassService {
     return await this.classModel.find().populate('students').populate('teachers').exec();
   }
 
-  async sendInvite() {
-    return 'a';
+  async getListClassesOwn(userId: string) {
+    const classes = await this.classModel.find({
+      owner: userId,
+    })
+  }
+
+  async getListClassUsers(classId: string) {
+    return await this.classModel.find({
+      id: classId,
+    }).populate('students').populate('teachers').exec();
+  }
+
+  async sendInvite(sendInvitationDto: SendInvitationDto) {
+    const emailToken = await this.authService.signVerifyToken(sendInvitationDto.email);
+    this.sharedService.setToken(emailToken);
+    await this.mailService.sendInvitationTeacher('lexuantien07@gmail.com', emailToken, 'a');
+    return {
+      message: 'success',
+      statusCode: HttpStatus.OK,
+    }
+  }
+
+  async acceptInvitation(body) {
+    console.log('body ', body)
+    return {
+      message: 'success',
+      statusCode: HttpStatus.OK,
+    }
   }
 }

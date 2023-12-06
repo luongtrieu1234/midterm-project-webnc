@@ -66,7 +66,7 @@ export class UsersService {
     // const emailToken = await this.authService.signVerifyToken(userResetPasswordRequestDto.email);
     const emailToken = await this.authService.signVerifyToken(userSignupRequestDto.email);
     this.sharedService.setToken(emailToken);
-    await this.mailService.sendUserConfirmation(userSignupRequestDto.email, codeMail);
+    // await this.mailService.sendUserConfirmation(userSignupRequestDto.email, codeMail);
     const hashedPassword = await bcrypt.hash(userSignupRequestDto.password, 12);
 
     const user = await this.userModel.create({

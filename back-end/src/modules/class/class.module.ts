@@ -10,12 +10,14 @@ import { MailModule } from 'src/others/mail/mail.module';
 import { SharedService } from 'src/others/auth/shared.service';
 import { UserModule } from '../users/users.module';
 import { UserModel, UserSchema } from '../users/users.model';
+import { RoleModule } from '../role/role.module';
 
 @Module({
   imports: [
     AuthModule,
     MailModule,
     UserModule,
+    RoleModule,
     MongooseModule.forFeature([{ name: 'Class', schema: ClassSchema }]),
     // JwtModule.register({
     //   secret: 'secret-key',
