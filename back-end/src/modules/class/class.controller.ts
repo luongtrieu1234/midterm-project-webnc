@@ -27,6 +27,7 @@ import { UserRole } from '../role/roles.enum';
 import { RoleGuard } from '../role/role.guard';
 import { AuthGuardCustom } from 'src/others/auth/auth.guard';
 import { SendInvitationDto } from './dto/send-invitation.dto';
+import { Param } from '@nestjs/common';
 
 @Controller('class')
 @ApiTags('class')
@@ -43,8 +44,10 @@ export class ClassController {
   // @Roles(UserRole.TEACHER)
   // @UseGuards(RoleGuard)
   @HttpCode(201)
-  async createClass(@Body() createClassDto: CreateClassDto) {
-    return await this.classService.createClass(createClassDto);
+  async createClass(
+    @Req() req,
+    @Body() createClassDto: CreateClassDto) {
+    return await this.classService.createClass(req.user.id, createClassDto);
   }
 
   @Patch('update')
@@ -56,43 +59,69 @@ export class ClassController {
 
   @Get('all')
   @UseGuards(AuthGuardCustom)
-  @Roles(UserRole.TEACHER)
-  // @UseGuards(RoleGuard)
+  // @Roles(UserRole.TEACHER)
   @HttpCode(200)
   async getListClasses(@Req() req) {
     console.log('req ', req.user);
     return await this.classService.getListClasses();
   }
 
-  @Get('class-owner')
+  @Get('classes-of-user')
   @UseGuards(AuthGuardCustom)
   // @Roles(UserRole.TEACHER)
-  // @UseGuards(RoleGuard)
   @HttpCode(200)
-  async getListClassesOwn(@Req() req) {
+  async getListClassesOfUser(@Req() req,) {
     console.log('req ', req.user);
-    return await this.classService.getListClassesOwn(req.user.id);
+    return await this.classService.getListClassesOfUser(req.user.id);
+  }
+
+  @Get('classes-as-teacher')
+  @UseGuards(AuthGuardCustom)
+  // @Roles(UserRole.TEACHER)
+  @HttpCode(200)
+  async getListTeacherClasses(@Req() req,) {
+    console.log('req ', req.user);
+    return await this.classService.getListTeacherClassesByUserId(req.user.id);
+  }
+
+  @Get('classes-as-student')
+  @UseGuards(AuthGuardCustom)
+  // @Roles(UserRole.TEACHER)
+  @HttpCode(200)
+  async getListStudentClasses(@Req() req,) {
+    console.log('req ', req.user);
+    return await this.classService.getListStudentClassesByUserId(req.user.id);
   }
 
   @Get('users-list')
   @UseGuards(AuthGuardCustom)
   // @Roles(UserRole.TEACHER)
-  // @UseGuards(RoleGuard)
   @HttpCode(200)
-  async getListClassUsers(@Query() query) {
-    console.log('req ', query);
-    return await this.classService.getListClassUsers(query.classId);
+  async getListUsersOfClass(@Query('classId') classId: string) {
+    console.log('req ', JSON.stringify(classId));
+    return await this.classService.getListUsersOfClass(classId);
   }
 
-  @Post('invite')
+  @Get('user-role')
+  @UseGuards(AuthGuardCustom)
   @HttpCode(200)
-  async sendInvite(@Body() sendInvitationDto: SendInvitationDto) {
-    return await this.classService.sendInvite(sendInvitationDto);
+  async getUserRoleInClass(
+    @Query('classId') classId: string,
+    @Req() req,
+  ) {
+    console.log('req ', JSON.stringify(classId), req.user);
+    return await this.classService.getUserRoleInClass(classId, req.user.id);
   }
 
-  @Post('accept-invitation')
-  @HttpCode(200)
-  async acceptInvitation(@Body() body) {
-    return await this.classService.acceptInvitation(body);
-  }
+  // @Post('invite')
+  // @HttpCode(200)
+  // async sendInvite(@Body() sendInvitationDto: SendInvitationDto) {
+  //   return await this.classService.sendInvite(sendInvitationDto);
+  // }
+
+  // @Post('accept-invitation')
+  // @HttpCode(200)
+  // async acceptInvitation(@Body() body) {
+  //   return await this.classService.acceptInvitation(body);
+  // }
 }

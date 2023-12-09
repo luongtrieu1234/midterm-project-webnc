@@ -3,7 +3,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
+// import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '../../others/auth/auth.service';
 import {
   BadRequestException,
@@ -42,7 +42,7 @@ export class ClassService {
     private readonly roleModel: Model<RoleModel>,
   ) {}
 
-  async createClass(createClassDto: CreateClassDto) {
+  async createClass(ownerId: string, createClassDto: CreateClassDto) {
     const currentClass = await this.classModel.findOne({
       name: createClassDto.name,
     });
@@ -50,7 +50,11 @@ export class ClassService {
     if (currentClass) {
       throw new BadRequestException('Class existed');
     }
+    const classOwner = await this.userModel.findOne({
+      _id: ownerId,
+    });
     const newClass = await this.classModel.create({
+      owner: classOwner._id,
       name: createClassDto.name,
     });
     return newClass;
@@ -61,7 +65,7 @@ export class ClassService {
     const currentClass = await this.classModel.findOne({
       name: updateClassDto.name,
     });
-    console.log('check class ', currentClass);
+    // console.log('check class ', currentClass);
     if (!currentClass) {
       throw new BadRequestException('Class not found');
     }
@@ -73,9 +77,17 @@ export class ClassService {
         const studentAdd = await this.userModel.findOne({
           email: student.email,
         });
-        if (studentAdd && !currentClass.students.some(existingStudent  => 
-          existingStudent.user.toString() === studentAdd._id.toString() &&
-          existingStudent.role.toString() === studentRole._id.toString()
+        // const isExisting = currentClass.students.includes(studentAdd)
+        //   console.log('isExisting ', isExisting)
+        const isExisting2 = currentClass.students.some(existingStudent => 
+          existingStudent?.user?.toString() === studentAdd._id.toString() &&
+          existingStudent?.role?.toString() === studentRole._id.toString()
+        )
+        console.log('isExisting2 ', isExisting2)
+
+        if (studentAdd && !currentClass.students.some(existingStudent => 
+          existingStudent?.user?.toString() === studentAdd._id.toString() &&
+          existingStudent?.role?.toString() === studentRole._id.toString()
         )) {
           currentClass.students.push({
             user: studentAdd._id.toString(), role: studentRole._id.toString()
@@ -93,9 +105,10 @@ export class ClassService {
         const teacherAdd = await this.userModel.findOne({
           email: teacher.email,
         });
-        if (teacherAdd && !currentClass.teachers.includes({
-          user: teacherAdd._id.toString(), role: teacherRole._id.toString()
-        })) {
+        if (teacherAdd && !currentClass.teachers.some(existingTeacher => 
+          existingTeacher?.user?.toString() === teacherAdd._id.toString() &&
+          existingTeacher?.role?.toString() === teacherRole._id.toString()
+        )) {
           currentClass.teachers.push({
             user: teacherAdd._id.toString(), role: teacherRole._id.toString()
           });
@@ -109,7 +122,7 @@ export class ClassService {
       .populate('students')
       .populate('teachers')
       .exec();
-    console.log('Populated Class:', populatedClass);
+    // console.log('Populated Class:', populatedClass);
 
     return {
       message: 'success',
@@ -122,16 +135,43 @@ export class ClassService {
     return await this.classModel.find().populate('students').populate('teachers').exec();
   }
 
-  async getListClassesOwn(userId: string) {
+  async getListClassesOfUser(userId: string) {
     const classes = await this.classModel.find({
       owner: userId,
     })
+    return classes;
   }
 
-  async getListClassUsers(classId: string) {
-    return await this.classModel.find({
-      id: classId,
+  async getListTeacherClassesByUserId(userId: string) {
+    const classes = await this.classModel.find({
+      'teachers.user': userId,
+    })
+    return classes;
+  }
+
+  async getListStudentClassesByUserId(userId: string) {
+    const classes = await this.classModel.find({
+      'students.user': userId,
+    })
+    return classes;
+  }
+
+  async getListUsersOfClass(classId: string) {
+    console.log('check dto ', classId)
+    const classDocument = await this.classModel.findById(classId)
+    const userIdToCheck = '6570241126d4f4880dbddd97';
+
+    const userRoleInfo = await this.getUserRoleInClass(classDocument, userIdToCheck);
+
+    if (userRoleInfo) {
+      console.log(`User has the role '${userRoleInfo.role}' as a ${userRoleInfo.userType}.`);
+    } else {
+      console.log('User not found in the class.');
+    }
+    return await this.classModel.findOne({
+      _id: classId,
     }).populate('students').populate('teachers').exec();
+
   }
 
   async sendInvite(sendInvitationDto: SendInvitationDto) {
@@ -150,5 +190,42 @@ export class ClassService {
       message: 'success',
       statusCode: HttpStatus.OK,
     }
+  }
+
+  async getUserRoleInClass(classId, userId) {
+    // Check in the students array
+    const classDocument = await this.classModel.findById(classId);
+    const student = classDocument.students.find(
+      (student) => student.user.toString() === userId
+    );
+  
+    if (student) {
+      const studentRole = await this.getRoleById(student.role);
+      return { role: studentRole, userType: 'student' };
+    }
+  
+    // Check in the teachers array
+    const teacher = classDocument.teachers.find(
+      (teacher) => teacher.user.toString() === userId
+    );
+  
+    if (teacher) {
+      const teacherRole = await this.getRoleById(teacher.role);
+      return { 
+        message: 'success',
+        statusCode: HttpStatus.OK,
+        role: teacherRole, 
+        userType: 'teacher'
+       };
+    }
+  
+    // User not found in students or teachers array
+    return null;
+  }
+  
+  async getRoleById(roleId) {
+    // Assume you have a Mongoose model for the Role schema
+    const role = await this.roleModel.findById(roleId);
+    return role ? role.name : null;
   }
 }
