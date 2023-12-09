@@ -117,11 +117,14 @@ export class ClassService {
       });
       await Promise.all(promises);
     }
-    const populatedClass = await this.classModel
-      .findById(currentClass._id)
-      .populate('students')
-      .populate('teachers')
-      .exec();
+    // const populatedClass = await this.classModel
+    //   .findById(currentClass._id)
+    //   .populate('students')
+    //   .populate('teachers')
+    //   .exec();
+      
+    const populatedClass = await this.getClassWithUserInfo(currentClass._id.toString());
+
     // console.log('Populated Class:', populatedClass);
 
     return {
@@ -132,28 +135,41 @@ export class ClassService {
   }
 
   async getListClasses() {
-    return await this.classModel.find().populate('students').populate('teachers').exec();
+    const classes = await this.classModel.find();
+    const promises = classes?.map(async (classDocument) => {
+      return await this.getClassWithUserInfo(classDocument._id.toString());
+    });
+    return await Promise.all(promises);
   }
 
   async getListClassesOfUser(userId: string) {
     const classes = await this.classModel.find({
       owner: userId,
     })
-    return classes;
+    const promises = classes?.map(async (classDocument) => {
+      return await this.getClassWithUserInfo(classDocument._id.toString());
+    });
+    return await Promise.all(promises);
   }
 
   async getListTeacherClassesByUserId(userId: string) {
     const classes = await this.classModel.find({
       'teachers.user': userId,
     })
-    return classes;
+    const promises = classes?.map(async (classDocument) => {
+      return await this.getClassWithUserInfo(classDocument._id.toString());
+    });
+    return await Promise.all(promises);
   }
 
   async getListStudentClassesByUserId(userId: string) {
     const classes = await this.classModel.find({
       'students.user': userId,
     })
-    return classes;
+    const promises = classes?.map(async (classDocument) => {
+      return await this.getClassWithUserInfo(classDocument._id.toString());
+    });
+    return await Promise.all(promises);
   }
 
   async getListUsersOfClass(classId: string) {
@@ -227,5 +243,35 @@ export class ClassService {
     // Assume you have a Mongoose model for the Role schema
     const role = await this.roleModel.findById(roleId);
     return role ? role.name : null;
+  }
+
+  async getClassWithUserInfo(classId: string) {
+    try {
+      const classDocument = await this.classModel.findById(classId);
+
+      if (!classDocument) {
+        throw new Error('Class not found');
+      }
+
+      // Iterate through students and update with user info
+      for (const student of classDocument.students) {
+        student.user = await this.userModel.findById(student.user);
+      }
+
+      // Iterate through teachers and update with user info
+      for (const teacher of classDocument.teachers) {
+        teacher.user = await this.userModel.findById(teacher.user);
+      }
+
+      if (classDocument.owner) {
+        classDocument.owner = await this.userModel.findById(classDocument.owner);
+      }
+
+      return classDocument;
+    } catch (error) {
+      // Handle errors
+      console.error('Error retrieving class information:', error.message);
+      throw error;
+    }
   }
 }

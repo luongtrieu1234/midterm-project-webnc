@@ -66,6 +66,14 @@ export class ClassController {
     return await this.classService.getListClasses();
   }
 
+  @Get('class-detail')
+  @UseGuards(AuthGuardCustom)
+  // @Roles(UserRole.TEACHER)
+  @HttpCode(200)
+  async getClassById(@Query('classId') classId: string) {
+    return await this.classService.getClassWithUserInfo(classId);
+  }
+
   @Get('classes-of-user')
   @UseGuards(AuthGuardCustom)
   // @Roles(UserRole.TEACHER)
