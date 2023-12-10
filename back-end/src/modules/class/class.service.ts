@@ -71,7 +71,7 @@ export class ClassService {
     }
     if (updateClassDto.students) {
       const studentRole = await this.roleModel.findOne({
-        name: 'student'
+        name: 'student',
       });
       const promises = updateClassDto.students?.map(async (student) => {
         const studentAdd = await this.userModel.findOne({
@@ -79,18 +79,24 @@ export class ClassService {
         });
         // const isExisting = currentClass.students.includes(studentAdd)
         //   console.log('isExisting ', isExisting)
-        const isExisting2 = currentClass.students.some(existingStudent => 
-          existingStudent?.user?.toString() === studentAdd._id.toString() &&
-          existingStudent?.role?.toString() === studentRole._id.toString()
-        )
-        console.log('isExisting2 ', isExisting2)
+        const isExisting2 = currentClass.students.some(
+          (existingStudent) =>
+            existingStudent?.user?.toString() === studentAdd._id.toString() &&
+            existingStudent?.role?.toString() === studentRole._id.toString(),
+        );
+        console.log('isExisting2 ', isExisting2);
 
-        if (studentAdd && !currentClass.students.some(existingStudent => 
-          existingStudent?.user?.toString() === studentAdd._id.toString() &&
-          existingStudent?.role?.toString() === studentRole._id.toString()
-        )) {
+        if (
+          studentAdd &&
+          !currentClass.students.some(
+            (existingStudent) =>
+              existingStudent?.user?.toString() === studentAdd._id.toString() &&
+              existingStudent?.role?.toString() === studentRole._id.toString(),
+          )
+        ) {
           currentClass.students.push({
-            user: studentAdd._id.toString(), role: studentRole._id.toString()
+            user: studentAdd._id.toString(),
+            role: studentRole._id.toString(),
           });
           return currentClass.save();
         }
@@ -99,18 +105,23 @@ export class ClassService {
     }
     if (updateClassDto.teachers) {
       const teacherRole = await this.roleModel.findOne({
-        name: 'teacher'
+        name: 'teacher',
       });
       const promises = updateClassDto.teachers?.map(async (teacher) => {
         const teacherAdd = await this.userModel.findOne({
           email: teacher.email,
         });
-        if (teacherAdd && !currentClass.teachers.some(existingTeacher => 
-          existingTeacher?.user?.toString() === teacherAdd._id.toString() &&
-          existingTeacher?.role?.toString() === teacherRole._id.toString()
-        )) {
+        if (
+          teacherAdd &&
+          !currentClass.teachers.some(
+            (existingTeacher) =>
+              existingTeacher?.user?.toString() === teacherAdd._id.toString() &&
+              existingTeacher?.role?.toString() === teacherRole._id.toString(),
+          )
+        ) {
           currentClass.teachers.push({
-            user: teacherAdd._id.toString(), role: teacherRole._id.toString()
+            user: teacherAdd._id.toString(),
+            role: teacherRole._id.toString(),
           });
           return currentClass.save();
         }
@@ -122,7 +133,7 @@ export class ClassService {
     //   .populate('students')
     //   .populate('teachers')
     //   .exec();
-      
+
     const populatedClass = await this.getClassWithUserInfo(currentClass._id.toString());
 
     // console.log('Populated Class:', populatedClass);
@@ -145,7 +156,7 @@ export class ClassService {
   async getListClassesOfUser(userId: string) {
     const classes = await this.classModel.find({
       owner: userId,
-    })
+    });
     const promises = classes?.map(async (classDocument) => {
       return await this.getClassWithUserInfo(classDocument._id.toString());
     });
@@ -155,7 +166,7 @@ export class ClassService {
   async getListTeacherClassesByUserId(userId: string) {
     const classes = await this.classModel.find({
       'teachers.user': userId,
-    })
+    });
     const promises = classes?.map(async (classDocument) => {
       return await this.getClassWithUserInfo(classDocument._id.toString());
     });
@@ -165,7 +176,7 @@ export class ClassService {
   async getListStudentClassesByUserId(userId: string) {
     const classes = await this.classModel.find({
       'students.user': userId,
-    })
+    });
     const promises = classes?.map(async (classDocument) => {
       return await this.getClassWithUserInfo(classDocument._id.toString());
     });
@@ -173,8 +184,8 @@ export class ClassService {
   }
 
   async getListUsersOfClass(classId: string) {
-    console.log('check dto ', classId)
-    const classDocument = await this.classModel.findById(classId)
+    console.log('check dto ', classId);
+    const classDocument = await this.classModel.findById(classId);
     const userIdToCheck = '6570241126d4f4880dbddd97';
 
     const userRoleInfo = await this.getUserRoleInClass(classDocument, userIdToCheck);
@@ -184,61 +195,98 @@ export class ClassService {
     } else {
       console.log('User not found in the class.');
     }
-    return await this.classModel.findOne({
-      _id: classId,
-    }).populate('students').populate('teachers').exec();
-
+    return await this.classModel
+      .findOne({
+        _id: classId,
+      })
+      .populate('students')
+      .populate('teachers')
+      .exec();
   }
 
-  async sendInvite(sendInvitationDto: SendInvitationDto) {
+  async sendInviteTeacher(sendInvitationDto: SendInvitationDto) {
     const emailToken = await this.authService.signVerifyToken(sendInvitationDto.email);
     this.sharedService.setToken(emailToken);
-    await this.mailService.sendInvitationTeacher('lexuantien07@gmail.com', emailToken, 'a');
+    await this.mailService.sendInvitationTeacher(
+      sendInvitationDto.email,
+      emailToken,
+      sendInvitationDto.name,
+    );
     return {
       message: 'success',
       statusCode: HttpStatus.OK,
-    }
+    };
+  }
+  async sendInviteStudent(sendInvitationDto: SendInvitationDto) {
+    const emailToken = await this.authService.signVerifyToken(sendInvitationDto.email);
+    this.sharedService.setToken(emailToken);
+    await this.mailService.sendInvitationStudent(
+      sendInvitationDto.email,
+      emailToken,
+      sendInvitationDto.name,
+    );
+    return {
+      message: 'success',
+      statusCode: HttpStatus.OK,
+    };
   }
 
-  async acceptInvitation(body) {
-    console.log('body ', body)
+  async acceptJoinClassByTeacher(token: string, className: string) {
+    const payload = await this.authService.verifyToken(token);
+    if (payload) {
+      await this.addUsersToClass({
+        name: className.replace(/\+/g, ' '),
+        students: [],
+        teachers: [{ email: payload.email }],
+      });
+    }
     return {
       message: 'success',
       statusCode: HttpStatus.OK,
+    };
+  }
+  async acceptJoinClassByStudent(token: string, className: string) {
+    const payload = await this.authService.verifyToken(token);
+    if (payload) {
+      await this.addUsersToClass({
+        name: className.replace(/\+/g, ' '),
+        students: [{ email: payload.email }],
+        teachers: [],
+      });
     }
+    return {
+      message: 'success',
+      statusCode: HttpStatus.OK,
+    };
   }
 
   async getUserRoleInClass(classId, userId) {
     // Check in the students array
     const classDocument = await this.classModel.findById(classId);
-    const student = classDocument.students.find(
-      (student) => student.user.toString() === userId
-    );
-  
+    const student = classDocument.students.find((student) => student.user.toString() === userId);
+
     if (student) {
       const studentRole = await this.getRoleById(student.role);
       return { role: studentRole, userType: 'student' };
     }
-  
+
     // Check in the teachers array
-    const teacher = classDocument.teachers.find(
-      (teacher) => teacher.user.toString() === userId
-    );
-  
+    const teacher = classDocument.teachers.find((teacher) => teacher.user.toString() === userId);
+
     if (teacher) {
       const teacherRole = await this.getRoleById(teacher.role);
-      return { 
+      return {
         message: 'success',
         statusCode: HttpStatus.OK,
-        role: teacherRole, 
-        userType: 'teacher'
-       };
+        role: teacherRole,
+        userType: 'teacher',
+      };
     }
-  
+
     // User not found in students or teachers array
     return null;
   }
-  
+
   async getRoleById(roleId) {
     // Assume you have a Mongoose model for the Role schema
     const role = await this.roleModel.findById(roleId);

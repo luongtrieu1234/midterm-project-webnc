@@ -1,7 +1,9 @@
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.codeActionsOnSave": { "source.fixAll.eslint": true },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
   "editor.inlayHints.fontFamily": "Consolas, 'Courier New', monospace",
   "editor.inlayHints.fontSize": 14,
   "editor.inlayHints.padding": true,

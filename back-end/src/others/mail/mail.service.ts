@@ -53,7 +53,9 @@ export class MailService {
   }
 
   async sendInvitationTeacher(email: string, token: string, className: string) {
-    const url = `${process.env.CLIENT_URL}/class/invitation?token=${token}`;
+    const url = `${
+      process.env.SERVER_URL
+    }/class/accept-join-class-by-teacher?className=${className.replace(/ /g, '+')}&token=${token}`;
 
     await this.mailerService.sendMail({
       to: email,
@@ -78,7 +80,9 @@ export class MailService {
   }
 
   async sendInvitationStudent(email: string, token: string, className: string) {
-    const url = `${process.env.CLIENT_URL}/class/invitation?token=${token}`;
+    const url = `${
+      process.env.SERVER_URL
+    }/class/accept-join-class-by-student?className=${className.replace(/ /g, '+')}&token=${token}`;
 
     await this.mailerService.sendMail({
       to: email,
