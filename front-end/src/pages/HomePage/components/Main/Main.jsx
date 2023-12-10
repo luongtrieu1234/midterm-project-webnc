@@ -1,11 +1,34 @@
-import React, { useEffect, useState } from 'react';
+// @ts-nocheck
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
+import { useForm, Controller } from 'react-hook-form';
 
 import { Button } from 'primereact/button';
 import { ScrollPanel } from 'primereact/scrollpanel';
+import { Dialog } from 'primereact/dialog';
+import { InputText } from 'primereact/inputtext';
+import { Toast } from 'primereact/toast';
 
 const Main = () => {
+  //Call API to get class list
   const [classList, setClassList] = useState([]);
+  const toast = useRef(null);
+  const showSuccess = () => {
+    toast.current.show({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Class created successfully!',
+      life: 3000,
+    });
+  };
+  const showError = () => {
+    toast.current.show({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Class created error',
+      life: 3000,
+    });
+  };
   console.log(classList);
   useEffect(() => {
     const fetchClassList = async () => {
@@ -29,8 +52,73 @@ const Main = () => {
     fetchClassList();
   }, []);
 
+  //Add class
+  const [visible, setVisible] = useState(false);
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
+
+  const addClass = async (data) => {
+    try {
+      const token = localStorage.getItem('token'); // replace 'token' with your actual key
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/class`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      // Handle successful response
+      if (response.status === 201) {
+        console.log(response);
+        setVisible(false);
+        reset();
+        showSuccess();
+      } else {
+        showError();
+      }
+    } catch (error) {
+      showError();
+    }
+  };
+
+  const Action = (
+    <div>
+      <Button
+        label='Cancel'
+        icon='pi pi-times'
+        onClick={() => setVisible(false)}
+        className='p-button-text'
+      />
+      <Button label='Create' icon='pi pi-check' onClick={handleSubmit(addClass)} autoFocus />
+    </div>
+  );
+
   return (
     <div className='grid mb-5'>
+      <Toast ref={toast} />
+      <div className='card flex justify-content-center ml-6 mb-2'>
+        <Button label='Create Class' icon='pi pi-plus' onClick={() => setVisible(true)} />
+        <Dialog
+          header='Create Class'
+          visible={visible}
+          style={{ width: '50vw' }}
+          onHide={() => setVisible(false)}
+          footer={Action}
+        >
+          <p className='mb-3'>Class Name</p>
+          <Controller
+            name='name'
+            control={control}
+            defaultValue=''
+            rules={{ required: 'This field is required' }}
+            render={({ field }) => <InputText {...field} style={{ width: '70%' }} />}
+          />
+          {errors.name && <p className='text-red-500'>{errors.name.message}</p>}
+        </Dialog>
+      </div>
       <ScrollPanel style={{ width: '100%', height: '550px' }}>
         <div className='grid ml-3'>
           {classList.map((course) => (

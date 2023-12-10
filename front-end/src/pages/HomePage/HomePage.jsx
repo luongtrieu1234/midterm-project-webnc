@@ -6,7 +6,7 @@ import Main from './components/Main';
 
 const HomePage = () => {
   return (
-    <div className='' style={{ height: '100vh' }}>
+    <div className='' style={{ height: '100vh', overflow: 'hidden' }}>
       <Header />
       <hr className='mx-0 border-left-1 border-bottom-none border-200' />
       <div className='flex'>
