@@ -36,12 +36,15 @@ const Main = () => {
     const fetchCourseDetail = async () => {
       try {
         const token = localStorage.getItem('token'); // get token from local storage
-        const response = await axios.get(`http://localhost:5000/class/class-detail?classId=${id}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/class/class-detail?classId=${id}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setCourse(response.data);
       } catch (error) {
         console.error('Failed to fetch course details:', error);
