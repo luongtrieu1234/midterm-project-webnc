@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useForm, Controller } from 'react-hook-form';
+import { Link } from 'react-router-dom';
 
 import { Button } from 'primereact/button';
 import { ScrollPanel } from 'primereact/scrollpanel';
@@ -131,17 +132,13 @@ const Main = () => {
                   <div className=''>
                     <div className='text-900 font-medium text-xl mb-2'>{course.name}</div>
                     <li className='flex align-items-center gap-2'>
-                      <i
-                        className='pi pi-stopwatch'
-                        style={{ fontSize: '1rem', color: '#0000CD' }}
-                      ></i>
                       <div className='text-600'>{course._id}</div>
                     </li>
                   </div>
                   <hr className='my-3 mx-0 border-top-1 border-bottom-none border-300' />
                   <div className='flex align-items-center'>
                     {/* <span className='font-bold text-2xl text-900'>${course.price}</span> */}
-                    <span className='ml-2 font-medium text-600'>per month</span>
+                    <span className='ml-2 font-medium text-600'>welcome to course</span>
                   </div>
                   <hr className='my-3 mx-0 border-top-1 border-bottom-none border-300' />
                   {/* <ul className='list-none p-0 m-0 flex-grow-1'>
@@ -153,7 +150,9 @@ const Main = () => {
                     ))}
                   </ul> */}
                   <hr className='mb-3 mx-0 border-top-1 border-bottom-none border-300 mt-auto' />
-                  <Button label='Enter Class' className='p-3 w-full' />
+                  <Link to={`/course/${course._id}`}>
+                    <Button label='Enter Class' className='p-3 w-full' />
+                  </Link>
                 </div>
               </div>
             </div>

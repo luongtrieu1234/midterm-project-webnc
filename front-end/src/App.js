@@ -12,6 +12,7 @@ import {
   ResetPassword,
   ConfirmCode,
   ConfirmCodeSignUp,
+  ClassDetail,
 } from './pages';
 import { PageError, Loading, NotLogged } from './components';
 
@@ -37,6 +38,7 @@ function App() {
       <Route path='/me' element={<Profile />} />
       <Route path='/loading' element={<Loading />} />
       {token && <Route path='/home-page' element={<HomePage />} />}
+      {token && <Route path='/course/:id' element={<ClassDetail />} />}
       {!token && <Route path='/home-page' element={<NotLogged />} />}
       <Route path='*' element={<PageError />} />
     </Routes>
