@@ -136,7 +136,7 @@ export class ClassController {
     @Query('className') className,
   ) {
     const inforClass = await this.classService.acceptJoinClassByTeacher(token, className);
-    const urlJoinClass = `${process.env.CLIENT_URL}/class`;
+    const urlJoinClass = `${process.env.CLIENT_URL}/home-page`;
     return res.redirect(urlJoinClass);
   }
 
@@ -148,7 +148,7 @@ export class ClassController {
     @Query('className') className,
   ) {
     const inforClass = await this.classService.acceptJoinClassByStudent(token, className);
-    const urlJoinClass = `${process.env.CLIENT_URL}/class`;
+    const urlJoinClass = `${process.env.CLIENT_URL}/home-page`;
     return res.redirect(urlJoinClass);
   }
 }
