@@ -293,6 +293,26 @@ export class ClassService {
     return role ? role.name : null;
   }
 
+  async getLinkInvitation(email, classId) {
+    try {
+      const classDocument = await this.classModel.findById(classId);
+
+      if (!classDocument) {
+        throw new Error('Class not found');
+      }
+      const emailToken = await this.authService.signVerifyToken(email);
+      const link = `${
+        process.env.SERVER_URL
+      }/class/accept-join-class-by-student?className=${classDocument.name.replace(/ /g, '+')}&token=${emailToken}`;
+      
+      return link;
+    } catch (error) {
+      // Handle errors
+      console.error('Error retrieving class information:', error.message);
+      throw error;
+    }
+  }
+
   async getClassWithUserInfo(classId: string) {
     try {
       const classDocument = await this.classModel.findById(classId);
