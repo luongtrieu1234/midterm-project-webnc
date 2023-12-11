@@ -72,6 +72,7 @@ export class ClassController {
     return await this.classService.getClassWithUserInfo(classId);
   }
 
+  
   @Get('class-link')
   @UseGuards(AuthGuardCustom)
   // @Roles(UserRole.TEACHER)
