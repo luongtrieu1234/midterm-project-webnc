@@ -16,6 +16,9 @@ import { classNames } from 'primereact/utils';
 const Main = () => {
   const { id } = useParams();
   const [course, setCourse] = useState(null);
+  const [Link, setLink] = useState(null);
+  console.log('link: ', Link);
+  const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('Infor Class');
   const [visibleAddTeacherDialog, setVisibleAddTeacherDialog] = useState(false);
   const [visibleAddStudentDialog, setVisibleAddStudentDialog] = useState(false);
@@ -89,8 +92,26 @@ const Main = () => {
         console.error('Failed to fetch course details:', error);
       }
     };
+    const fetchLink = async () => {
+      try {
+        const token = localStorage.getItem('token'); // get token from local storage
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/class/class-link?classId=${id}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setLink(response.data);
+      } catch (error) {
+        console.error('Failed to fetch course details:', error);
+      }
+    };
 
     fetchCourseDetail();
+    fetchLink();
   }, [id]);
 
   if (!course) {
@@ -163,9 +184,23 @@ const Main = () => {
       />
     </div>
   );
+
   return (
     <div>
       <Toast ref={toast} />
+      <div className='card flex mt-3 mb-3'>
+        <Button label='Class invitation' icon='pi pi-external-link' onClick={() => setOpen(true)} />
+        <Dialog
+          header='Class invitation'
+          visible={open}
+          style={{ width: '50vw' }}
+          onHide={() => setOpen(false)}
+        >
+          <p className='m-0' style={{ color: 'blue' }}>
+            {Link}
+          </p>
+        </Dialog>
+      </div>
 
       <TabMenu model={items} />
       <div>
