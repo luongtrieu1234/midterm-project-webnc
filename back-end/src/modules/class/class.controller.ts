@@ -72,6 +72,14 @@ export class ClassController {
     return await this.classService.getClassWithUserInfo(classId);
   }
 
+  @Get('class-link')
+  @UseGuards(AuthGuardCustom)
+  // @Roles(UserRole.TEACHER)
+  @HttpCode(200)
+  async getLinkInvitation(@Query('classId') classId: string, @Req() req) {
+    return await this.classService.getLinkInvitation(req.user.email, classId);
+  }
+
   @Get('classes-of-user')
   @UseGuards(AuthGuardCustom)
   // @Roles(UserRole.TEACHER)
