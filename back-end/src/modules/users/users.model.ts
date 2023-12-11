@@ -5,7 +5,7 @@ export const UserSchema = new mongoose.Schema({
   password: { type: String, default: null },
   fullname: { type: String, default: '' }, // Set default value for fullname
   gender: { type: String, default: '' }, // Set default value for gender
-  dob: { type: Date, default: null }, // Set default value for dob (you can set it to a specific date if needed)
+  dob: { type: String, default: '' }, // Set default value for dob (you can set it to a specific date if needed)
   phone: { type: String, default: '' }, // Set default value for phone
   address: { type: String, default: '' }, // Set default value for address
   job: { type: String, default: '' }, // Set default value for job
@@ -23,7 +23,7 @@ export interface UserModel {
   password: string;
   fullname: string;
   gender: string;
-  dob: Date;
+  dob: string;
   phone: string;
   address: string;
   job: string;
