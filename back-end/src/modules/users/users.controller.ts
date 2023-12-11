@@ -28,6 +28,7 @@ import { Model } from 'mongoose';
 import { UserModel } from './users.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserConfirmCodeDto } from './dto/user-confirm-code.dto';
+import { AuthGuardCustom } from 'src/others/auth/auth.guard';
 
 @Controller('users')
 @ApiTags('users')
@@ -37,7 +38,7 @@ export class UsersController {
     private readonly usersService: UsersService,
     private authService: AuthService,
     private sharedService: SharedService,
-    private jwtService: JwtService,
+    // private jwtService: JwtService,
     @InjectModel('User')
     private readonly userModel: Model<UserModel>,
   ) {}
@@ -52,6 +53,11 @@ export class UsersController {
   @HttpCode(201)
   async userSignup() {
     return await this.usersService.userSignupActivate();
+  }
+
+  @Post('/reactivate')
+  async reactivateSignupRequest(@Body() userResetPasswordRequestDto: UserResetPasswordRequestDto) {
+    return await this.usersService.reactivateSignupRequest(userResetPasswordRequestDto);
   }
 
   // @Get('/confirm-signup')
@@ -96,6 +102,7 @@ export class UsersController {
   }
 
   @Get('me')
+  // @UseGuards(AuthGuardCustom)
   @HttpCode(200)
   userProfile(@Req() request: Request) {
     return this.usersService.userProfile(request);
@@ -161,7 +168,7 @@ export class UsersController {
     // return await this.usersService.verifyEmail(query.token);
     // console.log('check query service ', JSON.stringify(query));
     // const isValid = await this.authService.confirmVerifyToken();
-    const isValid = await this.jwtService.verifyAsync(query.token);
+    const isValid = await this.authService.verifyToken(query.token);
     if (isValid) {
       this.sharedService.setToken(query.token);
       return {

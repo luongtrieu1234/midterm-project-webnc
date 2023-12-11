@@ -8,6 +8,7 @@ import SearchEmail from './SearchEmail';
 import ResetPassword from './ResetPassword';
 import ConfirmCode from './ConfirmCode';
 import ConfirmCodeSignUp from './ConfirmCodeSignUp';
+import ClassDetail from './ClassDetail';
 
 export {
   HomePage,
@@ -20,4 +21,5 @@ export {
   ResetPassword,
   ConfirmCode,
   ConfirmCodeSignUp,
+  ClassDetail,
 };

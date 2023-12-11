@@ -12,7 +12,7 @@ import { User } from './users.entity';
 import { UserSignupRequestDto } from './dto/user-signup-request.dto';
 
 import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
+// import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '../../others/auth/auth.service';
 import {
   BadRequestException,
@@ -38,7 +38,7 @@ export class UsersService {
   constructor(
     // @Inject('UserRepository')
     // private readonly userRepository: typeof User,
-    private jwtService: JwtService,
+    // private jwtService: JwtService,
     private authService: AuthService,
     private mailService: MailService,
     private sharedService: SharedService,
@@ -66,7 +66,7 @@ export class UsersService {
     // const emailToken = await this.authService.signVerifyToken(userResetPasswordRequestDto.email);
     const emailToken = await this.authService.signVerifyToken(userSignupRequestDto.email);
     this.sharedService.setToken(emailToken);
-    await this.mailService.sendUserConfirmation(userSignupRequestDto.email, codeMail);
+    // await this.mailService.sendUserConfirmation(userSignupRequestDto.email, codeMail);
     const hashedPassword = await bcrypt.hash(userSignupRequestDto.password, 12);
 
     const user = await this.userModel.create({
@@ -85,7 +85,7 @@ export class UsersService {
     // if (!token) {
     //   throw new BadRequestException('Confirmation fail');
     // }
-    const data = await this.jwtService.verifyAsync(token);
+    const data = await this.authService.verifyToken(token);
     if (!data) {
       throw new UnauthorizedException();
     }
@@ -98,6 +98,26 @@ export class UsersService {
     return {
       message: 'success',
       statusCode: HttpStatus.OK,
+    };
+  }
+
+  async reactivateSignupRequest(userResetPasswordRequestDto: UserResetPasswordRequestDto) {
+    const user = await this.userModel.findOne({
+      email: userResetPasswordRequestDto.email,
+    });
+
+    if (!user) {
+      throw new BadRequestException('Email not found');
+    }
+    const codeMail = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log(codeMail);
+    this.sharedService.setCode(codeMail);
+    const emailToken = await this.authService.signVerifyToken(userResetPasswordRequestDto.email);
+    this.sharedService.setToken(emailToken);
+    await this.mailService.sendUserResetPassword(userResetPasswordRequestDto.email, codeMail);
+    return {
+      message: 'success',
+      status: HttpStatus.OK,
     };
   }
 
@@ -117,14 +137,14 @@ export class UsersService {
       throw new BadRequestException('invalid credentials');
     }
 
-    const jwt1 = await this.jwtService.signAsync({ id: user.id });
+    // const jwt1 = await this.jwtService.signAsync({ id: user.id });
     const jwt = await this.authService.signAccessToken(user);
 
     // response.cookie('jwt', jwt, { httpOnly: true });
 
     return {
       message: 'success',
-      jwt1: jwt1,
+      // jwt1: jwt1,
       jwt: jwt,
     };
   }
@@ -135,9 +155,8 @@ export class UsersService {
       const [type, token] = request.headers.authorization?.split(' ') ?? [];
       type === 'Bearer' ? token : undefined;
       console.log(`check token ${token}`);
-      console.log(`check token 2 ${token}`);
 
-      const data = await this.jwtService.verifyAsync(token);
+      const data = await this.authService.verifyToken(token);
 
       if (!data) {
         throw new UnauthorizedException('Access token error');
@@ -166,7 +185,7 @@ export class UsersService {
       type === 'Bearer' ? token : undefined;
       console.log(`check token ${token}`);
 
-      const data = await this.jwtService.verifyAsync(token);
+      const data = await this.authService.verifyToken(token);
       if (!data) {
         throw new UnauthorizedException();
       }
@@ -188,7 +207,7 @@ export class UsersService {
       type === 'Bearer' ? token : undefined;
       console.log(`check token ${token}`);
 
-      const data = await this.jwtService.verifyAsync(token);
+      const data = await this.authService.verifyToken(token);
 
       if (!data) {
         throw new UnauthorizedException('Access token error');
@@ -282,7 +301,7 @@ export class UsersService {
 
   async verifyEmail(query) {
     console.log('check query service ', JSON.stringify(query));
-    const isValid = await this.authService.confirmVerifyToken(query.token);
+    const isValid = await this.authService.verifyToken(query.token);
     if (isValid)
       return {
         message: 'Verify success',
@@ -346,7 +365,7 @@ export class UsersService {
       throw new BadRequestException('Confirmed password not match');
     }
     const hashedPassword = await bcrypt.hash(userResetPasswordDto.password, 12);
-    const data = await this.jwtService.verifyAsync(token);
+    const data = await this.authService.verifyToken(token);
     if (!data) {
       throw new UnauthorizedException();
     }
@@ -377,13 +396,14 @@ export class UsersService {
     // if (!token) {
     //   throw new BadRequestException('Confirmation fail');
     // }
-    const data = await this.authService.confirmVerifyToken(tokenUser);
+    const data = await this.authService.verifyToken(tokenUser);
     if (!data) {
       throw new UnauthorizedException();
     }
     const user = await this.userModel.findOne({
       email: data['email'],
     });
+    console.log(`check user resetPassword ${JSON.stringify(user)}`);
     user.active = true;
     user.save();
     return {

@@ -59,7 +59,7 @@ export class AuthService {
 
   async signAccessToken(user: UserModel): Promise<string> {
     const payload = {
-      // id: user.id,
+      id: user.id,
       email: user.email,
     };
 
@@ -71,12 +71,12 @@ export class AuthService {
       email: user,
     };
 
-    return await this.jwtService.sign(payload);
+    return await this.jwtService.signAsync(payload);
   }
 
-  async confirmVerifyToken(token) {
+  async verifyToken(token) {
     try {
-      console.log(`check token `, token);
+      console.log(`check token verifyToken Auth`, token);
       return await this.jwtService.verifyAsync(token);
     } catch (err) {
       console.log('Error token ', err);

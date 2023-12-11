@@ -4,7 +4,7 @@ import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Main from './components/Main';
 
-const HomePage = () => {
+const ClassDetail = () => {
   return (
     <div className='' style={{ height: '100vh', overflow: 'hidden' }}>
       <Header />
@@ -14,7 +14,7 @@ const HomePage = () => {
           <Sidebar />
         </div>
         <hr className='mx-0 border-left-1 border-bottom-none border-200' />
-        <div className='flex font-bold m-2 px-5 py-3 border-round w-full'>
+        <div className='flex font-bold px-5 border-round w-full'>
           <Main />
         </div>
       </div>
@@ -22,4 +22,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default ClassDetail;
