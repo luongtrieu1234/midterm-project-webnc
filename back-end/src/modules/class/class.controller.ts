@@ -44,7 +44,9 @@ export class ClassController {
   // @Roles(UserRole.TEACHER)
   // @UseGuards(RoleGuard)
   @HttpCode(201)
-  async createClass(@Req() req, @Body() createClassDto: CreateClassDto) {
+  async createClass(
+    @Req() req,
+    @Body() createClassDto: CreateClassDto) {
     return await this.classService.createClass(req.user.id, createClassDto);
   }
 
@@ -68,18 +70,23 @@ export class ClassController {
   @UseGuards(AuthGuardCustom)
   // @Roles(UserRole.TEACHER)
   @HttpCode(200)
-  async getClassById(
-    @Req() req,
-    @Query('classId') classId: string
-    ) {
-    return await this.classService.getClassWithUserInfo(req.user.email, classId);
+  async getClassById(@Query('classId') classId: string) {
+    return await this.classService.getClassWithUserInfo(classId);
+  }
+
+  @Get('class-link')
+  @UseGuards(AuthGuardCustom)
+  // @Roles(UserRole.TEACHER)
+  @HttpCode(200)
+  async getLinkInvitation(@Query('classId') classId: string, @Req() req) {
+    return await this.classService.getLinkInvitation(req.user.email, classId);
   }
 
   @Get('classes-of-user')
   @UseGuards(AuthGuardCustom)
   // @Roles(UserRole.TEACHER)
   @HttpCode(200)
-  async getListClassesOfUser(@Req() req) {
+  async getListClassesOfUser(@Req() req,) {
     console.log('req ', req.user);
     return await this.classService.getListClassesOfUser(req.user.id);
   }
@@ -88,7 +95,7 @@ export class ClassController {
   @UseGuards(AuthGuardCustom)
   // @Roles(UserRole.TEACHER)
   @HttpCode(200)
-  async getListTeacherClasses(@Req() req) {
+  async getListTeacherClasses(@Req() req,) {
     console.log('req ', req.user);
     return await this.classService.getListTeacherClassesByUserId(req.user.id);
   }
@@ -97,7 +104,7 @@ export class ClassController {
   @UseGuards(AuthGuardCustom)
   // @Roles(UserRole.TEACHER)
   @HttpCode(200)
-  async getListStudentClasses(@Req() req) {
+  async getListStudentClasses(@Req() req,) {
     console.log('req ', req.user);
     return await this.classService.getListStudentClassesByUserId(req.user.id);
   }
@@ -114,44 +121,23 @@ export class ClassController {
   @Get('user-role')
   @UseGuards(AuthGuardCustom)
   @HttpCode(200)
-  async getUserRoleInClass(@Query('classId') classId: string, @Req() req) {
+  async getUserRoleInClass(
+    @Query('classId') classId: string,
+    @Req() req,
+  ) {
     console.log('req ', JSON.stringify(classId), req.user);
     return await this.classService.getUserRoleInClass(classId, req.user.id);
   }
 
-  @Post('invite-tearcher')
-  @HttpCode(200)
-  async sendInviteTearcher(@Body() sendInvitationDto: SendInvitationDto) {
-    return await this.classService.sendInviteTeacher(sendInvitationDto);
-  }
+  // @Post('invite')
+  // @HttpCode(200)
+  // async sendInvite(@Body() sendInvitationDto: SendInvitationDto) {
+  //   return await this.classService.sendInvite(sendInvitationDto);
+  // }
 
-  @Post('invite-student')
-  @HttpCode(200)
-  async sendInviteStudent(@Body() sendInvitationDto: SendInvitationDto) {
-    return await this.classService.sendInviteStudent(sendInvitationDto);
-  }
-
-  @Get('accept-join-class-by-teacher')
-  @HttpCode(200)
-  async acceptJoinClassByTeacher(
-    @Res() res: Response,
-    @Query('token') token,
-    @Query('className') className,
-  ) {
-    const inforClass = await this.classService.acceptJoinClassByTeacher(token, className);
-    const urlJoinClass = `${process.env.CLIENT_URL}/home-page`;
-    return res.redirect(urlJoinClass);
-  }
-
-  @Get('accept-join-class-by-student')
-  @HttpCode(200)
-  async acceptJoinClassByStudent(
-    @Res() res: Response,
-    @Query('token') token,
-    @Query('className') className,
-  ) {
-    const inforClass = await this.classService.acceptJoinClassByStudent(token, className);
-    const urlJoinClass = `${process.env.CLIENT_URL}/home-page`;
-    return res.redirect(urlJoinClass);
-  }
+  // @Post('accept-invitation')
+  // @HttpCode(200)
+  // async acceptInvitation(@Body() body) {
+  //   return await this.classService.acceptInvitation(body);
+  // }
 }

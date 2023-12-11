@@ -134,7 +134,7 @@ export class ClassService {
     //   .populate('teachers')
     //   .exec();
 
-    const populatedClass = await this.getClassWithUserInfo('', currentClass._id.toString());
+    const populatedClass = await this.getClassWithUserInfo(currentClass._id.toString());
 
     // console.log('Populated Class:', populatedClass);
 
@@ -148,7 +148,7 @@ export class ClassService {
   async getListClasses() {
     const classes = await this.classModel.find();
     const promises = classes?.map(async (classDocument) => {
-      return await this.getClassWithUserInfo('', classDocument._id.toString());
+      return await this.getClassWithUserInfo(classDocument._id.toString());
     });
     return await Promise.all(promises);
   }
@@ -158,7 +158,7 @@ export class ClassService {
       owner: userId,
     });
     const promises = classes?.map(async (classDocument) => {
-      return await this.getClassWithUserInfo('', classDocument._id.toString());
+      return await this.getClassWithUserInfo(classDocument._id.toString());
     });
     return await Promise.all(promises);
   }
@@ -168,7 +168,7 @@ export class ClassService {
       'teachers.user': userId,
     });
     const promises = classes?.map(async (classDocument) => {
-      return await this.getClassWithUserInfo('', classDocument._id.toString());
+      return await this.getClassWithUserInfo(classDocument._id.toString());
     });
     return await Promise.all(promises);
   }
@@ -178,7 +178,7 @@ export class ClassService {
       'students.user': userId,
     });
     const promises = classes?.map(async (classDocument) => {
-      return await this.getClassWithUserInfo('', classDocument._id.toString());
+      return await this.getClassWithUserInfo(classDocument._id.toString());
     });
     return await Promise.all(promises);
   }
@@ -293,7 +293,28 @@ export class ClassService {
     return role ? role.name : null;
   }
 
-  async getClassWithUserInfo(userEmail: string, classId: string) {
+  async getLinkInvitation(email, classId) {
+    try {
+      const classDocument = await this.classModel.findById(classId);
+
+      if (!classDocument) {
+        throw new Error('Class not found');
+      }
+      const emailToken = await this.authService.signVerifyToken(email);
+      const link = `${
+        process.env.SERVER_URL
+      }/class/accept-join-class-by-student?className=${classDocument.name.replace(/ /g, '+')}&token=${emailToken}`;
+      
+      return link;
+    } catch (error) {
+      // Handle errors
+      console.error('Error retrieving class information:', error.message);
+      throw error;
+    }
+  }
+
+
+  async getClassWithUserInfo(classId: string) {
     try {
       const classDocument = await this.classModel.findById(classId);
 
@@ -314,15 +335,7 @@ export class ClassService {
       if (classDocument.owner) {
         classDocument.owner = await this.userModel.findById(classDocument.owner);
       }
-      const emailToken = await this.authService.signVerifyToken(userEmail);
-      const link = `${
-        process.env.SERVER_URL
-      }/class/accept-join-class-by-student?className=${classDocument.name.replace(/ /g, '+')}&token=${emailToken}`;
-      
-      return {
-        classDocument,
-        link
-      };
+      return classDocument;
     } catch (error) {
       // Handle errors
       console.error('Error retrieving class information:', error.message);
