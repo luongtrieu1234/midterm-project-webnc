@@ -35,7 +35,7 @@ const Main = () => {
     const fetchClassList = async () => {
       try {
         const token = localStorage.getItem('token'); // replace 'token' with your actual key
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/class/all`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/class/classes-of-user`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
