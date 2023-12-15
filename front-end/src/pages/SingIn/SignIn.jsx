@@ -41,6 +41,8 @@ const SignIn = () => {
   } = useForm({ defaultValues });
 
   const onSubmit = async (data) => {
+    console.log('Vo');
+
     setLoading(true); // Start loading state
     try {
       // eslint-disable-next-line no-undef
