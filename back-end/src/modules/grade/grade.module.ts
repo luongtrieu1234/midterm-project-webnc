@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 
 import { GradeController } from './grade.controller';
 import { GradeService } from './grade.service';
@@ -8,18 +8,27 @@ import { GradeSchema } from './grade.model';
 import { AuthModule } from 'src/others/auth/auth.module';
 import { MailModule } from 'src/others/mail/mail.module';
 import { SharedService } from 'src/others/auth/shared.service';
+import { GradeCompositionSchema } from './grade-composition.model';
+import { UserModule } from '../users/users.module';
+import { ClassModule } from '../class/class.module';
+import { GradeStructureSchema } from './grade-structure.model';
 
 @Module({
   imports: [
     AuthModule,
     MailModule,
+    forwardRef(() => ClassModule),
+    UserModule,
     MongooseModule.forFeature([{ name: 'Grade', schema: GradeSchema }]),
-    JwtModule.register({
-      secret: 'secret-key',
-      signOptions: { expiresIn: '1d' },
-    }),
+    MongooseModule.forFeature([{ name: 'GradeComposition', schema: GradeCompositionSchema }]),
+    MongooseModule.forFeature([{ name: 'GradeStructure', schema: GradeStructureSchema }]),
+    // JwtModule.register({
+    //   secret: 'secret-key',
+    //   signOptions: { expiresIn: '1d' },
+    // }),
   ],
   controllers: [GradeController],
   providers: [GradeService, SharedService],
+  exports: [MongooseModule],
 })
 export class GradeModule {}

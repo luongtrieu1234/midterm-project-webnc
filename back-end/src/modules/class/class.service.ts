@@ -24,6 +24,8 @@ import { UserModel } from '../users/users.model';
 import { ClassModel } from './class.model';
 import { SendInvitationDto } from './dto/send-invitation.dto';
 import { RoleModel } from '../role/role.model';
+import { GradeModel } from '../grade/grade.model';
+import { GradeStructureModel } from '../grade/grade-structure.model';
 
 @Injectable()
 export class ClassService {
@@ -40,6 +42,10 @@ export class ClassService {
     private readonly classModel: Model<ClassModel>,
     @InjectModel('Role')
     private readonly roleModel: Model<RoleModel>,
+    @InjectModel('Grade')
+    private readonly gradeModel: Model<GradeModel>,
+    @InjectModel('GradeStructure')
+    private readonly gradeStructureModel: Model<GradeStructureModel>,
   ) {}
 
   async createClass(ownerId: string, createClassDto: CreateClassDto) {
@@ -57,6 +63,11 @@ export class ClassService {
       owner: classOwner._id,
       name: createClassDto.name,
     });
+    const gradeStructure = await this.gradeStructureModel.create({
+      name: `Grade structure of class ${createClassDto.name}`,
+    });
+    newClass.gradeStructure = gradeStructure._id.toString();
+    newClass.save();
     return newClass;
   }
 
