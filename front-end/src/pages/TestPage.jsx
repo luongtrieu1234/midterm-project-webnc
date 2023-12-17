@@ -1,16 +1,13 @@
-import React from 'react';
 import Layout from 'layout';
-import ViewListClass from 'features/Class/pages/ViewList';
 import { LayoutProvider } from 'layout/context/layoutcontext';
+import React from 'react';
 
-const HomePage = () => {
+export default function TestPage() {
   return (
     <LayoutProvider>
       <Layout>
-        <ViewListClass />
+        <span>{'abc'}</span>
       </Layout>
     </LayoutProvider>
   );
-};
-
-export default HomePage;
+}

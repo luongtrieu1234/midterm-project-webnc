@@ -189,7 +189,11 @@ const Main = () => {
     <div>
       <Toast ref={toast} />
       <div className='card flex mt-3 mb-3'>
-        <Button label='Class invitation' icon='pi pi-external-link' onClick={() => setOpen(true)} />
+        <Button
+          label='Class invitation'
+          icon='pi pi-external-link'
+          onClick={() => setOpen(true)}
+        />
         <Dialog
           header='Class invitation'
           visible={open}
@@ -210,45 +214,83 @@ const Main = () => {
           </div>
         )}
         {activeTab === 'People' && (
-          <div style={{ margin: '0 auto', maxWidth: '600px', fontFamily: 'Arial, sans-serif' }}>
+          <div
+            style={{
+              // margin: '0 auto',
+              maxWidth: '600px',
+              fontFamily: 'Arial, sans-serif',
+            }}
+          >
             <h2
               className='flex align-items-center justify-content-between '
               style={{ color: '#333', borderBottom: '1px solid #ddd' }}
             >
               <span className=''>Teachers</span>
               <div className='card flex'>
-                <Button size='small' label='Add' onClick={() => setVisibleAddTeacherDialog(true)} />
+                <Button
+                  size='small'
+                  label='Add'
+                  onClick={() => setVisibleAddTeacherDialog(true)}
+                />
               </div>
             </h2>
             <ul style={{ listStyleType: 'none', padding: 0 }}>
               {course.teachers.length > 0 ? (
                 course.teachers.map((teacher, index) => (
-                  <li key={index} style={{ padding: '10px 0', borderBottom: '1px solid #ddd' }}>
-                    <span style={{ fontSize: '18px', color: '#555' }}>{teacher.user.fullname}</span>
+                  <li
+                    key={index}
+                    style={{
+                      padding: '10px 0',
+                      borderBottom: '1px solid #ddd',
+                    }}
+                  >
+                    <span style={{ fontSize: '18px', color: '#555' }}>
+                      {teacher.user.fullname}
+                    </span>
                   </li>
                 ))
               ) : (
-                <h2 style={{ color: '#555', fontSize: '18px' }}>There are no teachers</h2>
+                <h2 style={{ color: '#555', fontSize: '18px' }}>
+                  There are no teachers
+                </h2>
               )}
             </ul>
             <h2
               className='flex align-items-center justify-content-between '
-              style={{ color: '#333', borderBottom: '1px solid #ddd', marginTop: '20px' }}
+              style={{
+                color: '#333',
+                borderBottom: '1px solid #ddd',
+                marginTop: '20px',
+              }}
             >
               <span className=''>Students</span>
               <div className='card flex'>
-                <Button size='small' label='Add' onClick={() => setVisibleAddStudentDialog(true)} />
+                <Button
+                  size='small'
+                  label='Add'
+                  onClick={() => setVisibleAddStudentDialog(true)}
+                />
               </div>
             </h2>
             <ul style={{ listStyleType: 'none', padding: 0 }}>
               {course.students.length > 0 ? (
                 course.students.map((student, index) => (
-                  <li key={index} style={{ padding: '10px 0', borderBottom: '1px solid #ddd' }}>
-                    <span style={{ fontSize: '18px', color: '#555' }}>{student.user.fullname}</span>
+                  <li
+                    key={index}
+                    style={{
+                      padding: '10px 0',
+                      borderBottom: '1px solid #ddd',
+                    }}
+                  >
+                    <span style={{ fontSize: '18px', color: '#555' }}>
+                      {student.user.fullname}
+                    </span>
                   </li>
                 ))
               ) : (
-                <h2 style={{ color: '#555', fontSize: '18px' }}>There are no students</h2>
+                <h2 style={{ color: '#555', fontSize: '18px' }}>
+                  There are no students
+                </h2>
               )}
             </ul>
           </div>
@@ -275,7 +317,9 @@ const Main = () => {
             control={control}
             defaultValue=''
             rules={{ required: 'This field is required' }}
-            render={({ field }) => <InputText {...field} style={{ width: '70%' }} />}
+            render={({ field }) => (
+              <InputText {...field} style={{ width: '70%' }} />
+            )}
           />
           {/* {errors.name && <p className='text-red-500'>{errors.name.message}</p>} */}
         </Dialog>
@@ -294,7 +338,9 @@ const Main = () => {
             control={control}
             defaultValue=''
             rules={{ required: 'This field is required' }}
-            render={({ field }) => <InputText {...field} style={{ width: '70%' }} />}
+            render={({ field }) => (
+              <InputText {...field} style={{ width: '70%' }} />
+            )}
           />
           {/* {errors.name && <p className='text-red-500'>{errors.name.message}</p>} */}
         </Dialog>

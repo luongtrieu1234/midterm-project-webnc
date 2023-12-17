@@ -57,9 +57,5 @@ export default function Sidebar() {
     },
   ];
 
-  return (
-    <div className='card flex justify-content-center'>
-      <Menu model={items} />
-    </div>
-  );
+  return <Menu model={items} />;
 }

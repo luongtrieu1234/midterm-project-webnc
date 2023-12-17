@@ -7,12 +7,13 @@ import {
   LandingPage,
   SignUp,
   Profile,
-  Google,
+  VerifyPage,
   SearchEmail,
   ResetPassword,
   ConfirmCode,
   ConfirmCodeSignUp,
   ClassDetail,
+  TestPage,
 } from './pages';
 import { PageError, Loading, NotLogged } from './components';
 
@@ -28,9 +29,10 @@ function App() {
   return (
     <Routes>
       <Route path='/' element={<LandingPage />} />
+      <Route path='/test' element={<TestPage />} />
       <Route path='/sign-up' element={<SignUp />} />
       <Route path='/sign-in' element={<SignIn />} />
-      <Route path='/sign-in-google' element={<Google />} />
+      <Route path='/sign-in-google' element={<VerifyPage />} />
       <Route path='/search-email' element={<SearchEmail />} />
       <Route path='/reset-password' element={<ResetPassword />} />
       <Route path='/confirm-code' element={<ConfirmCode />} />

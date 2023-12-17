@@ -10,7 +10,7 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 
-const Main = () => {
+const ViewListClass = () => {
   //Call API to get class list
   const [classList, setClassList] = useState([]);
   const toast = useRef(null);
@@ -35,18 +35,24 @@ const Main = () => {
     const fetchClassList = async () => {
       try {
         const token = localStorage.getItem('token'); // replace 'token' with your actual key
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/class/classes-of-user`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/class/classes-of-user`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         if (response.status === 200) {
           setClassList(response.data);
         } else {
           console.log('Error occurred while fetching class list');
         }
       } catch (error) {
-        console.error('An error occurred while fetching the class list:', error);
+        console.error(
+          'An error occurred while fetching the class list:',
+          error
+        );
       }
     };
 
@@ -65,12 +71,16 @@ const Main = () => {
   const addClass = async (data) => {
     try {
       const token = localStorage.getItem('token'); // replace 'token' with your actual key
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/class`, data, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/class`,
+        data,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       // Handle successful response
       if (response.status === 201) {
         console.log(response);
@@ -93,15 +103,24 @@ const Main = () => {
         onClick={() => setVisible(false)}
         className='p-button-text'
       />
-      <Button label='Create' icon='pi pi-check' onClick={handleSubmit(addClass)} autoFocus />
+      <Button
+        label='Create'
+        icon='pi pi-check'
+        onClick={handleSubmit(addClass)}
+        autoFocus
+      />
     </div>
   );
 
   return (
     <div className='grid mb-5'>
       <Toast ref={toast} />
-      <div className='card flex justify-content-center ml-6 mb-2'>
-        <Button label='Create Class' icon='pi pi-plus' onClick={() => setVisible(true)} />
+      <div className='col-12'>
+        <Button
+          label='Create Class'
+          icon='pi pi-plus'
+          onClick={() => setVisible(true)}
+        />
         <Dialog
           header='Create Class'
           visible={visible}
@@ -115,22 +134,26 @@ const Main = () => {
             control={control}
             defaultValue=''
             rules={{ required: 'This field is required' }}
-            render={({ field }) => <InputText {...field} style={{ width: '70%' }} />}
+            render={({ field }) => (
+              <InputText {...field} style={{ width: '70%' }} />
+            )}
           />
           {errors.name && <p className='text-red-500'>{errors.name.message}</p>}
         </Dialog>
       </div>
       <ScrollPanel style={{ width: '100%', height: '550px' }}>
-        <div className='grid ml-3'>
+        <div className='grid'>
           {classList.map((course) => (
-            <div className='col-12 lg:col-4' key={course._id}>
+            <div className='md:col-4 col-12 ' key={course._id}>
               <div className='p-3 h-full'>
                 <div
                   className='shadow-2 p-3 h-full flex flex-column'
                   style={{ borderRadius: '6px' }}
                 >
                   <div className=''>
-                    <div className='text-900 font-medium text-xl mb-2'>{course.name}</div>
+                    <div className='text-900 font-medium text-xl mb-2'>
+                      {course.name}
+                    </div>
                     <li className='flex align-items-center gap-2'>
                       <div className='text-600'>{course._id}</div>
                     </li>
@@ -138,7 +161,9 @@ const Main = () => {
                   <hr className='my-3 mx-0 border-top-1 border-bottom-none border-300' />
                   <div className='flex align-items-center'>
                     {/* <span className='font-bold text-2xl text-900'>${course.price}</span> */}
-                    <span className='ml-2 font-medium text-600'>welcome to course</span>
+                    <span className='ml-2 font-medium text-600'>
+                      welcome to course
+                    </span>
                   </div>
                   <hr className='my-3 mx-0 border-top-1 border-bottom-none border-300' />
                   {/* <ul className='list-none p-0 m-0 flex-grow-1'>
@@ -163,4 +188,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default ViewListClass;

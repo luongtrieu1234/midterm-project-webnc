@@ -1,19 +1,73 @@
 import PropTypes from 'prop-types';
-import React from 'react';
-import Header from './Header';
-import Sidebar from './Sidebar';
+import React, { useContext, useLayoutEffect, useRef } from 'react';
+import AppTopbar from './AppTopbar';
+import AppSidebar from './AppSidebar';
+import { Toast } from 'primereact/toast';
+import { classNames } from 'primereact/utils';
+import { LayoutContext } from './context/layoutcontext';
+import { useLocation } from 'react-router-dom';
 
+export let toast;
 export default function Layout({ children }) {
+  const location = useLocation();
+  const currentPath = location.pathname;
+  const toastRef = useRef(null);
+  const { layoutConfig, layoutState, setLayoutState } =
+    useContext(LayoutContext);
+  if (currentPath === '/' && layoutState.staticMenuDesktopInactive === false) {
+    setLayoutState((prevLayoutState) => ({
+      ...prevLayoutState,
+      staticMenuDesktopInactive: true,
+    }));
+  }
+
+  const containerClass = classNames('layout-wrapper', {
+    'layout-theme-light': layoutConfig.colorScheme === 'light',
+    'layout-theme-dark': layoutConfig.colorScheme === 'dark',
+    'layout-overlay': layoutConfig.menuMode === 'overlay',
+    'layout-static': layoutConfig.menuMode === 'static',
+    'layout-static-inactive':
+      layoutState.staticMenuDesktopInactive &&
+      layoutConfig.menuMode === 'static',
+    'layout-overlay-active': layoutState.overlayMenuActive,
+    'layout-mobile-active': layoutState.staticMenuMobileActive,
+    'p-input-filled': layoutConfig.inputStyle === 'filled',
+    'p-ripple-disabled': !layoutConfig.ripple,
+  });
+
+  useLayoutEffect(() => {
+    toast = (mode, detail) =>
+      toastRef.current.show({
+        severity: mode,
+        summary: mode,
+        detail,
+        life: 4000,
+      });
+  });
   return (
-    <div style={{ height: '100vh', overflow: 'hidden' }}>
-      <Header />
-      <div className='flex'>
-        <div className='flex justify-content-center font-bold m-2 px-4 py-2 w-3'>
-          <Sidebar />
-        </div>
-        <hr className='mx-0 border-left-1 border-bottom-none border-200' />
-        <div className='flex font-bold px-5 border-round w-full'>{children}</div>
+    <div className={containerClass}>
+      <div className='layout-topbar'>
+        <AppTopbar />
       </div>
+      <div className='layout-sidebar'>
+        <AppSidebar />
+      </div>
+      <div className='layout-main-container'>
+        <div className='layout-main'>{children}</div>
+      </div>
+      <div
+        className='layout-mask'
+        onClick={() => {
+          setLayoutState((prevLayoutState) => ({
+            ...prevLayoutState,
+            overlayMenuActive: false,
+            staticMenuMobileActive: false,
+            menuHoverActive: false,
+          }));
+        }}
+      />
+
+      <Toast ref={toastRef} />
     </div>
   );
 }
