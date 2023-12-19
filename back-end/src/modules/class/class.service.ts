@@ -63,11 +63,11 @@ export class ClassService {
       owner: classOwner._id,
       name: createClassDto.name,
     });
-    const gradeStructure = await this.gradeStructureModel.create({
-      name: `Grade structure of class ${createClassDto.name}`,
-    });
-    newClass.gradeStructure = gradeStructure._id.toString();
-    newClass.save();
+    // const gradeStructure = await this.gradeStructureModel.create({
+    //   name: `Grade structure of class ${createClassDto.name}`,
+    // });
+    // newClass.gradeStructure = gradeStructure._id.toString();
+    // newClass.save();
     return newClass;
   }
 
@@ -314,8 +314,11 @@ export class ClassService {
       const emailToken = await this.authService.signVerifyToken(email);
       const link = `${
         process.env.SERVER_URL
-      }/class/accept-join-class-by-student?className=${classDocument.name.replace(/ /g, '+')}&token=${emailToken}`;
-      
+      }/class/accept-join-class-by-student?className=${classDocument.name.replace(
+        / /g,
+        '+',
+      )}&token=${emailToken}`;
+
       return link;
     } catch (error) {
       // Handle errors

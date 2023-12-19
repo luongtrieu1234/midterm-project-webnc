@@ -5,7 +5,7 @@ import { Type } from 'class-transformer';
 export class AddGradeCompositionDto {
   @ApiProperty({ required: true })
   @IsNotEmpty()
-  readonly gradeStructureId: string;
+  readonly classId: string;
 
   @ApiProperty({ required: true })
   @IsNotEmpty()

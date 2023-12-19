@@ -28,6 +28,6 @@ import { GradeModule } from '../grade/grade.module';
   ],
   controllers: [ClassController],
   providers: [ClassService, SharedService],
-  exports: [MongooseModule],
+  exports: [MongooseModule, ClassService],
 })
 export class ClassModule {}

@@ -3,13 +3,13 @@ import { IsArray, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 export class UpdateGradeCompositionDto {
+  // @ApiProperty({ required: true })
+  // @IsNotEmpty()
+  // readonly classId: string;
+
   @ApiProperty({ required: true })
   @IsNotEmpty()
-  readonly gradeStructureId: string;
-  
-  @ApiProperty({ required: true })
-  @IsNotEmpty()
-  readonly id: string;
+  readonly gradeCompositionId: string;
 
   @ApiProperty({ required: false })
   @IsNotEmpty()
