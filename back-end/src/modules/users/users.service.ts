@@ -66,7 +66,7 @@ export class UsersService {
     // const emailToken = await this.authService.signVerifyToken(userResetPasswordRequestDto.email);
     const emailToken = await this.authService.signVerifyToken(userSignupRequestDto.email);
     this.sharedService.setToken(emailToken);
-    await this.mailService.sendUserConfirmation('lexuantien07@gmail.com', emailToken);
+    await this.mailService.sendUserConfirmation(userSignupRequestDto.email, emailToken);
     const hashedPassword = await bcrypt.hash(userSignupRequestDto.password, 12);
 
     const user = await this.userModel.create({
@@ -360,7 +360,7 @@ export class UsersService {
     this.sharedService.setCode(codeMail);
     const emailToken = await this.authService.signVerifyToken(userResetPasswordRequestDto.email);
     this.sharedService.setToken(emailToken);
-    await this.mailService.sendUserResetPassword('lexuantien07@gmail.com', emailToken);
+    await this.mailService.sendUserResetPassword(userResetPasswordRequestDto.email, emailToken);
     return {
       message: 'success',
       status: HttpStatus.OK,
