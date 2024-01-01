@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { Model } from 'mongoose';
+import { Model, SortOrder } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 import * as bcrypt from 'bcrypt';
@@ -26,6 +26,7 @@ import { SendInvitationDto } from './dto/send-invitation.dto';
 import { RoleModel } from '../role/role.model';
 import { GradeModel } from '../grade/grade.model';
 import { GradeStructureModel } from '../grade/grade-structure.model';
+import { ConfirmClassCodeDto } from './dto/confirm-class-code.dto';
 
 @Injectable()
 export class ClassService {
@@ -59,10 +60,26 @@ export class ClassService {
     const classOwner = await this.userModel.findOne({
       _id: ownerId,
     });
+    let classCode = Math.floor(100000 + Math.random() * 900000).toString();
+    while (1) {
+      const isClassCode = await this.classModel.findOne({ classCode: classCode });
+      if (isClassCode) {
+        classCode = Math.floor(100000 + Math.random() * 900000).toString();
+      } else {
+        break;
+      }
+    }
     const newClass = await this.classModel.create({
       owner: classOwner._id,
       name: createClassDto.name,
+      classCode: classCode,
     });
+    // const owner = await this.userModel.findById(ownerId);
+    const teacherRole = await this.roleModel.findOne({
+      name: 'teacher',
+    });
+    newClass.teachers.push({ user: ownerId, classRole: 'teacher' });
+    newClass.save();
     // const gradeStructure = await this.gradeStructureModel.create({
     //   name: `Grade structure of class ${createClassDto.name}`,
     // });
@@ -93,7 +110,7 @@ export class ClassService {
         const isExisting2 = currentClass.students.some(
           (existingStudent) =>
             existingStudent?.user?.toString() === studentAdd._id.toString() &&
-            existingStudent?.role?.toString() === studentRole._id.toString(),
+            existingStudent?.classRole?.toString() === 'student',
         );
         console.log('isExisting2 ', isExisting2);
 
@@ -102,12 +119,12 @@ export class ClassService {
           !currentClass.students.some(
             (existingStudent) =>
               existingStudent?.user?.toString() === studentAdd._id.toString() &&
-              existingStudent?.role?.toString() === studentRole._id.toString(),
+              existingStudent?.classRole?.toString() === 'student',
           )
         ) {
           currentClass.students.push({
             user: studentAdd._id.toString(),
-            role: studentRole._id.toString(),
+            classRole: 'student',
           });
           return currentClass.save();
         }
@@ -127,12 +144,12 @@ export class ClassService {
           !currentClass.teachers.some(
             (existingTeacher) =>
               existingTeacher?.user?.toString() === teacherAdd._id.toString() &&
-              existingTeacher?.role?.toString() === teacherRole._id.toString(),
+              existingTeacher?.classRole?.toString() === 'teacher',
           )
         ) {
           currentClass.teachers.push({
             user: teacherAdd._id.toString(),
-            role: teacherRole._id.toString(),
+            classRole: 'teacher',
           });
           return currentClass.save();
         }
@@ -156,8 +173,26 @@ export class ClassService {
     };
   }
 
-  async getListClasses() {
-    const classes = await this.classModel.find();
+  async getListClasses(sortType: string, filterOption: string) {
+    console.log('sortType ', sortType);
+    console.log('filterOption ', filterOption);
+    let sort: SortOrder = 1;
+    if (sortType === 'desc') {
+      sort = 'desc' as SortOrder;
+    } else {
+      sort = 'asc' as SortOrder;
+    }
+    let filter = {};
+    if (filterOption === 'active') {
+      filter = { active: true };
+    } else if (filterOption === 'inactive') {
+      filter = { active: false };
+    }
+
+    const classes = await this.classModel
+      .find(filter)
+      .sort({ createdAt: sort as SortOrder })
+      .exec();
     const promises = classes?.map(async (classDocument) => {
       return await this.getClassWithUserInfo(classDocument._id.toString());
     });
@@ -202,7 +237,7 @@ export class ClassService {
     const userRoleInfo = await this.getUserRoleInClass(classDocument, userIdToCheck);
 
     if (userRoleInfo) {
-      console.log(`User has the role '${userRoleInfo.role}' as a ${userRoleInfo.userType}.`);
+      console.log(`User has the role '${userRoleInfo.role}' as a ${userRoleInfo.role}.`);
     } else {
       console.log('User not found in the class.');
     }
@@ -277,31 +312,22 @@ export class ClassService {
     const student = classDocument.students.find((student) => student.user.toString() === userId);
 
     if (student) {
-      const studentRole = await this.getRoleById(student.role);
-      return { role: studentRole, userType: 'student' };
+      return { message: 'success', statusCode: HttpStatus.OK, role: 'student' };
     }
 
     // Check in the teachers array
     const teacher = classDocument.teachers.find((teacher) => teacher.user.toString() === userId);
 
     if (teacher) {
-      const teacherRole = await this.getRoleById(teacher.role);
       return {
         message: 'success',
         statusCode: HttpStatus.OK,
-        role: teacherRole,
-        userType: 'teacher',
+        role: 'teacher',
       };
     }
 
     // User not found in students or teachers array
     return null;
-  }
-
-  async getRoleById(roleId) {
-    // Assume you have a Mongoose model for the Role schema
-    const role = await this.roleModel.findById(roleId);
-    return role ? role.name : null;
   }
 
   async getLinkInvitation(email, classId) {
@@ -355,5 +381,25 @@ export class ClassService {
       console.error('Error retrieving class information:', error.message);
       throw error;
     }
+  }
+
+  async confirmClassCode(dto: ConfirmClassCodeDto, email: string) {
+    const classCode = dto.code;
+    const classDocument = await this.classModel.findById(dto.classId);
+    if (!classDocument) {
+      throw new BadRequestException('Class not found');
+    }
+    if (classDocument.classCode !== classCode) {
+      throw new BadRequestException('Class code is not correct');
+    }
+    await this.addUsersToClass({
+      name: classDocument.name,
+      students: [{ email: email }],
+      teachers: [],
+    });
+    return {
+      message: 'Verify success',
+      statusCode: HttpStatus.OK,
+    };
   }
 }

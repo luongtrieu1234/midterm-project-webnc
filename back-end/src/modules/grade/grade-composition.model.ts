@@ -6,15 +6,19 @@ export const GradeCompositionSchema = new mongoose.Schema({
   grades: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Grade' }],
   name: { type: String },
   gradeScale: { type: Number },
+  position: { type: Number },
+  isFinal: { type: Boolean, default: false },
 });
 
 export interface GradeCompositionModel {
   id: string;
   class: string;
   // gradeStructure: string;
-  grade: string[];
+  grades: string[];
   name: string;
   gradeScale: number;
+  position: number;
+  isFinal: boolean;
 }
 
 export const GradeCompositionModel = mongoose.model<GradeCompositionModel>(

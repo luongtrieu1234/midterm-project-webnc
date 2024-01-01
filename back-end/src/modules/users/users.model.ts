@@ -11,7 +11,8 @@ export const UserSchema = new mongoose.Schema({
   job: { type: String, default: '' }, // Set default value for job
   active: { type: Boolean, default: false }, // Set default value for job
   hobby: { type: [String], default: [] }, // Set default value for hobby
-  roles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null }],
+  role: { type: String, default: 'user' },
+  studentId: { type: String, default: '' },
   deletedAt: { type: Date, default: null }, // Set default value for deletedAt
   createdAt: { type: Date, default: Date.now }, // Set default value for createdAt to the current date and time
   updatedAt: { type: Date, default: Date.now },
@@ -29,7 +30,8 @@ export interface UserModel {
   job: string;
   active: boolean;
   hobby: string[];
-  roles: string[];
+  role: string;
+  studentId: string;
   deletedAt: Date;
   createdAt: Date;
   updatedAt: Date;

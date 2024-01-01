@@ -6,16 +6,25 @@ export const ClassSchema = new mongoose.Schema({
   students: [
     {
       user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-      role: { type: mongoose.Schema.Types.ObjectId, ref: 'Role' },
+      classRole: { type: String, default: 'student' },
+      studentId: { type: String, default: '' },
+    },
+  ],
+  studentIds: [
+    {
+      id: { type: String },
+      user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     },
   ],
   teachers: [
     {
       user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-      role: { type: mongoose.Schema.Types.ObjectId, ref: 'Role' },
+      classRole: { type: String, default: 'teacher' },
     },
   ],
   gradeComposition: [{ type: mongoose.Schema.Types.ObjectId, ref: 'GradeComposition' }],
+  classCode: { type: String },
+  active: { type: Boolean, default: true },
   deletedAt: { type: Date, default: null }, // Set default value for deletedAt
   createdAt: { type: Date, default: Date.now }, // Set default value for createdAt to the current date and time
   updatedAt: { type: Date, default: Date.now },
@@ -25,9 +34,11 @@ export interface ClassModel {
   id: string;
   name: string;
   owner: string;
-  students: { user: string; role: string }[];
-  teachers: { user: string; role: string }[];
+  students: { user: string; classRole: string }[];
+  teachers: { user: string; classRole: string }[];
   gradeComposition: string[];
+  classCode: string;
+  active: boolean;
   deletedAt: Date;
   createdAt: Date;
   updatedAt: Date;

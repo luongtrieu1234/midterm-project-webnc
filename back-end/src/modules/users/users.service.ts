@@ -66,7 +66,7 @@ export class UsersService {
     // const emailToken = await this.authService.signVerifyToken(userResetPasswordRequestDto.email);
     const emailToken = await this.authService.signVerifyToken(userSignupRequestDto.email);
     this.sharedService.setToken(emailToken);
-    // await this.mailService.sendUserConfirmation(userSignupRequestDto.email, codeMail);
+    await this.mailService.sendUserConfirmation('lexuantien07@gmail.com', emailToken);
     const hashedPassword = await bcrypt.hash(userSignupRequestDto.password, 12);
 
     const user = await this.userModel.create({
@@ -101,6 +101,42 @@ export class UsersService {
     };
   }
 
+  async userSignup(token: string) {
+    const payload = await this.authService.verifyToken(token);
+    if (!payload) {
+      throw new UnauthorizedException();
+    }
+    if (payload) {
+      const user = await this.userModel.findOne({
+        email: payload['email'],
+      });
+      user.active = true;
+      user.save();
+    }
+    return {
+      message: 'success',
+      statusCode: HttpStatus.OK,
+    };
+  }
+
+  async userResetPassword(token: string) {
+    const payload = await this.authService.verifyToken(token);
+    if (!payload) {
+      throw new UnauthorizedException();
+    }
+    // if (payload) {
+    //   const user = await this.userModel.findOne({
+    //     email: payload['email'],
+    //   });
+    //   user.active = true;
+    //   user.save();
+    // }
+    return {
+      message: 'success',
+      statusCode: HttpStatus.OK,
+    };
+  }
+
   async reactivateSignupRequest(userResetPasswordRequestDto: UserResetPasswordRequestDto) {
     const user = await this.userModel.findOne({
       email: userResetPasswordRequestDto.email,
@@ -128,6 +164,9 @@ export class UsersService {
 
     if (!user) {
       throw new BadRequestException('Email not found');
+    }
+    if (user.active !== true) {
+      throw new BadRequestException('Email is not active');
     }
 
     if (!(await bcrypt.compare(userLoginRequestDto.password, user.password))) {
@@ -321,7 +360,7 @@ export class UsersService {
     this.sharedService.setCode(codeMail);
     const emailToken = await this.authService.signVerifyToken(userResetPasswordRequestDto.email);
     this.sharedService.setToken(emailToken);
-    await this.mailService.sendUserResetPassword(userResetPasswordRequestDto.email, codeMail);
+    await this.mailService.sendUserResetPassword('lexuantien07@gmail.com', emailToken);
     return {
       message: 'success',
       status: HttpStatus.OK,
@@ -353,8 +392,8 @@ export class UsersService {
     // };
   }
 
-  async resetPassword(userResetPasswordDto: UserResetPasswordDto) {
-    const token = this.sharedService.getToken();
+  async resetPassword(userResetPasswordDto: UserResetPasswordDto, token: string) {
+    // const token = this.sharedService.getToken();
     // if (!token) {
     //   throw new BadRequestException('Confirmation fail');
     // }
