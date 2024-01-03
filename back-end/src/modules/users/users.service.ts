@@ -447,4 +447,28 @@ export class UsersService {
       statusCode: HttpStatus.OK,
     };
   }
+
+  async mapStudentIdToAccount(studentId: string, userId: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    if (user.studentId) {
+      throw new BadRequestException('User already mapped');
+    }
+    const users = await this.userModel.find();
+    const studentIdExists = users.find((user) => user.studentId === studentId);
+    if (studentIdExists) {
+      throw new BadRequestException('Student Id already exists');
+    }
+    return await this.userModel.findByIdAndUpdate(userId, { studentId });
+  }
+
+  async getStudentById(studentId: string) {
+    const user = await this.userModel.findOne({ studentId });
+    if (!user) {
+      throw new BadRequestException('Student not found');
+    }
+    return user;
+  }
 }

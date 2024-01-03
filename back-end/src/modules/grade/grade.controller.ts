@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -31,6 +32,11 @@ import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express
 import { UploadFileDto } from './dto/upload-excel-file.dto';
 import { multerOptions } from 'src/others/multer/multer.config';
 import { AddGradeDto } from './dto/add-grade.dto';
+import { ReviewRequestDto } from './dto/review-request.dto';
+import { CommentDto } from './dto/comment.dto';
+import { MarkDecisionDto } from './dto/mark-decition.dto';
+import { ClassService } from '../class/class.service';
+import { UsersService } from '../users/users.service';
 
 @Controller('grade')
 @ApiTags('grade')
@@ -38,47 +44,57 @@ import { AddGradeDto } from './dto/add-grade.dto';
 export class GradeController {
   constructor(
     private readonly gradeService: GradeService,
+    private readonly classService: ClassService,
+    private readonly usersService: UsersService,
     private authService: AuthService,
     private sharedService: SharedService,
   ) {}
 
   @Get('grade-structure')
-  // @UseGuards(AuthGuardCustom)
+  @UseGuards(AuthGuardCustom)
   // @Roles(UserRole.TEACHER)
   @HttpCode(200)
-  async showGradeStructure(@Query('classId') classId: string) {
+  async showGradeStructure(@Query('classId') classId: string, @Req() req) {
     return await this.gradeService.showGradeStructure(classId);
   }
 
   @Post('add-grade-composition')
-  // @UseGuards(AuthGuardCustom)
+  @UseGuards(AuthGuardCustom)
   // @Roles(UserRole.TEACHER)
   @HttpCode(200)
-  async addGradeComposition(@Body() addGradeCompositionDto: AddGradeCompositionDto) {
+  async addGradeComposition(@Body() addGradeCompositionDto: AddGradeCompositionDto, @Req() req) {
     return await this.gradeService.addGradeComposition(addGradeCompositionDto);
   }
 
   @Patch('update-grade-composition')
-  // @UseGuards(AuthGuardCustom)
+  @UseGuards(AuthGuardCustom)
   // @Roles(UserRole.TEACHER)
   @HttpCode(200)
-  async updateGradeComposition(@Body() updateGradeCompositionDto: UpdateGradeCompositionDto) {
+  async updateGradeComposition(
+    @Body() updateGradeCompositionDto: UpdateGradeCompositionDto,
+    @Req() req,
+  ) {
     return await this.gradeService.updateGradeComposition(updateGradeCompositionDto);
   }
 
   @Post('delete-grade-composition')
-  // @UseGuards(AuthGuardCustom)
+  @UseGuards(AuthGuardCustom)
   // @Roles(UserRole.TEACHER)
   @HttpCode(200)
-  async removeGradeComposition(@Query('gradeCompositionId') gradeCompositionId: string) {
+  async removeGradeComposition(
+    @Query('gradeCompositionId') gradeCompositionId: string,
+    @Req() req,
+  ) {
     return await this.gradeService.removeGradeComposition(gradeCompositionId);
   }
 
   @Get('excel-template-list')
+  @UseGuards(AuthGuardCustom)
   @Header('Access-Control-Expose-Headers', 'Content-Disposition')
   async downloadTemplateFileList(
     @Res({ passthrough: true }) response: Response,
     @Query('classID') classId: string,
+    @Req() req,
   ) {
     const { buffer, classCode } = await this.gradeService.downloadTemplateFileList(
       response,
@@ -89,10 +105,12 @@ export class GradeController {
   }
 
   @Get('excel-template-grade')
+  @UseGuards(AuthGuardCustom)
   @Header('Access-Control-Expose-Headers', 'Content-Disposition')
   async downloadTemplateFileGrade(
     @Res({ passthrough: true }) response: Response,
     @Query('gradeCompositionId') gradeCompositionId: string,
+    @Req() req,
   ) {
     const { buffer, gradeCompositionName } = await this.gradeService.downloadTemplateFileGrade(
       response,
@@ -102,8 +120,22 @@ export class GradeController {
     return response.send(buffer);
   }
 
+  @Get('export-file-grade')
+  @UseGuards(AuthGuardCustom)
+  @Header('Access-Control-Expose-Headers', 'Content-Disposition')
+  async exportFileGrade(
+    @Res({ passthrough: true }) response: Response,
+    @Query('classId') classId: string,
+    @Req() req,
+  ) {
+    const { buffer, className } = await this.gradeService.exportFileGrade(response, classId);
+    response.set('Content-Disposition', `attachment; filename=${className}.xlsx`);
+    return response.send(buffer);
+  }
+
   @ApiConsumes('multipart/form-data')
   @Post('upload-file-list')
+  @UseGuards(AuthGuardCustom)
   @HttpCode(200)
   // @UseInterceptors(FileFieldsInterceptor([{ name: 'excelFile', maxCount: 1 }]))
   @UseInterceptors(FileFieldsInterceptor([{ name: 'excelFile', maxCount: 1 }], multerOptions))
@@ -113,6 +145,7 @@ export class GradeController {
     files: {
       excelFile?: Express.Multer.File[];
     },
+    @Req() req,
   ) {
     // const data = await this.gradeService.readExcelFileList(
     //   files?.excelFile?.[0].buffer,
@@ -125,6 +158,7 @@ export class GradeController {
 
   @ApiConsumes('multipart/form-data')
   @Post('upload-file-grade')
+  @UseGuards(AuthGuardCustom)
   @HttpCode(200)
   @UseInterceptors(FileFieldsInterceptor([{ name: 'excelFile', maxCount: 1 }]))
   // @UseInterceptors(FileFieldsInterceptor([{ name: 'excelFile', maxCount: 1 }], multerOptions))
@@ -134,6 +168,7 @@ export class GradeController {
     files: {
       excelFile?: Express.Multer.File[];
     },
+    @Req() req,
   ) {
     await this.gradeService.readExcelFileGrade(
       files?.excelFile?.[0].buffer,
@@ -143,23 +178,95 @@ export class GradeController {
     return { message: files, body: dto };
   }
 
-  @Get('read-file')
-  async readFile(@Query('classID') classId: string) {
-    return await this.gradeService.getClassGrades(classId);
-  }
+  // @Get('read-file')
+  // async readFile(@Query('classID') classId: string) {
+  //   return await this.gradeService.getClassGrades(classId);
+  // }
 
   @Get('class-grades')
-  async getClassGrades(@Query('classID') classId: string) {
+  @UseGuards(AuthGuardCustom)
+  async getClassGrades(@Query('classID') classId: string, @Req() req) {
     return await this.gradeService.getClassGrades(classId);
   }
 
   @Post('add-grade')
-  async addGrade(@Body() dto: AddGradeDto) {
+  @UseGuards(AuthGuardCustom)
+  async addGrade(@Body() dto: AddGradeDto, @Req() req) {
     return await this.gradeService.addGrade(dto);
   }
 
-  @Post('set-final')
-  async setFinalGradeComposition(@Query('gradeCompositionId') gradeCompositionId: string) {
-    return await this.gradeService.setFinalGradeComposition(gradeCompositionId);
+  @Post('update-grade')
+  @UseGuards(AuthGuardCustom)
+  async updateGrade(@Body() dto: AddGradeDto, @Req() req) {
+    return await this.gradeService.updateGrade(dto);
+  }
+
+  @Post('mark-grade-composition-final')
+  @UseGuards(AuthGuardCustom)
+  async markFinalGradeComposition(
+    @Query('gradeCompositionId') gradeCompositionId: string,
+    @Req() req,
+  ) {
+    return await this.gradeService.markFinalGradeComposition(gradeCompositionId);
+  }
+
+  @Get('grade-of-student')
+  @UseGuards(AuthGuardCustom)
+  @HttpCode(200)
+  async getGradesOfStudent(@Req() req, @Query('classId') classId: string) {
+    return await this.gradeService.getGradesOfStudent(classId, req.user.id);
+  }
+
+  @Post('review-request')
+  @UseGuards(AuthGuardCustom)
+  @HttpCode(200)
+  async requestReviewGrade(@Body() reviewRequestDto: ReviewRequestDto, @Req() req) {
+    return await this.gradeService.requestReviewGrade(reviewRequestDto);
+  }
+
+  @Get('list-review-request')
+  @UseGuards(AuthGuardCustom)
+  @HttpCode(200)
+  async getListGradeReviewRequests(@Req() req, @Query('classId') classId: string) {
+    return await this.gradeService.getListGradeReviewRequests(classId);
+  }
+
+  @Get('review-request-detail')
+  @UseGuards(AuthGuardCustom)
+  @HttpCode(200)
+  async getGradeReviewRequestDetail(
+    @Req() req,
+    @Query('classId') classId: string,
+    @Query('gradeId') gradeId: string,
+  ) {
+    return await this.gradeService.getGradeReviewRequestDetail(classId, gradeId);
+  }
+
+  @Get('grade-detail-by-id')
+  @UseGuards(AuthGuardCustom)
+  @HttpCode(200)
+  async getGradeDetailByGradeId(@Req() req, @Query('gradeId') gradeId: string) {
+    return await this.gradeService.getGradeDetailByGradeId(gradeId);
+  }
+
+  @Post('comment')
+  @UseGuards(AuthGuardCustom)
+  @HttpCode(200)
+  async commentReview(@Body() commentDto: CommentDto, @Req() req) {
+    return await this.gradeService.commentReview(commentDto, req.user.id);
+  }
+
+  @Post('mark-decision')
+  @UseGuards(AuthGuardCustom)
+  async markFinalDecisionGrade(@Body() markDecisionDto: MarkDecisionDto, @Req() req) {
+    // const user = await this.usersService.findUserByEmail(req.user.email);
+    // const gradeDocument = await this.gradeService.getGradeDetailByGradeId(markDecisionDto.gradeId);
+    // const userRole = await this.classService.getUserRoleInClass(
+    //   gradeDocument.result.class,
+    //   user.id,
+    // );
+    // if (userRole.role !== 'teacher')
+    //   throw new BadRequestException('You are not a teacher of this class');
+    return await this.gradeService.markFinalDecisionGrade(markDecisionDto);
   }
 }

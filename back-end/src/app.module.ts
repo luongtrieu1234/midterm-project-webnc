@@ -32,7 +32,7 @@ import { AdminModule } from './modules/admin/admin.module';
       envFilePath: ['.env', '.env.pro'],
       isGlobal: true,
     }),
-    MongooseModule.forRoot('mongodb+srv://admin1:admin1@cluster0.1npefek.mongodb.net/midterm'),
+    MongooseModule.forRoot(`${process.env.DATABASE_URL}/${process.env.DATABASE_NAME}`),
     JwtModule,
   ],
   controllers: [AppController],

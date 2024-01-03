@@ -38,49 +38,72 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // migration-script.ts
 var mongoose_1 = require("mongoose");
+var bcrypt = require("bcrypt");
+var users_model_1 = require("../../modules/users/users.model");
+var role_model_1 = require("../../modules/role/role.model");
+var class_model_1 = require("../../modules/class/class.model");
+var grade_composition_model_1 = require("../../modules/grade/grade-composition.model");
+var grade_model_1 = require("../../modules/grade/grade.model");
 var dotenv_1 = require("dotenv");
+var grade_structure_model_1 = require("../../modules/grade/grade-structure.model");
 (0, dotenv_1.config)();
 function runMigration() {
     return __awaiter(this, void 0, void 0, function () {
-        var error_1;
+        var hashedPassword1, usersData, createdUser, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 8, 9, 11]);
+                    _a.trys.push([0, 10, 11, 13]);
+                    console.log('Connecting to database...', process.env.DATABASE_URL, process.env.DATABASE_NAME);
                     return [4 /*yield*/, (0, mongoose_1.connect)("".concat(process.env.DATABASE_URL, "/").concat(process.env.DATABASE_NAME))];
                 case 1:
                     _a.sent();
-                    return [4 /*yield*/, mongoose_1.connection.db.dropCollection('roles')];
+                    return [4 /*yield*/, role_model_1.RoleModel.createCollection()];
                 case 2:
                     _a.sent();
-                    return [4 /*yield*/, mongoose_1.connection.db.dropCollection('users')];
+                    return [4 /*yield*/, users_model_1.UserModel.createCollection()];
                 case 3:
                     _a.sent();
-                    return [4 /*yield*/, mongoose_1.connection.db.dropCollection('classes')];
+                    return [4 /*yield*/, class_model_1.ClassModel.createCollection()];
                 case 4:
                     _a.sent();
-                    return [4 /*yield*/, mongoose_1.connection.db.dropCollection('gradestructures')];
+                    return [4 /*yield*/, grade_structure_model_1.GradeStructureModel.createCollection()];
                 case 5:
                     _a.sent();
-                    return [4 /*yield*/, mongoose_1.connection.db.dropCollection('gradecompositions')];
+                    return [4 /*yield*/, grade_composition_model_1.GradeCompositionModel.createCollection()];
                 case 6:
                     _a.sent();
-                    return [4 /*yield*/, mongoose_1.connection.db.dropCollection('grades')];
+                    return [4 /*yield*/, grade_model_1.GradeModel.createCollection()];
                 case 7:
                     _a.sent();
-                    return [3 /*break*/, 11];
+                    return [4 /*yield*/, bcrypt.hash('admin', 12)];
                 case 8:
+                    hashedPassword1 = _a.sent();
+                    usersData = [
+                        {
+                            fullname: 'Admin',
+                            email: 'admin@admin.com',
+                            password: hashedPassword1,
+                            role: 'admin',
+                        },
+                    ];
+                    return [4 /*yield*/, users_model_1.UserModel.create(usersData)];
+                case 9:
+                    createdUser = _a.sent();
+                    console.log('Admin user created:', createdUser);
+                    return [3 /*break*/, 13];
+                case 10:
                     error_1 = _a.sent();
                     console.error('Migration error:', error_1);
-                    return [3 /*break*/, 11];
-                case 9:
+                    return [3 /*break*/, 13];
+                case 11:
                     // Close the connection
                     console.log('Closing connection...');
                     return [4 /*yield*/, mongoose_1.connection.close()];
-                case 10:
+                case 12:
                     _a.sent();
                     return [7 /*endfinally*/];
-                case 11: return [2 /*return*/];
+                case 13: return [2 /*return*/];
             }
         });
     });
