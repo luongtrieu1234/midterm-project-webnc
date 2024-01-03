@@ -29,6 +29,7 @@ import { UserModel } from './users.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserConfirmCodeDto } from './dto/user-confirm-code.dto';
 import { AuthGuardCustom } from 'src/others/auth/auth.guard';
+import { MapStudentIdToAccountDto } from './dto/map-student-account.dto';
 
 @Controller('users')
 @ApiTags('users')
@@ -176,5 +177,13 @@ export class UsersController {
   @Post('/confirm-code-sign-up')
   async confirmCodeMailSignup(@Body() code: UserConfirmCodeDto) {
     return await this.usersService.verifyCodeEmailActivate(code);
+  }
+
+  @Post('map-student')
+  @HttpCode(200)
+  @UseGuards(AuthGuardCustom)
+  async mapStudentIdToAccount(@Body() dto: MapStudentIdToAccountDto, @Req() req) {
+    const userId = req.user.id;
+    return await this.usersService.mapStudentIdToAccount(dto.studentId, userId);
   }
 }

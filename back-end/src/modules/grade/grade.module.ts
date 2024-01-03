@@ -12,6 +12,7 @@ import { GradeCompositionSchema } from './grade-composition.model';
 import { UserModule } from '../users/users.module';
 import { ClassModule } from '../class/class.module';
 import { GradeStructureSchema } from './grade-structure.model';
+import { CommentSchema } from './comment.model';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { GradeStructureSchema } from './grade-structure.model';
     MongooseModule.forFeature([{ name: 'Grade', schema: GradeSchema }]),
     MongooseModule.forFeature([{ name: 'GradeComposition', schema: GradeCompositionSchema }]),
     MongooseModule.forFeature([{ name: 'GradeStructure', schema: GradeStructureSchema }]),
+    MongooseModule.forFeature([{ name: 'Comment', schema: CommentSchema }]),
     // JwtModule.register({
     //   secret: 'secret-key',
     //   signOptions: { expiresIn: '1d' },

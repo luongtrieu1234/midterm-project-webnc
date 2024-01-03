@@ -8,6 +8,7 @@ import { UserModel } from '../users/users.model';
 import { ClassModel } from '../class/class.model';
 import { AuthService } from '~/others/auth/auth.service';
 import { ClassService } from '../class/class.service';
+import * as ExcelJS from 'exceljs';
 @Injectable()
 export class AdminService {
   constructor(
@@ -45,7 +46,7 @@ export class AdminService {
 
   async inactivateAccount(userId: string) {
     const user = await this.userModel.findOne({
-      id: userId,
+      _id: userId,
     });
     if (!user) {
       throw new BadRequestException('Account not found');
@@ -60,31 +61,57 @@ export class AdminService {
     };
   }
 
-  async getListClasses(sortType: string, filterOption: string) {
-    console.log('sortType ', sortType);
-    console.log('filterOption ', filterOption);
-    let sort: SortOrder = 1;
-    if (sortType === 'desc') {
-      sort = 'desc' as SortOrder;
-    } else {
-      sort = 'asc' as SortOrder;
-    }
-    let filter = {};
-    if (filterOption === 'active') {
-      filter = { active: true };
-    } else if (filterOption === 'inactive') {
-      filter = { active: false };
+  async activateAccount(userId: string) {
+    const user = await this.userModel.findOne({
+      _id: userId,
+    });
+    if (!user) {
+      throw new BadRequestException('Account not found');
     }
 
-    const classes = await this.classModel
-      .find(filter)
-      .sort({ createdAt: sort as SortOrder })
-      .exec();
-    const promises = classes?.map(async (classDocument) => {
-      return await this.classService.getClassWithUserInfo(classDocument._id.toString());
-    });
-    return await Promise.all(promises);
+    user.active = true;
+    user.save();
+
+    return {
+      message: 'success',
+      statusCode: 200,
+    };
   }
+
+  async getListUsers() {
+    const users = await this.userModel.find({}).exec();
+    return {
+      users,
+      message: 'success',
+      statusCode: 200,
+    };
+  }
+
+  // async getListClasses(sortType: string, filterOption: string) {
+  //   console.log('sortType ', sortType);
+  //   console.log('filterOption ', filterOption);
+  //   let sort: SortOrder = 1;
+  //   if (sortType === 'desc') {
+  //     sort = 'desc' as SortOrder;
+  //   } else {
+  //     sort = 'asc' as SortOrder;
+  //   }
+  //   let filter = {};
+  //   if (filterOption === 'active') {
+  //     filter = { active: true };
+  //   } else if (filterOption === 'inactive') {
+  //     filter = { active: false };
+  //   }
+
+  //   const classes = await this.classModel
+  //     .find(filter)
+  //     .sort({ createdAt: sort as SortOrder })
+  //     .exec();
+  //   const promises = classes?.map(async (classDocument) => {
+  //     return await this.classService.getClassWithUserInfo(classDocument._id.toString());
+  //   });
+  //   return await Promise.all(promises);
+  // }
 
   async inactivateClass(classId: string) {
     const classDocument = await this.classModel.findOne({
@@ -117,6 +144,94 @@ export class AdminService {
     classDocument.save();
 
     return {
+      message: 'success',
+      statusCode: 200,
+    };
+  }
+
+  async mapStudentAccount(studentId: string, userId: string) {
+    const user = await this.userModel.findOne({ _id: userId });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    if (user.studentId) {
+      throw new BadRequestException('This account has been mapped');
+    }
+    const studentAccount = await this.userModel.findOne({ studentId: studentId });
+    if (studentAccount) {
+      throw new BadRequestException('This studentId has been mapped');
+    }
+    user.studentId = studentId;
+    user.save();
+    return {
+      user,
+      message: 'success',
+      statusCode: 200,
+    };
+  }
+
+  async unMapStudentAccount(userId: string) {
+    const user = await this.userModel.findOne({ _id: userId });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    if (!user.studentId) {
+      throw new BadRequestException('This account has not been mapped');
+    }
+    user.studentId = '';
+    user.save();
+    return {
+      user,
+      message: 'success',
+      statusCode: 200,
+    };
+  }
+
+  async mapStudentAccountFromFile(buffer: Buffer, originalname: string) {
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(buffer);
+
+    const worksheet = workbook.getWorksheet(1);
+    const data = [];
+
+    worksheet.eachRow((row) => {
+      data.push(row.values);
+    });
+    console.log('Uploaded data:', data);
+    let keys = data[0].slice(1); // Get the keys from the first subarray, excluding the first empty item
+    let values = data.slice(1); // Get the values from the rest of the subarrays
+
+    let result: { No: any; StudentId: any; Email: any }[] = values.map((subarray) => {
+      let obj: { No: any; StudentId: any; Email: any } = {
+        No: undefined,
+        StudentId: undefined,
+        Email: undefined,
+      };
+      keys.forEach((key, index) => {
+        obj[key] = subarray[index + 1]; // Assign the value to the corresponding key in the object, excluding the first empty item in the subarray
+      });
+      // if (obj.Email === undefined) {
+      //   obj.Email = ;
+      // }
+      return obj;
+    });
+
+    console.log('result ', result);
+    let notFoundUsers = [];
+    for (const element of result) {
+      const student = await this.userModel.findOne({
+        email: element.Email?.text ?? element.Email,
+      });
+      if (!student) {
+        notFoundUsers.push(element.Email);
+        continue;
+      }
+      student.studentId = element.StudentId;
+      await student.save();
+    }
+
+    return {
+      notFoundUsers,
       message: 'success',
       statusCode: 200,
     };

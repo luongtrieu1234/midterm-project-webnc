@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger, Query } from '@nestjs/common';
+import { Inject, Injectable, Logger, Query, StreamableFile } from '@nestjs/common';
 import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -28,6 +28,10 @@ import { GradeStructureModel } from './grade-structure.model';
 import { ClassService } from '../class/class.service';
 import { GradeModel } from './grade.model';
 import { AddGradeDto } from './dto/add-grade.dto';
+import { ReviewRequestDto } from './dto/review-request.dto';
+import { CommentModel } from './comment.model';
+import { CommentDto } from './dto/comment.dto';
+import { MarkDecisionDto } from './dto/mark-decition.dto';
 
 @Injectable()
 export class GradeService {
@@ -47,8 +51,10 @@ export class GradeService {
     @InjectModel('GradeStructure')
     private readonly gradeStructureModel: Model<GradeStructureModel>,
     @InjectModel('Grade')
-    private readonly gradeModel: Model<GradeModel>, // private readonly userModel: Model<UserModel>,
-    // @InjectModel('User')
+    private readonly gradeModel: Model<GradeModel>,
+    @InjectModel('Comment')
+    private readonly commentModel: Model<CommentModel>, // @InjectModel('User')
+    // private readonly userModel: Model<UserModel>,
   ) {}
   async showGradeStructure(classId: string) {
     try {
@@ -132,6 +138,12 @@ export class GradeService {
   async removeGradeComposition(gradeCompositionId: string) {
     try {
       await this.gradeCompositionModel.findByIdAndDelete(gradeCompositionId).exec();
+      const classDocument = await this.classModel.findOne({ gradeComposition: gradeCompositionId });
+      const index = classDocument.gradeComposition.indexOf(gradeCompositionId);
+      if (index !== -1) {
+        classDocument.gradeComposition.splice(index, 1);
+      }
+      classDocument.save();
     } catch (error) {
       console.error('Error removing grade composition:', error.message);
       throw error;
@@ -193,6 +205,72 @@ export class GradeService {
     return { buffer, gradeCompositionName };
   }
 
+  async exportFileGrade(response: Response, classId: string) {
+    const classDocument = await this.classModel.findById(classId);
+    console.log('classId ', classId);
+    if (!classDocument) {
+      throw new BadRequestException('Class not existed');
+    }
+    const classData = await this.getClassGrades(classId);
+    const workbook = new ExcelJS.Workbook();
+    // create first sheet with file name exceljs-example
+    const worksheet = workbook.addWorksheet('exceljs-example');
+
+    const columnData = [
+      { header: 'No', key: 'no' },
+      { header: 'StudentId', key: 'studentId' },
+      { header: 'Name', key: 'name' },
+    ];
+    for (let i = 0; i < classData?.result?.[0]?.gradeComposition.length; i++) {
+      columnData.push({
+        header: classData?.result?.[0]?.gradeComposition[i].gradeCompositionDetails.name,
+        key: classData?.result?.[0]?.gradeComposition[i].gradeCompositionDetails.name,
+      });
+    }
+    worksheet.columns = columnData;
+    let columns = [...columnData];
+    // let index = columns.indexOf({ header: 'No', key: 'no' });
+    // if (index !== -1) {
+    //   columnData.splice(index, 1);
+    // }
+    columns.shift();
+    columns.shift();
+    columns.shift();
+    // columns.pop();
+    // columns.pop();
+    // columns.pop();
+    console.log('columnData ', columnData);
+    console.log('columns ', columns);
+    let data = [
+      // { no: '1', name: 'Muhammad Ichsan' },
+      // { no: '2', name: 'Muhammad Amin' },
+    ];
+    classData?.result?.map((student, index) => {
+      // console.log('student ', student.user['fullname']);
+      // data.push({
+      //   no: index + 1,
+      //   studentId: student.user['_id'],
+      //   fullname: student.user['fullname'],
+      // });
+      let studentData = { no: index + 1 }; // Initialize with 'no' key
+      studentData['studentId'] = student.studentDetails['studentId']; // Add 'studentId' key
+      studentData['name'] = student.studentDetails['fullname']; // Add 'name' key
+
+      columns.forEach((column, index) => {
+        studentData[column.key] = student.gradeComposition?.[index]?.grades?.[0]?.['value']; // Add keys from columnData
+      });
+
+      data.push(studentData);
+    });
+
+    data.forEach((val, i, _) => {
+      worksheet.addRow(val);
+    });
+    const buffer = await workbook.xlsx.writeBuffer();
+    const className = classDocument.name;
+    return { buffer, className };
+  }
+
   async readExcelFileList(buffer: Buffer, originalname: string): Promise<any[]> {
     const parts = originalname.split('.');
     const nameWithoutExtension = parts.slice(0, -1).join('.');
@@ -214,7 +292,7 @@ export class GradeService {
     return data;
   }
 
-  async readExcelFileGrade(buffer: Buffer, originalname: string): Promise<any[]> {
+  async readExcelFileGrade(buffer: Buffer, originalname: string) {
     const parts = originalname.split('.');
     const nameWithoutExtension = parts.slice(0, -1).join('.');
     console.log(nameWithoutExtension);
@@ -232,30 +310,84 @@ export class GradeService {
       data.push(row.values);
     });
     console.log('Uploaded data:', data);
+    let keys = data[0].slice(1); // Get the keys from the first subarray, excluding the first empty item
+    let values = data.slice(1); // Get the values from the rest of the subarrays
 
-    return data;
-  }
-
-  async readExcelGrade(filePath) {
-    const workbook = new ExcelJS.Workbook();
-
-    try {
-      await workbook.xlsx.readFile(filePath);
-
-      // Assuming there's only one sheet in the Excel file; adjust accordingly
-      const worksheet = workbook.getWorksheet(1);
-
-      // Iterate through rows and columns
-      worksheet.eachRow((row, rowNumber) => {
-        console.log(`Row ${rowNumber}:`);
-        row.eachCell((cell, colNumber) => {
-          console.log(`  Column ${colNumber}: ${cell.value}`);
-        });
+    let result: { No: any; StudentId: any; Grade: any }[] = values.map((subarray) => {
+      let obj: { No: any; StudentId: any; Grade: any } = {
+        No: undefined,
+        StudentId: undefined,
+        Grade: undefined,
+      };
+      keys.forEach((key, index) => {
+        obj[key] = subarray[index + 1]; // Assign the value to the corresponding key in the object, excluding the first empty item in the subarray
       });
-    } catch (error) {
-      console.error('Error reading Excel file:', error.message);
+      return obj;
+    });
+
+    console.log(result);
+    // const promises = result?.map(async (element: { Grade: any; StudentId: any }) => {
+    //   const student = await this.userModel.findOne({ studentId: element.StudentId });
+    //   const gradeDocument = await this.gradeModel.create({
+    //     value: element.Grade,
+    //     gradeComposition: gradeCompositionDocument._id.toString(),
+    //     student: student._id.toString(),
+    //   });
+    //   gradeCompositionDocument.grades.push(gradeDocument._id.toString());
+    //   return gradeCompositionDocument.save();
+    // });
+    // await Promise.all(promises);
+    for (const element of result) {
+      const student = await this.userModel.findOne({ studentId: element.StudentId });
+      const currentGradeDocument = await this.gradeModel.findOne({
+        gradeComposition: gradeCompositionDocument._id.toString(),
+        student: student._id.toString(),
+      });
+      if (currentGradeDocument) {
+        currentGradeDocument.value = element.Grade;
+        await currentGradeDocument.save();
+        continue;
+      }
+      const gradeDocument = await this.gradeModel.create({
+        value: element.Grade,
+        gradeComposition: gradeCompositionDocument._id.toString(),
+        student: student._id.toString(),
+      });
+      gradeCompositionDocument.grades.push(gradeDocument._id.toString());
+      await gradeCompositionDocument.save();
     }
+    // await this.addGrade({
+    //   gradeCompositionId: gradeCompositionDocument._id.toString(),
+    //   studentId: result[0].StudentId,
+    //   value: result[0].Grade,
+    // });
+
+    return {
+      message: 'success',
+      statusCode: 200,
+    };
   }
+
+  // async readExcelGrade(filePath) {
+  //   const workbook = new ExcelJS.Workbook();
+
+  //   try {
+  //     await workbook.xlsx.readFile(filePath);
+
+  //     // Assuming there's only one sheet in the Excel file; adjust accordingly
+  //     const worksheet = workbook.getWorksheet(1);
+
+  //     // Iterate through rows and columns
+  //     worksheet.eachRow((row, rowNumber) => {
+  //       console.log(`Row ${rowNumber}:`);
+  //       row.eachCell((cell, colNumber) => {
+  //         console.log(`  Column ${colNumber}: ${cell.value}`);
+  //       });
+  //     });
+  //   } catch (error) {
+  //     console.error('Error reading Excel file:', error.message);
+  //   }
+  // }
 
   async getClassGrades(classId: string) {
     try {
@@ -266,9 +398,9 @@ export class GradeService {
       const gradeCompositionDocuments = await classDocument.gradeComposition;
       const studentDocuments = await classDocument.students;
 
-      console.log('classDocument ', classDocument);
-      console.log('gradeCompositionDocuments ', gradeCompositionDocuments);
-      console.log('studentDocuments ', studentDocuments);
+      // console.log('classDocument ', classDocument);
+      // console.log('gradeCompositionDocuments ', gradeCompositionDocuments);
+      // console.log('studentDocuments ', studentDocuments);
       // const result = await this.classModel.aggregate([
       //   {
       //     $match: {
@@ -397,6 +529,14 @@ export class GradeService {
           },
         },
         {
+          $unwind: '$studentGrades',
+        },
+        // {
+        //   $addFields: {
+        //     'students.totalGrade': { $sum: '$studentGrades.value' },
+        //   },
+        // },
+        {
           $group: {
             _id: {
               classId: '$_id',
@@ -409,13 +549,15 @@ export class GradeService {
                 grades: '$studentGrades',
               },
             },
+            totalGrade: { $sum: '$studentGrades.value' },
+            overallGrade: { $avg: '$studentGrades.value' },
           },
         },
       ]);
-      return result;
+      return { result, statusCode: 200, message: 'success' };
     } catch (error) {
       console.log('Error retrieving data ', error);
-      throw new BadRequestException('Error');
+      throw new BadRequestException('Error', error.response.message);
     }
   }
 
@@ -429,10 +571,12 @@ export class GradeService {
         throw new BadRequestException('Grade composition not existed');
       }
 
+      const classDocument = await this.classModel.findById(gradeCompositionDocument.class);
       const gradeDocument = await this.gradeModel.create({
         value: dto.value,
         gradeComposition: dto.gradeCompositionId,
         student: dto.studentId,
+        class: classDocument._id.toString(),
       });
 
       gradeCompositionDocument.grades.push(gradeDocument._id.toString());
@@ -441,17 +585,355 @@ export class GradeService {
       return gradeDocument;
     } catch (error) {
       console.log('Error retrieving data ', error);
-      throw new BadRequestException('Error');
+      throw new BadRequestException('Error', error.response.message);
     }
   }
 
-  async setFinalGradeComposition(gradeCompositionId: string) {
+  async updateGrade(dto: AddGradeDto) {
+    try {
+      const gradeCompositionDocument = await this.gradeCompositionModel
+        .findById(dto.gradeCompositionId)
+        .exec();
+
+      if (!gradeCompositionDocument) {
+        throw new BadRequestException('Grade composition not existed');
+      }
+
+      const gradeDocument = await this.gradeModel.findOneAndUpdate(
+        {
+          gradeComposition: dto.gradeCompositionId,
+          student: dto.studentId,
+        },
+        { value: dto.value },
+        { new: true },
+      );
+
+      if (!gradeDocument) {
+        throw new BadRequestException('Grade not found');
+      }
+
+      return {
+        message: 'Success',
+        statusCode: 200,
+        data: gradeDocument,
+      };
+    } catch (error) {
+      console.log('Error retrieving data ', error);
+      throw new BadRequestException('Error', error.response.message);
+    }
+  }
+
+  async markFinalGradeComposition(gradeCompositionId: string) {
     const gradeCompositionDocument = await this.gradeCompositionModel.findById(gradeCompositionId);
     gradeCompositionDocument.isFinal = true;
     gradeCompositionDocument.save();
     return {
       message: 'success',
       statusCode: 200,
+    };
+  }
+
+  async getGradesOfStudent(classId: string, userId: string) {
+    try {
+      const classDocument = await this.classModel.findById(classId);
+      if (!classDocument) {
+        throw new BadRequestException('Class not existed', 'Class not existed');
+      }
+      const gradeCompositionDocuments = await classDocument.gradeComposition;
+      const studentDocument = await this.userModel.findById(userId);
+      console.log('studentDocument ', studentDocument);
+      if (!studentDocument) {
+        throw new BadRequestException('Student not existed');
+      }
+      const result = await this.classModel.aggregate([
+        {
+          $match: {
+            _id: new mongoose.Types.ObjectId(classId),
+          },
+        },
+        {
+          $unwind: '$gradeComposition',
+        },
+        {
+          $lookup: {
+            from: 'gradecompositions', // Target collection (GradeCompositionModel.collection.name)
+            localField: 'gradeComposition',
+            foreignField: '_id',
+            as: 'gradeCompositionDetails',
+          },
+        },
+        {
+          $match: {
+            'gradeCompositionDetails.isFinal': true,
+          },
+        },
+        {
+          $sort: {
+            'gradeCompositionDetails.position': 1, // Sort by the 'position' field in ascending order
+          },
+        },
+        {
+          $unwind: '$gradeCompositionDetails',
+        },
+        {
+          $unwind: '$students',
+        },
+        {
+          $match: {
+            'students.user': new mongoose.Types.ObjectId(userId),
+          },
+        },
+        {
+          $lookup: {
+            from: 'users', // Target collection (UserModel.collection.name)
+            localField: 'students.user',
+            foreignField: '_id',
+            as: 'studentDetails',
+          },
+        },
+        {
+          $unwind: '$studentDetails',
+        },
+        {
+          $lookup: {
+            from: 'grades', // Target collection (GradesModel.collection.name)
+            let: { studentId: '$students.user', gradeCompositionId: '$gradeComposition' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ['$student', '$$studentId'] },
+                      { $eq: ['$gradeComposition', '$$gradeCompositionId'] },
+                    ],
+                  },
+                },
+              },
+            ],
+            as: 'studentGrades',
+          },
+        },
+        {
+          $unwind: '$studentGrades',
+        },
+        {
+          $group: {
+            _id: {
+              classId: '$_id',
+              studentId: '$students.user',
+            },
+            studentDetails: { $first: '$studentDetails' },
+            gradeComposition: {
+              $push: {
+                gradeCompositionDetails: '$gradeCompositionDetails',
+                grades: '$studentGrades',
+              },
+            },
+            totalGrade: { $sum: '$studentGrades.value' },
+            overallGrade: { $avg: '$studentGrades.value' },
+          },
+        },
+      ]);
+      return { result, statusCode: 200, message: 'success' };
+    } catch (error) {
+      console.log('Error retrieving data ', error);
+      throw new BadRequestException('Error', error.response.message);
+    }
+  }
+
+  async requestReviewGrade(reviewRequestDto: ReviewRequestDto) {
+    const updatedGradeDocument = await this.gradeModel.findOneAndUpdate(
+      { _id: reviewRequestDto.gradeId },
+      {
+        $set: {
+          requestReview: true,
+          finalDecision: false,
+          expectedGrade: reviewRequestDto.expectedGrade,
+          explanation: reviewRequestDto.explanation,
+        },
+      },
+      { new: true }, // This option returns the updated document
+    );
+
+    if (!updatedGradeDocument) {
+      throw new BadRequestException('Grade not found');
+    }
+
+    return {
+      message: 'Success',
+      statusCode: 200,
+      data: updatedGradeDocument,
+    };
+  }
+
+  async getListGradeReviewRequests(classId: string) {
+    const classDocument = await this.classModel.findById(classId);
+    if (!classDocument) {
+      throw new BadRequestException('Class not existed');
+    }
+
+    const result = await this.classModel.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(classId),
+        },
+      },
+      {
+        $unwind: '$gradeComposition',
+      },
+      {
+        $lookup: {
+          from: 'gradecompositions', // Target collection (GradeCompositionModel.collection.name)
+          localField: 'gradeComposition',
+          foreignField: '_id',
+          as: 'gradeCompositionDetails',
+        },
+      },
+      {
+        $sort: {
+          'gradeCompositionDetails.position': 1, // Sort by the 'position' field in ascending order
+        },
+      },
+      {
+        $unwind: '$gradeCompositionDetails',
+      },
+      {
+        $unwind: '$students',
+      },
+      {
+        $lookup: {
+          from: 'users', // Target collection (UserModel.collection.name)
+          localField: 'students.user',
+          foreignField: '_id',
+          as: 'studentDetails',
+        },
+      },
+      {
+        $unwind: '$studentDetails',
+      },
+      {
+        $lookup: {
+          from: 'grades', // Target collection (GradesModel.collection.name)
+          let: { studentId: '$students.user', gradeCompositionId: '$gradeComposition' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ['$student', '$$studentId'] },
+                    { $eq: ['$gradeComposition', '$$gradeCompositionId'] },
+                    { $eq: ['$requestReview', true] }, // Add this line
+                  ],
+                },
+              },
+            },
+            {
+              $lookup: {
+                from: 'comments',
+                localField: 'comments',
+                foreignField: '_id',
+                pipeline: [
+                  {
+                    $sort: {
+                      order: -1, // Sort by 'order' in ascending order
+                    },
+                  },
+                ],
+                as: 'comments',
+              },
+            },
+          ],
+          as: 'studentGrades',
+        },
+      },
+      {
+        $match: {
+          'studentGrades.requestReview': true,
+        },
+      },
+      {
+        $group: {
+          _id: {
+            classId: '$_id',
+            // gradeCompositionId: '$gradeComposition',
+          },
+          students: {
+            $push: {
+              // studentDetails: '$studentDetails',
+              grades: '$studentGrades',
+            },
+          },
+          // gradeCompositionDetails: { $first: '$gradeCompositionDetails' },
+        },
+      },
+    ]);
+    return { result, statusCode: 200, message: 'success' };
+  }
+
+  async getGradeReviewRequestDetail(classId: string, gradeId: string) {
+    const grade = await this.gradeModel
+      .findById(gradeId)
+      .populate('student')
+      .populate('gradeComposition')
+      .populate('comments');
+    return grade;
+  }
+
+  async getGradeDetailByGradeId(gradeId: string) {
+    const gradeDocument = await this.gradeModel.findById(gradeId).populate('comments');
+    return {
+      message: 'success',
+      statusCode: 200,
+      result: gradeDocument,
+    };
+  }
+
+  async commentReview(commentDto: CommentDto, userId: string) {
+    const gradeDocument = await this.gradeModel.findById(commentDto.gradeId).populate('comments');
+    if (!gradeDocument) {
+      throw new BadRequestException('Grade not existed');
+    }
+    const comments = await this.commentModel.find({ _id: { $in: gradeDocument.comments } });
+    const orders = comments.map((comment) => {
+      return comment.order;
+    });
+    console.log('comments ', comments);
+    const orderMax = Math.max(...orders.map(Number));
+    const commentDocument = await this.commentModel.create({
+      content: commentDto.content,
+      user: userId,
+      order: orderMax + 1,
+    });
+    gradeDocument.comments.push(commentDocument._id.toString());
+    await gradeDocument.save();
+    const currentGradeDocument = await this.gradeModel
+      .findById(commentDto.gradeId)
+      .populate({ path: 'comments', options: { sort: { created_at: -1 } } });
+    return {
+      message: 'success',
+      statusCode: 200,
+      currentGradeDocument,
+    };
+  }
+
+  async markFinalDecisionGrade(markDecisionDto: MarkDecisionDto) {
+    const updatedGradeDocument = await this.gradeModel.findOneAndUpdate(
+      { _id: markDecisionDto.gradeId },
+      { $set: { finalDecision: true, value: markDecisionDto.updatedGrade } },
+      { new: true }, // This option returns the updated document
+    );
+
+    if (!updatedGradeDocument) {
+      return {
+        message: 'Grade not found',
+        statusCode: 404,
+      };
+    }
+
+    return {
+      message: 'Success',
+      statusCode: 200,
+      updatedGradeDocument: updatedGradeDocument,
     };
   }
 }

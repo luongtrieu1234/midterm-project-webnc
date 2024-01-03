@@ -19,3 +19,7 @@ MAIL_FROM=noreply@example.com
 
 # optional
 MAIL_TRANSPORT=smtp://${MAIL_USER}:${MAIL_PASSWORD}@${MAIL_HOST}
+
+# ---------------DATABASE--------------
+DATABASE_URL=mongodb+srv://admin1:admin1@cluster0.1npefek.mongodb.net
+DATABASE_NAME=midterm

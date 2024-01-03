@@ -6,7 +6,7 @@ import { UserModel } from '../../modules/users/users.model';
 
 async function runMigration() {
   try {
-    await connect('mongodb+srv://admin1:admin1@cluster0.1npefek.mongodb.net/midterm');
+    await connect(`${process.env.DATABASE_URL}/${process.env.DATABASE_NAME}`);
     await connection.db.dropCollection('roles');
     await connection.db.dropCollection('users');
     await RoleModel.createCollection();

@@ -16,6 +16,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "db:up": "tsc src/others/migration/migration-script.ts && node src/others/migration/migration-script.js",
+    "db:new": "tsc src/others/migration/migration.ts && node src/others/migration/migration.js",
     "db:drop:all": "tsc src/others/migration/drop-collections.ts && node src/others/migration/drop-collections.js",
     "db:migrate:up": "ts-node node_modules/sequelize-cli/lib/sequelize db:migrate",
     "db:migrate:down": "ts-node node_modules/sequelize-cli/lib/sequelize db:migrate:undo",
