@@ -1,16 +1,16 @@
 import React from 'react';
-import Main from './components/Main';
 import Layout from 'layout';
 import { LayoutProvider } from 'layout/context/layoutcontext';
+import { ClassDetail } from 'features/Class/pages';
 
-const ClassDetail = () => {
+const ClassDetailPage = () => {
   return (
     <LayoutProvider>
       <Layout>
-        <Main />
+        <ClassDetail />
       </Layout>
     </LayoutProvider>
   );
 };
 
-export default ClassDetail;
+export default ClassDetailPage;

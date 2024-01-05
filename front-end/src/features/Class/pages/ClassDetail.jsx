@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 import { TabMenu } from 'primereact/tabmenu';
@@ -13,11 +13,11 @@ import { inviteTeacherToClass, inviteStudentToClass } from 'apis/class.api';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 // import { Toast } from 'primereact/toast';
-const Main = () => {
+const ClassDetail = () => {
   const { id } = useParams();
   const [course, setCourse] = useState(null);
-  const [Link, setLink] = useState(null);
-  console.log('link: ', Link);
+  const [link, setLink] = useState(null);
+  console.log('link: ', link);
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('Infor Class');
   const [visibleAddTeacherDialog, setVisibleAddTeacherDialog] = useState(false);
@@ -70,6 +70,13 @@ const Main = () => {
       icon: 'pi pi-fw pi-file',
       command: () => {
         setActiveTab('Classwork');
+      },
+    },
+    {
+      label: 'Grade Structure',
+      icon: 'pi pi-fw pi-sitemap',
+      command: () => {
+        setActiveTab('GradeStructure');
       },
     },
   ];
@@ -194,6 +201,9 @@ const Main = () => {
           icon='pi pi-external-link'
           onClick={() => setOpen(true)}
         />
+        <Link to={`/course/${id}/grade`}>
+          <Button label='Grade' icon='pi pi-external-link' />
+        </Link>
         <Dialog
           header='Class invitation'
           visible={open}
@@ -201,7 +211,7 @@ const Main = () => {
           onHide={() => setOpen(false)}
         >
           <p className='m-0' style={{ color: 'blue' }}>
-            {Link}
+            {link}
           </p>
         </Dialog>
       </div>
@@ -349,4 +359,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default ClassDetail;

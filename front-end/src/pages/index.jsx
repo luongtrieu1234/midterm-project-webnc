@@ -8,7 +8,8 @@ import SearchEmail from './SearchEmail';
 import ResetPassword from './ResetPassword';
 import ConfirmCode from './ConfirmCode';
 import ConfirmCodeSignUp from './ConfirmCodeSignUp';
-import ClassDetail from './ClassDetail';
+import ClassDetailPage from './ClassDetailPage';
+import GradePage from './GradePage';
 import TestPage from './TestPage';
 
 export {
@@ -22,6 +23,7 @@ export {
   ResetPassword,
   ConfirmCode,
   ConfirmCodeSignUp,
-  ClassDetail,
+  ClassDetailPage,
+  GradePage,
   TestPage,
 };

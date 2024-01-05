@@ -8,6 +8,14 @@ import { LayoutContext } from './context/layoutcontext';
 import { useLocation } from 'react-router-dom';
 
 export let toast;
+export const showSuccess = () => {
+  toast.current.show({
+    severity: 'success',
+    summary: 'Success',
+    detail: 'Sent mail invite to user!',
+    life: 3000,
+  });
+};
 export default function Layout({ children }) {
   const location = useLocation();
   const currentPath = location.pathname;
