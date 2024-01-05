@@ -43,11 +43,11 @@ export class ClassService {
     private readonly classModel: Model<ClassModel>,
     @InjectModel('Role')
     private readonly roleModel: Model<RoleModel>,
-    @InjectModel('Grade')
-    private readonly gradeModel: Model<GradeModel>,
-    @InjectModel('GradeStructure')
-    private readonly gradeStructureModel: Model<GradeStructureModel>,
-  ) {}
+  ) // @InjectModel('Grade')
+  // private readonly gradeModel: Model<GradeModel>,
+  // @InjectModel('GradeStructure')
+  // private readonly gradeStructureModel: Model<GradeStructureModel>,
+  {}
 
   async createClass(ownerId: string, createClassDto: CreateClassDto) {
     const currentClass = await this.classModel.findOne({

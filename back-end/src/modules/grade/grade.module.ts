@@ -13,13 +13,15 @@ import { UserModule } from '../users/users.module';
 import { ClassModule } from '../class/class.module';
 import { GradeStructureSchema } from './grade-structure.model';
 import { CommentSchema } from './comment.model';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
     AuthModule,
     MailModule,
-    forwardRef(() => ClassModule),
+    ClassModule,
     UserModule,
+    NotificationModule,
     MongooseModule.forFeature([{ name: 'Grade', schema: GradeSchema }]),
     MongooseModule.forFeature([{ name: 'GradeComposition', schema: GradeCompositionSchema }]),
     MongooseModule.forFeature([{ name: 'GradeStructure', schema: GradeStructureSchema }]),

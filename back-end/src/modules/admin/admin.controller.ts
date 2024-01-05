@@ -56,18 +56,52 @@ export class AdminController {
     return await this.adminService.inactivateAccount(userId);
   }
 
-  // @Get('all-classes')
-  // @HttpCode(200)
-  // @UseGuards(AuthGuardCustom)
-  // @Roles(UserRole.ADMIN)
-  // async getListClasses(
-  //   @Req() req,
-  //   @Query('filterOption') filterOption: string,
-  //   @Query('sortType') sortType: string,
-  // ) {
-  //   console.log('req ', req.user);
-  //   return await this.adminService.getListClasses(sortType, filterOption);
-  // }
+  @Post('activate-account/:userId')
+  @HttpCode(200)
+  @UseGuards(AuthGuardCustom)
+  @Roles(UserRole.ADMIN)
+  async activateAccount(
+    @Param('userId') userId: string,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    return await this.adminService.activateAccount(userId);
+  }
+
+  @Post('map-student/:userId/:studentId')
+  @HttpCode(200)
+  @UseGuards(AuthGuardCustom)
+  @Roles(UserRole.ADMIN)
+  async mapStudentAccount(
+    @Param('userId') userId: string,
+    @Param('studentId') studentId: string,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    return await this.adminService.mapStudentAccount(studentId, userId);
+  }
+
+  @Post('unmap-student/:userId')
+  @HttpCode(200)
+  @UseGuards(AuthGuardCustom)
+  @Roles(UserRole.ADMIN)
+  async unMapStudentAccount(
+    @Param('userId') userId: string,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    return await this.adminService.unMapStudentAccount(userId);
+  }
+
+  @Get('all-classes')
+  @HttpCode(200)
+  @UseGuards(AuthGuardCustom)
+  @Roles(UserRole.ADMIN)
+  async getListClasses(
+    @Req() req,
+    @Query('filterOption') filterOption: string,
+    @Query('sortType') sortType: string,
+  ) {
+    console.log('req ', req.user);
+    return await this.adminService.getListClasses(sortType, filterOption);
+  }
 
   @Post('inactivate-class/:classId')
   @HttpCode(200)

@@ -13,6 +13,7 @@ export const UserSchema = new mongoose.Schema({
   hobby: { type: [String], default: [] }, // Set default value for hobby
   role: { type: String, default: 'user' },
   studentId: { type: String, default: '' },
+  notifications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Notification' }],
   deletedAt: { type: Date, default: null }, // Set default value for deletedAt
   createdAt: { type: Date, default: Date.now }, // Set default value for createdAt to the current date and time
   updatedAt: { type: Date, default: Date.now },
@@ -32,6 +33,7 @@ export interface UserModel {
   hobby: string[];
   role: string;
   studentId: string;
+  notifications: string[];
   deletedAt: Date;
   createdAt: Date;
   updatedAt: Date;

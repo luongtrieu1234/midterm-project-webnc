@@ -87,31 +87,31 @@ export class AdminService {
     };
   }
 
-  // async getListClasses(sortType: string, filterOption: string) {
-  //   console.log('sortType ', sortType);
-  //   console.log('filterOption ', filterOption);
-  //   let sort: SortOrder = 1;
-  //   if (sortType === 'desc') {
-  //     sort = 'desc' as SortOrder;
-  //   } else {
-  //     sort = 'asc' as SortOrder;
-  //   }
-  //   let filter = {};
-  //   if (filterOption === 'active') {
-  //     filter = { active: true };
-  //   } else if (filterOption === 'inactive') {
-  //     filter = { active: false };
-  //   }
+  async getListClasses(sortType: string, filterOption: string) {
+    console.log('sortType ', sortType);
+    console.log('filterOption ', filterOption);
+    let sort: SortOrder = 1;
+    if (sortType === 'desc') {
+      sort = 'desc' as SortOrder;
+    } else {
+      sort = 'asc' as SortOrder;
+    }
+    let filter = {};
+    if (filterOption === 'active') {
+      filter = { active: true };
+    } else if (filterOption === 'inactive') {
+      filter = { active: false };
+    }
 
-  //   const classes = await this.classModel
-  //     .find(filter)
-  //     .sort({ createdAt: sort as SortOrder })
-  //     .exec();
-  //   const promises = classes?.map(async (classDocument) => {
-  //     return await this.classService.getClassWithUserInfo(classDocument._id.toString());
-  //   });
-  //   return await Promise.all(promises);
-  // }
+    const classes = await this.classModel
+      .find(filter)
+      .sort({ createdAt: sort as SortOrder })
+      .exec();
+    const promises = classes?.map(async (classDocument) => {
+      return await this.classService.getClassWithUserInfo(classDocument._id.toString());
+    });
+    return await Promise.all(promises);
+  }
 
   async inactivateClass(classId: string) {
     const classDocument = await this.classModel.findOne({
@@ -150,11 +150,13 @@ export class AdminService {
   }
 
   async mapStudentAccount(studentId: string, userId: string) {
+    console.log('studentId ', studentId);
+    console.log('userId ', userId);
     const user = await this.userModel.findOne({ _id: userId });
     if (!user) {
       throw new BadRequestException('User not found');
     }
-    if (user.studentId) {
+    if (user.studentId !== '') {
       throw new BadRequestException('This account has been mapped');
     }
     const studentAccount = await this.userModel.findOne({ studentId: studentId });

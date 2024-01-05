@@ -137,8 +137,8 @@ export class GradeController {
   @Post('upload-file-list')
   @UseGuards(AuthGuardCustom)
   @HttpCode(200)
-  // @UseInterceptors(FileFieldsInterceptor([{ name: 'excelFile', maxCount: 1 }]))
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'excelFile', maxCount: 1 }], multerOptions))
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'excelFile', maxCount: 1 }]))
+  // @UseInterceptors(FileFieldsInterceptor([{ name: 'excelFile', maxCount: 1 }], multerOptions))
   async uploadFileList(
     @Body() dto: UploadFileDto,
     @UploadedFiles()
@@ -147,13 +147,12 @@ export class GradeController {
     },
     @Req() req,
   ) {
-    // const data = await this.gradeService.readExcelFileList(
-    //   files?.excelFile?.[0].buffer,
-    //   files?.excelFile?.[0].originalname,
-    // );
-    // console.log('Uploaded data:', data);
+    return await this.gradeService.readExcelFileList(
+      files?.excelFile?.[0].buffer,
+      files?.excelFile?.[0].originalname,
+    );
 
-    return { message: files, body: dto };
+    // { message: files, body: dto };
   }
 
   @ApiConsumes('multipart/form-data')
@@ -170,12 +169,12 @@ export class GradeController {
     },
     @Req() req,
   ) {
-    await this.gradeService.readExcelFileGrade(
+    return await this.gradeService.readExcelFileGrade(
       files?.excelFile?.[0].buffer,
       files?.excelFile?.[0].originalname,
     );
 
-    return { message: files, body: dto };
+    // { message: files, body: dto };
   }
 
   // @Get('read-file')

@@ -32,6 +32,8 @@ import { UserResetPasswordRequestDto } from './dto/user-reset-passowrd-request.d
 import { UserResetPasswordDto } from './dto/user-reset-passowrd.dto';
 import { SharedService } from 'src/others/auth/shared.service';
 import { UserConfirmCodeDto } from './dto/user-confirm-code.dto';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationModel } from '../notification/notification.model';
 
 @Injectable()
 export class UsersService {
@@ -42,10 +44,13 @@ export class UsersService {
     private authService: AuthService,
     private mailService: MailService,
     private sharedService: SharedService,
+    private notificationService: NotificationService,
     // @Inject('SEQUELIZE')
     // private readonly sequelize: Sequelize,
     @InjectModel('User')
     private readonly userModel: Model<UserModel>,
+    @InjectModel('Notification')
+    private readonly notificationModel: Model<NotificationModel>,
   ) {}
   async findUserByEmail(email: string) {
     return await this.userModel.findOne({
@@ -470,5 +475,10 @@ export class UsersService {
       throw new BadRequestException('Student not found');
     }
     return user;
+  }
+
+  async getListNotifications(userId: string) {
+    const notifications = await this.notificationModel.find({ recipient: userId });
+    return { notifications, message: 'success', statusCode: HttpStatus.OK };
   }
 }

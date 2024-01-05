@@ -32,6 +32,7 @@ import { ReviewRequestDto } from './dto/review-request.dto';
 import { CommentModel } from './comment.model';
 import { CommentDto } from './dto/comment.dto';
 import { MarkDecisionDto } from './dto/mark-decition.dto';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class GradeService {
@@ -42,6 +43,7 @@ export class GradeService {
     private mailService: MailService,
     private sharedService: SharedService,
     private classService: ClassService,
+    private notificationService: NotificationService,
     @InjectModel('User')
     private readonly userModel: Model<UserModel>,
     @InjectModel('Class')
@@ -54,8 +56,8 @@ export class GradeService {
     private readonly gradeModel: Model<GradeModel>,
     @InjectModel('Comment')
     private readonly commentModel: Model<CommentModel>, // @InjectModel('User')
-    // private readonly userModel: Model<UserModel>,
-  ) {}
+  ) // private readonly userModel: Model<UserModel>,
+  {}
   async showGradeStructure(classId: string) {
     try {
       // const classDocument = await this.classModel
@@ -159,7 +161,7 @@ export class GradeService {
       { header: 'No', key: 'no' },
       { header: 'StudentId', key: 'studentId' },
       { header: 'Fullname', key: 'fullname' },
-      { header: 'Email', key: 'email' },
+      // { header: 'Email', key: 'email' },
     ];
     const classDocument = await this.classModel.findById(classId);
     console.log('classId ', classId);
@@ -271,7 +273,7 @@ export class GradeService {
     return { buffer, className };
   }
 
-  async readExcelFileList(buffer: Buffer, originalname: string): Promise<any[]> {
+  async readExcelFileList(buffer: Buffer, originalname: string) {
     const parts = originalname.split('.');
     const nameWithoutExtension = parts.slice(0, -1).join('.');
     console.log(nameWithoutExtension);
@@ -288,8 +290,47 @@ export class GradeService {
     worksheet.eachRow((row) => {
       data.push(row.values);
     });
+    console.log('Uploaded data:', data);
+    let keys = data[0].slice(1); // Get the keys from the first subarray, excluding the first empty item
+    let values = data.slice(1); // Get the values from the rest of the subarrays
 
-    return data;
+    let result: { No: any; StudentId: any; Fullname: any }[] = values.map((subarray) => {
+      let obj: { No: any; StudentId: any; Fullname: any } = {
+        No: undefined,
+        StudentId: undefined,
+        Fullname: undefined,
+      };
+      keys.forEach((key, index) => {
+        obj[key] = subarray[index + 1]; // Assign the value to the corresponding key in the object, excluding the first empty item in the subarray
+      });
+      // if (obj.Email === undefined) {
+      //   obj.Email = ;
+      // }
+      return obj;
+    });
+
+    console.log('result ', result);
+    let notFoundStudents = [];
+    let updatedStudents = [];
+    for (const element of result) {
+      const student = await this.userModel.findOne({
+        studentId: element.StudentId,
+      });
+      if (!student) {
+        notFoundStudents.push(element.StudentId);
+        continue;
+      }
+      student.fullname = element.Fullname;
+      updatedStudents.push(element.StudentId);
+      await student.save();
+    }
+
+    return {
+      notFoundStudents,
+      updatedStudents,
+      message: 'success',
+      statusCode: 200,
+    };
   }
 
   async readExcelFileGrade(buffer: Buffer, originalname: string) {
@@ -325,7 +366,7 @@ export class GradeService {
       return obj;
     });
 
-    console.log(result);
+    console.log('result ', result);
     // const promises = result?.map(async (element: { Grade: any; StudentId: any }) => {
     //   const student = await this.userModel.findOne({ studentId: element.StudentId });
     //   const gradeDocument = await this.gradeModel.create({
@@ -337,8 +378,15 @@ export class GradeService {
     //   return gradeCompositionDocument.save();
     // });
     // await Promise.all(promises);
+    let notFoundStudents = [];
+    let updatedGradeStudents = [];
+    let createdGradeStudents = [];
     for (const element of result) {
       const student = await this.userModel.findOne({ studentId: element.StudentId });
+      if (!student) {
+        notFoundStudents.push(element.StudentId);
+        continue;
+      }
       const currentGradeDocument = await this.gradeModel.findOne({
         gradeComposition: gradeCompositionDocument._id.toString(),
         student: student._id.toString(),
@@ -346,6 +394,7 @@ export class GradeService {
       if (currentGradeDocument) {
         currentGradeDocument.value = element.Grade;
         await currentGradeDocument.save();
+        updatedGradeStudents.push(element.StudentId);
         continue;
       }
       const gradeDocument = await this.gradeModel.create({
@@ -354,6 +403,8 @@ export class GradeService {
         student: student._id.toString(),
       });
       gradeCompositionDocument.grades.push(gradeDocument._id.toString());
+      console.log('element.StudentId ', element.StudentId);
+      createdGradeStudents.push(element.StudentId);
       await gradeCompositionDocument.save();
     }
     // await this.addGrade({
@@ -363,6 +414,9 @@ export class GradeService {
     // });
 
     return {
+      notFoundStudents,
+      updatedGradeStudents,
+      createdGradeStudents,
       message: 'success',
       statusCode: 200,
     };
@@ -627,6 +681,14 @@ export class GradeService {
     const gradeCompositionDocument = await this.gradeCompositionModel.findById(gradeCompositionId);
     gradeCompositionDocument.isFinal = true;
     gradeCompositionDocument.save();
+    const classDocument = await this.classModel.findById(gradeCompositionDocument.class);
+    const students = await this.classModel.findById(classDocument._id).populate('students');
+    const studentIds = students.students.map((student) => student.user.toString());
+    console.log('studentIds ', studentIds);
+    await this.notificationService.notifyStudentsGradeCompositionFinalized(
+      gradeCompositionId,
+      studentIds,
+    );
     return {
       message: 'success',
       statusCode: 200,
@@ -755,6 +817,15 @@ export class GradeService {
       { new: true }, // This option returns the updated document
     );
 
+    const teachers = await this.classModel
+      .findById(updatedGradeDocument.class)
+      .populate('teachers');
+    const teacherIds = teachers.teachers.map((teacher) => teacher.user.toString());
+    console.log('teacherIds ', teacherIds);
+    await this.notificationService.notifyTeachersGradeReviewRequest(
+      reviewRequestDto.gradeId,
+      teacherIds,
+    );
     if (!updatedGradeDocument) {
       throw new BadRequestException('Grade not found');
     }
@@ -909,6 +980,26 @@ export class GradeService {
     const currentGradeDocument = await this.gradeModel
       .findById(commentDto.gradeId)
       .populate({ path: 'comments', options: { sort: { created_at: -1 } } });
+    const user = await this.classService.getUserRoleInClass(currentGradeDocument.class, userId);
+    const userRole = user.role;
+    if (userRole === 'teacher') {
+      const student = await this.userModel.findById(currentGradeDocument.student);
+      await this.notificationService.notifyStudentGradeReviewReply(
+        student._id.toString(),
+        currentGradeDocument._id.toString(),
+      );
+    } else if (userRole === 'student') {
+      const teachers = await this.classModel
+        .findById(currentGradeDocument.class)
+        .populate('teachers');
+      const teacherIds = teachers.teachers.map((teacher) => teacher.user.toString());
+      teacherIds.map(async (teacherId) => {
+        await this.notificationService.notifyTeacherStudentGradeReviewReply(
+          teacherId,
+          currentGradeDocument._id.toString(),
+        );
+      });
+    }
     return {
       message: 'success',
       statusCode: 200,
@@ -930,6 +1021,11 @@ export class GradeService {
       };
     }
 
+    const student = await this.userModel.findById(updatedGradeDocument.student);
+    await this.notificationService.notifyStudentFinalMarkReviewDecision(
+      student._id.toString(),
+      updatedGradeDocument._id.toString(),
+    );
     return {
       message: 'Success',
       statusCode: 200,

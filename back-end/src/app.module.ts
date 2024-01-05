@@ -17,6 +17,7 @@ import { RoleGuard } from './modules/role/role.guard';
 import { JwtStrategy } from './others/auth/jwt.strategy';
 import { AuthGuardCustom } from './others/auth/auth.guard';
 import { AdminModule } from './modules/admin/admin.module';
+import { NotificationModule } from './modules/notification/notification.module';
 // import { ConfigModule } from './config/config.module';
 
 @Module({
@@ -28,6 +29,7 @@ import { AdminModule } from './modules/admin/admin.module';
     GradeModule,
     MailModule,
     AdminModule,
+    NotificationModule,
     NestjsConfigModule.forRoot({
       envFilePath: ['.env', '.env.pro'],
       isGlobal: true,
