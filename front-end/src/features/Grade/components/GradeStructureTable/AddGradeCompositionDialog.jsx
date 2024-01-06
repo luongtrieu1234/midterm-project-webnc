@@ -7,6 +7,7 @@ export default function AddGradeCompositionDialog({
   visible,
   setVisible,
   control,
+  errors,
   footer,
 }) {
   return (
@@ -18,17 +19,23 @@ export default function AddGradeCompositionDialog({
         onHide={() => setVisible(false)}
         footer={footer}
       >
-        <div>
-          <TextInput
-            label='Grade Composition'
-            name='gradeComposition'
-            control={control}
-          />
-          <NumberInput
-            label='Grade Scale'
-            name='gradeScale'
-            control={control}
-          />
+        <div className='grid p-fluid'>
+          <div className='col-6'>
+            <TextInput
+              label='Grade Composition'
+              name='gradeComposition'
+              control={control}
+              errors={errors}
+            />
+          </div>
+          <div className='col-6'>
+            <NumberInput
+              label='Grade Scale'
+              name='gradeScale'
+              control={control}
+              errors={errors}
+            />
+          </div>
         </div>
       </Dialog>
     </div>
@@ -36,7 +43,8 @@ export default function AddGradeCompositionDialog({
 }
 
 AddGradeCompositionDialog.propTypes = {
-  control: PropTypes.object.isRequired,
+  control: PropTypes.shape({}).isRequired,
+  errors: PropTypes.shape({}).isRequired,
   footer: PropTypes.element.isRequired,
   setVisible: PropTypes.func.isRequired,
   visible: PropTypes.any.isRequired,

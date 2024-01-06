@@ -93,7 +93,7 @@ export class GradeController {
   @Header('Access-Control-Expose-Headers', 'Content-Disposition')
   async downloadTemplateFileList(
     @Res({ passthrough: true }) response: Response,
-    @Query('classID') classId: string,
+    @Query('classId') classId: string,
     @Req() req,
   ) {
     const { buffer, classCode } = await this.gradeService.downloadTemplateFileList(

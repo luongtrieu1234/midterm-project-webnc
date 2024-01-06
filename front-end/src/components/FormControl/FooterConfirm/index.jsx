@@ -3,12 +3,7 @@ import { Button } from 'primereact/button';
 import { classNames } from 'primereact/utils';
 import React from 'react';
 
-export default function FooterComfirm({
-  action,
-  isLoading,
-  setVisible,
-  handleSubmit,
-}) {
+const FooterComfirm = ({ action, isLoading, setVisible, handleSubmit }) => {
   return (
     <div>
       <Button
@@ -28,7 +23,7 @@ export default function FooterComfirm({
       />
     </div>
   );
-}
+};
 
 FooterComfirm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
@@ -40,3 +35,5 @@ FooterComfirm.propTypes = {
 FooterComfirm.defaultProps = {
   isLoading: false,
 };
+
+export default React.memo(FooterComfirm);
