@@ -69,7 +69,7 @@ export default function GradeList() {
   function formatHeader() {
     return (
       <div className='flex align-items-center justify-content-between'>
-        <div className='text-xl'>Grade Structures</div>
+        <div className='text-xl'>Grade List</div>
         <div className='card'>
           <Tooltip target='.add-grade-composition' className='text-sm' />
           <Button
@@ -126,8 +126,7 @@ export default function GradeList() {
           stripedRows
           style={{ maxWidth: '50rem' }}
         >
-          <Column rowReorder style={{ width: '1rem' }} />
-          <Column field='no' header='No' sortable />
+          <Column field='no' header='No' sortable style={{ width: '1rem' }} />
           <Column field='studentId' header='Student Id' sortable />
           <Column field='fullName' header='Full Name' sortable />
           <Column
