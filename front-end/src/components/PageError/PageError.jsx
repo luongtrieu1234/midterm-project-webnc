@@ -1,6 +1,7 @@
 import React from 'react';
 
 import './PageError.css';
+import { Link } from 'react-router-dom';
 
 const PageError = () => {
   return (
@@ -13,12 +14,10 @@ const PageError = () => {
             </h1>
           </div>
           <h2>the page you requested could not found</h2>
-          <form className='notfound-search'>
-            <input type='text' placeholder='Search...' />
-            <button type='button'>
-              <span></span>
-            </button>
-          </form>
+          <Link to='/' className='link-style'>
+            {' '}
+            Go back to home page
+          </Link>
         </div>
       </div>
     </div>

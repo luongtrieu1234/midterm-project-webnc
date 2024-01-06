@@ -1,19 +1,14 @@
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Tooltip } from 'primereact/tooltip';
 
 export default function GradeStructureTable({
+  data,
   setVisibleAddGradeCompositionDialog,
 }) {
-  // eslint-disable-next-line no-unused-vars
-  const [data, setData] = useState([
-    { id: 1, name: 'Điểm giữa kỳ', scale: '0-10' },
-    { id: 2, name: 'Điểm cuối kì', scale: '0-10' },
-    { id: 3, name: 'Điểm đồ án', scale: '0-10' },
-  ]);
   function formatHeader() {
     return (
       <div className='flex align-items-center justify-content-between'>
@@ -49,7 +44,7 @@ export default function GradeStructureTable({
       >
         <Column rowReorder style={{ width: '1rem' }} />
         <Column field='name' header='Name' sortable />
-        <Column field='scale' header='Scale' sortable />
+        <Column field='gradeScale' header='Scale' sortable />
         <Column
           header='Actions'
           style={{ maxWidth: '4rem' }}
@@ -62,4 +57,5 @@ export default function GradeStructureTable({
 
 GradeStructureTable.propTypes = {
   setVisibleAddGradeCompositionDialog: PropTypes.func.isRequired,
+  data: PropTypes.object.isRequired,
 };

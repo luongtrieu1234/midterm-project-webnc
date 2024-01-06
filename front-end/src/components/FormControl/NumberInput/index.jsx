@@ -27,9 +27,9 @@ export default function NumberInput({
 }) {
   const { t } = useTranslation();
   return (
-    <div className='field'>
-      <label htmlFor={name}>
-        {label}{' '}
+    <div className='field '>
+      <label htmlFor={name} className='block'>
+        {label}
         {isRequired && (
           <span className='text-red-500' style={{ fontWeight: 900 }}>
             *

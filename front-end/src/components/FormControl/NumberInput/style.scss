@@ -3,3 +3,9 @@
     text-align: right;
   }
 }
+.text-input {
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none;
+  }
+}

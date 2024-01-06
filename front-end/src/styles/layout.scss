@@ -3,6 +3,16 @@ $height-topbar: 58px;
 $bg-topbar: #059bb4;
 $border-white: #dee2e6;
 $transitionDuration: 0.2s;
+$link-color: #2205ff;
+
+.download-link {
+  color: $link-color;
+  background-color: none;
+  font-size: medium;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .flex-center {
   display: flex;
   justify-content: center;
