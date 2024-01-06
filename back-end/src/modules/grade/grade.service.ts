@@ -56,8 +56,8 @@ export class GradeService {
     private readonly gradeModel: Model<GradeModel>,
     @InjectModel('Comment')
     private readonly commentModel: Model<CommentModel>, // @InjectModel('User')
-  ) // private readonly userModel: Model<UserModel>,
-  {}
+    // private readonly userModel: Model<UserModel>,
+  ) {}
   async showGradeStructure(classId: string) {
     try {
       // const classDocument = await this.classModel
@@ -212,10 +212,10 @@ export class GradeService {
       { header: 'StudentId', key: 'studentId' },
       { header: 'Name', key: 'name' },
     ];
-    for (let i = 0; i < gradeCompositions?.length; i++) {
+    for (let i = 0; i < classData?.result?.[0]?.gradeComposition?.length; i++) {
       columnData.push({
-        header: gradeCompositions?.[i]['name'],
-        key: gradeCompositions?.[i]['name'],
+        header: gradeCompositions?.[i]?.['name'],
+        key: gradeCompositions?.[i]?.['name'],
       });
     }
     console.log(
@@ -245,7 +245,7 @@ export class GradeService {
       studentData['name'] = student.studentDetails['fullname']; // Add 'name' key
 
       columns.forEach((column, index) => {
-        studentData[column.key] = student.gradeComposition?.[index]?.grades['value']; // Add keys from columnData
+        studentData[column.key] = student.gradeComposition?.[index]?.grade?.['value']; // Add keys from columnData
       });
 
       data.push(studentData);
@@ -438,8 +438,8 @@ export class GradeService {
       const gradeCompositionDocuments = await classDocument.gradeComposition;
       const studentDocuments = await classDocument.students;
 
-      // console.log('classDocument ', classDocument);
-      // console.log('gradeCompositionDocuments ', gradeCompositionDocuments);
+      console.log('classDocument ', classDocument);
+      console.log('gradeCompositionDocuments ', gradeCompositionDocuments);
       // console.log('studentDocuments ', studentDocuments);
       // const result = await this.classModel.aggregate([
       //   {
@@ -586,7 +586,7 @@ export class GradeService {
             gradeComposition: {
               $push: {
                 gradeCompositionDetails: '$gradeCompositionDetails',
-                grades: '$studentGrades',
+                // grades: '$studentGrades',
               },
             },
             totalGrade: { $sum: '$studentGrades.value' },
@@ -594,10 +594,35 @@ export class GradeService {
           },
         },
       ]);
-      return { result, statusCode: 200, message: 'success' };
+      let dataReturn = [];
+      for (const student of studentDocuments) {
+        let studentData = { studentDetails: student.user };
+        let gradeCompositionData = [];
+        // let gradeData = [];
+        for (const gradeComposition of gradeCompositionDocuments) {
+          const a = await this.gradeCompositionModel.findById(gradeComposition).select('name');
+          // gradeCompositionData.push(a);
+          const gradeDocument = await this.gradeModel.findOne({
+            gradeComposition: gradeComposition['_id'].toString(),
+            student: student.user['_id'].toString(),
+          });
+          // gradeData.push(gradeDocument);
+          let gradeData = { gradeCompositionDetails: a };
+          gradeData['grade'] = gradeDocument;
+          // studentData['grade'] = gradeDocument;
+          gradeCompositionData.push(gradeData);
+          // console.log('studentData ', studentData);
+          // console.log('gradeDocument ', gradeDocument);
+        }
+        studentData['gradeComposition'] = gradeCompositionData;
+        // studentData['grade'] = gradeData;
+
+        dataReturn.push(studentData);
+      }
+      return { result: dataReturn, statusCode: 200, message: 'success' };
     } catch (error) {
       console.log('Error retrieving data ', error);
-      throw new BadRequestException('Error', error.response.message);
+      throw new BadRequestException('Error', error);
     }
   }
 
