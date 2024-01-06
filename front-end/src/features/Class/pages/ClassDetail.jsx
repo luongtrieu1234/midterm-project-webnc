@@ -161,7 +161,7 @@ const ClassDetail = () => {
         className='p-button-text'
       />
       <Button
-        label='Create'
+        label='Add'
         icon={classNames('pi pi-check', {
           'pi-spin pi-spinner': isInviteTeacherLoading,
           'pi pi-check': !isInviteTeacherLoading,
@@ -195,7 +195,7 @@ const ClassDetail = () => {
   return (
     <div>
       <Toast ref={toast} />
-      <div className='card flex mt-3 mb-3'>
+      <div className='card flex mt-3 mb-3 gap-3'>
         <Button
           label='Class invitation'
           icon='pi pi-external-link'
@@ -217,29 +217,40 @@ const ClassDetail = () => {
       </div>
 
       <TabMenu model={items} />
-      <div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignContent: 'center',
+        }}
+      >
+        {/* Infor Class */}
         {activeTab === 'Infor Class' && course && (
           <div>
             <h2>{course.name}</h2>
           </div>
         )}
+
+        {/* People */}
         {activeTab === 'People' && (
           <div
             style={{
               // margin: '0 auto',
-              maxWidth: '600px',
+              maxWidth: '100%',
               fontFamily: 'Arial, sans-serif',
             }}
           >
             <h2
               className='flex align-items-center justify-content-between '
-              style={{ color: '#333', borderBottom: '1px solid #ddd' }}
+              style={{ color: '#333', borderBottom: '1px solid #6E6BF1' }}
             >
-              <span className=''>Teachers</span>
-              <div className='card flex'>
+              <span style={{ fontSize: '25px', color: '#6E6BF1' }}>
+                Teachers
+              </span>
+              <div className='card flex ' style={{ marginLeft: '30rem' }}>
                 <Button
                   size='small'
-                  label='Add'
+                  label='Add Teacher'
                   onClick={() => setVisibleAddTeacherDialog(true)}
                 />
               </div>
@@ -252,6 +263,7 @@ const ClassDetail = () => {
                     style={{
                       padding: '10px 0',
                       borderBottom: '1px solid #ddd',
+                      marginBottom: '20px',
                     }}
                   >
                     <span style={{ fontSize: '18px', color: '#555' }}>
@@ -269,15 +281,17 @@ const ClassDetail = () => {
               className='flex align-items-center justify-content-between '
               style={{
                 color: '#333',
-                borderBottom: '1px solid #ddd',
+                borderBottom: '1px solid #6E6BF1',
                 marginTop: '20px',
               }}
             >
-              <span className=''>Students</span>
+              <span style={{ fontSize: '25px', color: '#6E6BF1' }}>
+                Students
+              </span>
               <div className='card flex'>
                 <Button
                   size='small'
-                  label='Add'
+                  label='Add Student'
                   onClick={() => setVisibleAddStudentDialog(true)}
                 />
               </div>
@@ -305,6 +319,8 @@ const ClassDetail = () => {
             </ul>
           </div>
         )}
+
+        {/* Class work */}
         {activeTab === 'Classwork' && (
           <div>
             <h2>Classwork</h2>
