@@ -105,6 +105,8 @@ export class GradeService {
         name: addGradeCompositionDto.name,
         gradeScale: addGradeCompositionDto.gradeScale,
         class: addGradeCompositionDto.classId,
+        content: addGradeCompositionDto?.content,
+        position: addGradeCompositionDto?.position,
       });
 
       classDocument.gradeComposition.push(gradeComposition._id.toString());
@@ -125,6 +127,8 @@ export class GradeService {
           {
             name: updateGradeCompositionDto.name,
             gradeScale: updateGradeCompositionDto.gradeScale,
+            content: updateGradeCompositionDto?.content,
+            position: updateGradeCompositionDto?.position,
           },
           { new: true },
         )
@@ -153,6 +157,11 @@ export class GradeService {
   }
 
   async downloadTemplateFileList(response: Response, classId: string) {
+    const classDocument = await this.classModel.findById(classId);
+    console.log('classId ', classId);
+    if (!classDocument) {
+      throw new BadRequestException('Class not existed');
+    }
     const workbook = new ExcelJS.Workbook();
     // create first sheet with file name exceljs-example
     const worksheet = workbook.addWorksheet('exceljs-example');
@@ -161,37 +170,15 @@ export class GradeService {
       { header: 'No', key: 'no' },
       { header: 'StudentId', key: 'studentId' },
       { header: 'Fullname', key: 'fullname' },
-      // { header: 'Email', key: 'email' },
     ];
-    const classDocument = await this.classModel.findById(classId);
-    console.log('classId ', classId);
-    if (!classDocument) {
-      throw new BadRequestException('Class not existed');
-    }
-    console.log('classDocument ', classDocument);
-    const classCode = classDocument.classCode;
     const buffer = await workbook.xlsx.writeBuffer();
+    const classCode = classDocument.classCode;
     return { buffer, classCode };
-
-    // let data = [
-    //   // { no: '1', name: 'Muhammad Ichsan' },
-    //   // { no: '2', name: 'Muhammad Amin' },
-    // ];
-    // students?.map((student, index) => {
-    //   console.log('student ', student.user['fullname']);
-    //   data.push({
-    //     no: index + 1,
-    //     studentId: student.user['_id'],
-    //     fullname: student.user['fullname'],
-    //   });
-    // });
-
-    // data.forEach((val, i, _) => {
-    //   worksheet.addRow(val);
-    // });
   }
 
   async downloadTemplateFileGrade(response: Response, gradeCompositionId: string) {
+    const gradeCompositionDocument = await this.gradeCompositionModel.findById(gradeCompositionId);
+    const gradeCompositionName = gradeCompositionDocument.name;
     const workbook = new ExcelJS.Workbook();
     // create first sheet with file name exceljs-example
     const worksheet = workbook.addWorksheet('exceljs-example');
@@ -201,14 +188,16 @@ export class GradeService {
       { header: 'StudentId', key: 'studentId' },
       { header: 'Grade', key: 'grade' },
     ];
-    const gradeCompositionDocument = await this.gradeCompositionModel.findById(gradeCompositionId);
-    const gradeCompositionName = gradeCompositionDocument.name;
     const buffer = await workbook.xlsx.writeBuffer();
     return { buffer, gradeCompositionName };
   }
 
   async exportFileGrade(response: Response, classId: string) {
-    const classDocument = await this.classModel.findById(classId);
+    const classDocument = await this.classModel
+      .findById(classId)
+      .populate({ path: 'gradeComposition', options: { sort: { position: 1 } } })
+      .exec();
+    const gradeCompositions = classDocument.gradeComposition;
     console.log('classId ', classId);
     if (!classDocument) {
       throw new BadRequestException('Class not existed');
@@ -223,24 +212,21 @@ export class GradeService {
       { header: 'StudentId', key: 'studentId' },
       { header: 'Name', key: 'name' },
     ];
-    for (let i = 0; i < classData?.result?.[0]?.gradeComposition.length; i++) {
+    for (let i = 0; i < gradeCompositions?.length; i++) {
       columnData.push({
-        header: classData?.result?.[0]?.gradeComposition[i].gradeCompositionDetails.name,
-        key: classData?.result?.[0]?.gradeComposition[i].gradeCompositionDetails.name,
+        header: gradeCompositions?.[i]['name'],
+        key: gradeCompositions?.[i]['name'],
       });
     }
+    console.log(
+      'classData?.result?.[0]?.gradeComposition ',
+      classData?.result?.[0]?.gradeComposition,
+    );
     worksheet.columns = columnData;
     let columns = [...columnData];
-    // let index = columns.indexOf({ header: 'No', key: 'no' });
-    // if (index !== -1) {
-    //   columnData.splice(index, 1);
-    // }
     columns.shift();
     columns.shift();
     columns.shift();
-    // columns.pop();
-    // columns.pop();
-    // columns.pop();
     console.log('columnData ', columnData);
     console.log('columns ', columns);
     let data = [
@@ -259,7 +245,7 @@ export class GradeService {
       studentData['name'] = student.studentDetails['fullname']; // Add 'name' key
 
       columns.forEach((column, index) => {
-        studentData[column.key] = student.gradeComposition?.[index]?.grades?.[0]?.['value']; // Add keys from columnData
+        studentData[column.key] = student.gradeComposition?.[index]?.grades['value']; // Add keys from columnData
       });
 
       data.push(studentData);
@@ -629,7 +615,7 @@ export class GradeService {
       const gradeDocument = await this.gradeModel.create({
         value: dto.value,
         gradeComposition: dto.gradeCompositionId,
-        student: dto.studentId,
+        student: dto.userId,
         class: classDocument._id.toString(),
       });
 
@@ -656,7 +642,7 @@ export class GradeService {
       const gradeDocument = await this.gradeModel.findOneAndUpdate(
         {
           gradeComposition: dto.gradeCompositionId,
-          student: dto.studentId,
+          student: dto.userId,
         },
         { value: dto.value },
         { new: true },

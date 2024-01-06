@@ -7,6 +7,7 @@ export const GradeCompositionSchema = new mongoose.Schema({
   name: { type: String },
   gradeScale: { type: Number },
   position: { type: Number },
+  content: { type: String, default: '' },
   isFinal: { type: Boolean, default: false },
 });
 
@@ -18,6 +19,7 @@ export interface GradeCompositionModel {
   name: string;
   gradeScale: number;
   position: number;
+  content: string;
   isFinal: boolean;
 }
 

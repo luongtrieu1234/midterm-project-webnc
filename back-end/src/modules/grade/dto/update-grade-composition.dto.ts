@@ -18,4 +18,10 @@ export class UpdateGradeCompositionDto {
   @ApiProperty({ required: false })
   @IsNotEmpty()
   readonly gradeScale: number;
+
+  @ApiProperty({ required: false })
+  readonly content: string;
+
+  @ApiProperty({ required: false })
+  readonly position: number;
 }

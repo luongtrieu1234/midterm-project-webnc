@@ -29,6 +29,7 @@ import { AuthGuardCustom } from 'src/others/auth/auth.guard';
 import { SendInvitationDto } from './dto/send-invitation.dto';
 import { Param } from '@nestjs/common';
 import { ConfirmClassCodeDto } from './dto/confirm-class-code.dto';
+import { UpdateInformationClassDto } from './dto/update-name-description.dto';
 
 @Controller('class')
 @ApiTags('class')
@@ -54,6 +55,13 @@ export class ClassController {
   @HttpCode(200)
   async updateClass(@Body() updateClassDto: UpdateClassDto) {
     return await this.classService.addUsersToClass(updateClassDto);
+  }
+
+  @Post('update-information')
+  @UseGuards(AuthGuardCustom)
+  @HttpCode(200)
+  async updateInformationClass(@Body() updateInformationClassDto: UpdateInformationClassDto) {
+    return await this.classService.updateInformationClass(updateInformationClassDto);
   }
 
   @Get('all')

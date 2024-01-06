@@ -16,9 +16,10 @@ import {
   UploadedFiles,
   UseGuards,
   UseInterceptors,
+  Response,
 } from '@nestjs/common';
 import { ApiConsumes, ApiProperty, ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { Response, Request, Express } from 'express';
+import { Request, Express } from 'express';
 
 import { GradeService } from './grade.service';
 
@@ -92,23 +93,27 @@ export class GradeController {
   @UseGuards(AuthGuardCustom)
   @Header('Access-Control-Expose-Headers', 'Content-Disposition')
   async downloadTemplateFileList(
-    @Res({ passthrough: true }) response: Response,
-    @Query('classID') classId: string,
+    @Response({ passthrough: true }) response,
+    @Query('classId') classId: string,
     @Req() req,
   ) {
     const { buffer, classCode } = await this.gradeService.downloadTemplateFileList(
       response,
       classId,
     );
-    response.set('Content-Disposition', `attachment; filename=${classCode}.xlsx`);
-    return response.send(buffer);
+    // response.set('Content-Disposition', `attachment; filename=${classCode}.xlsx`);
+    response.set({
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': `attachment; filename=${classCode}.xlsx`,
+    });
+    response.send(buffer);
   }
 
   @Get('excel-template-grade')
   @UseGuards(AuthGuardCustom)
   @Header('Access-Control-Expose-Headers', 'Content-Disposition')
   async downloadTemplateFileGrade(
-    @Res({ passthrough: true }) response: Response,
+    @Response({ passthrough: true }) response,
     @Query('gradeCompositionId') gradeCompositionId: string,
     @Req() req,
   ) {
@@ -116,21 +121,29 @@ export class GradeController {
       response,
       gradeCompositionId,
     );
-    response.set('Content-Disposition', `attachment; filename=${gradeCompositionName}.xlsx`);
-    return response.send(buffer);
+    // response.set('Content-Disposition', `attachment; filename=${gradeCompositionName}.xlsx`);
+    response.set({
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': `attachment; filename=${gradeCompositionName}.xlsx`,
+    });
+    response.send(buffer);
   }
 
   @Get('export-file-grade')
   @UseGuards(AuthGuardCustom)
   @Header('Access-Control-Expose-Headers', 'Content-Disposition')
   async exportFileGrade(
-    @Res({ passthrough: true }) response: Response,
+    @Response({ passthrough: true }) response,
     @Query('classId') classId: string,
     @Req() req,
   ) {
     const { buffer, className } = await this.gradeService.exportFileGrade(response, classId);
-    response.set('Content-Disposition', `attachment; filename=${className}.xlsx`);
-    return response.send(buffer);
+    // response.set('Content-Disposition', `attachment; filename=${className}.xlsx`);
+    response.set({
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': `attachment; filename=${className}.xlsx`,
+    });
+    response.send(buffer);
   }
 
   @ApiConsumes('multipart/form-data')
@@ -178,13 +191,13 @@ export class GradeController {
   }
 
   // @Get('read-file')
-  // async readFile(@Query('classID') classId: string) {
+  // async readFile(@Query('classId') classId: string) {
   //   return await this.gradeService.getClassGrades(classId);
   // }
 
   @Get('class-grades')
   @UseGuards(AuthGuardCustom)
-  async getClassGrades(@Query('classID') classId: string, @Req() req) {
+  async getClassGrades(@Query('classId') classId: string, @Req() req) {
     return await this.gradeService.getClassGrades(classId);
   }
 
