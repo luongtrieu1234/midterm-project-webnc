@@ -27,6 +27,7 @@ import { RoleModel } from '../role/role.model';
 import { GradeModel } from '../grade/grade.model';
 import { GradeStructureModel } from '../grade/grade-structure.model';
 import { ConfirmClassCodeDto } from './dto/confirm-class-code.dto';
+import { UpdateInformationClassDto } from './dto/update-name-description.dto';
 
 @Injectable()
 export class ClassService {
@@ -42,16 +43,16 @@ export class ClassService {
     @InjectModel('Class')
     private readonly classModel: Model<ClassModel>,
     @InjectModel('Role')
-    private readonly roleModel: Model<RoleModel>,
-  ) // @InjectModel('Grade')
-  // private readonly gradeModel: Model<GradeModel>,
-  // @InjectModel('GradeStructure')
+    private readonly roleModel: Model<RoleModel>, // @InjectModel('Grade')
+    // private readonly gradeModel: Model<GradeModel>,
+  ) // @InjectModel('GradeStructure')
   // private readonly gradeStructureModel: Model<GradeStructureModel>,
   {}
 
   async createClass(ownerId: string, createClassDto: CreateClassDto) {
     const currentClass = await this.classModel.findOne({
       name: createClassDto.name,
+      description: createClassDto?.description ?? '',
     });
     console.log('check class ', currentClass);
     if (currentClass) {
@@ -170,6 +171,30 @@ export class ClassService {
       message: 'success',
       classes: populatedClass,
       statusCode: HttpStatus.OK,
+    };
+  }
+
+  async updateInformationClass(updateInformationClassDto: UpdateInformationClassDto) {
+    const currentClass = await this.classModel.findOneAndUpdate(
+      {
+        _id: updateInformationClassDto.classId,
+      },
+      {
+        $set: {
+          name: updateInformationClassDto?.name,
+          description: updateInformationClassDto?.description,
+        },
+      },
+      { new: true },
+    );
+
+    if (!currentClass) {
+      throw new BadRequestException('Grade not found');
+    }
+    return {
+      message: 'success',
+      statusCode: HttpStatus.OK,
+      class: currentClass,
     };
   }
 

@@ -25,6 +25,7 @@ export const ClassSchema = new mongoose.Schema({
   gradeComposition: [{ type: mongoose.Schema.Types.ObjectId, ref: 'GradeComposition' }],
   classCode: { type: String },
   active: { type: Boolean, default: true },
+  description: { type: String, default: '' },
   deletedAt: { type: Date, default: null }, // Set default value for deletedAt
   createdAt: { type: Date, default: Date.now }, // Set default value for createdAt to the current date and time
   updatedAt: { type: Date, default: Date.now },
@@ -39,6 +40,7 @@ export interface ClassModel {
   gradeComposition: string[];
   classCode: string;
   active: boolean;
+  description: string;
   deletedAt: Date;
   createdAt: Date;
   updatedAt: Date;

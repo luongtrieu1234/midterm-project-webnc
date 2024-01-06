@@ -6,4 +6,7 @@ export class CreateClassDto {
   @ApiProperty({ required: true })
   @IsNotEmpty()
   readonly name: string;
+
+  @ApiProperty({ required: false })
+  readonly description: string;
 }
