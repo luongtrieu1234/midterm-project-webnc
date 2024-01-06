@@ -7,6 +7,7 @@ import TextareaInput from './TextareaInput';
 import TextInput from './TextInput';
 import Tickbox from './Tickbox';
 import FooterComfirm from './FooterConfirm';
+import CustomFileInput from './CustomFileInput';
 export {
   Combobox,
   CurrencyInput,
@@ -17,4 +18,5 @@ export {
   TextInput,
   Tickbox,
   FooterComfirm,
+  CustomFileInput,
 };

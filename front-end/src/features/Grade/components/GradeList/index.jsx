@@ -1,5 +1,4 @@
-import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
@@ -10,12 +9,13 @@ import { useQuery } from 'react-query';
 import { TOAST } from 'constant';
 import { toast } from 'layout';
 import { classNames } from 'primereact/utils';
+import { useForm } from 'react-hook-form';
+import { FooterComfirm } from 'components/FormControl';
+import AddFileStudentListDialog from './AddGradeCompositionDialog';
 
-export default function GradeList({
-  data,
-  setVisibleAddGradeCompositionDialog,
-}) {
+export default function GradeList() {
   const { classId } = useParams();
+
   const {
     refetch: handleDownloadCsvTemplate,
     isLoading: isDownloadCsvTemplateLoading,
@@ -40,6 +40,31 @@ export default function GradeList({
       },
     }
   );
+  const [visibleAddFileStudentListDialog, setVisibleAddFileStudentListDialog] =
+    useState(false);
+  const {
+    control,
+    handleSubmit,
+    // reset,
+    formState: { errors },
+  } = useForm();
+  const onSubmit = async (data) => {
+    console.log('Data:', data);
+  };
+  const footerComfirm = (
+    <FooterComfirm
+      isLoading={false}
+      action='Save'
+      setVisible={setVisibleAddFileStudentListDialog}
+      handleSubmit={handleSubmit(onSubmit)}
+    />
+  );
+  // useEffect(() => {
+  //   if (isAddGradeCompositionSuccess) {
+  //     setVisibleAddFileStudentListDialog(false);
+  //     refetch();
+  //   }
+  // }, [isAddGradeCompositionSuccess]);
 
   function formatHeader() {
     return (
@@ -51,7 +76,7 @@ export default function GradeList({
             className='add-grade-composition'
             icon='pi pi-plus'
             data-pr-tooltip='Add Grade Composition'
-            onClick={() => setVisibleAddGradeCompositionDialog(true)}
+            onClick={() => setVisibleAddFileStudentListDialog(true)}
           />
         </div>
       </div>
@@ -66,53 +91,61 @@ export default function GradeList({
     );
   }
   return (
-    <div className='mt-2'>
-      <div className='flex align-items-center justify-content-start gap-3 my-2'>
-        <div
-          className='flex flex align-items-center'
-          onClick={() => handleDownloadCsvTemplate()}
-        >
-          <i
-            className={classNames('pi mr-1', {
-              'pi-spinner':
-                isDownloadCsvTemplateLoading || isDownloadCsvTemplateFetching,
-              'pi-file-excel': !(
-                isDownloadCsvTemplateLoading || isDownloadCsvTemplateFetching
-              ),
-            })}
-            style={{ color: 'green' }}
-          ></i>
-          <div className='download-link'>
-            Download Template Student List (.csv)
+    <div>
+      <div className='mt-2'>
+        <div className='flex align-items-center justify-content-start gap-3 my-2'>
+          <div
+            className='flex flex align-items-center'
+            onClick={() => handleDownloadCsvTemplate()}
+          >
+            <i
+              className={classNames('pi mr-1', {
+                'pi-spinner':
+                  isDownloadCsvTemplateLoading || isDownloadCsvTemplateFetching,
+                'pi-file-excel': !(
+                  isDownloadCsvTemplateLoading || isDownloadCsvTemplateFetching
+                ),
+              })}
+              style={{ color: 'green' }}
+            ></i>
+            <div className='download-link'>
+              Download Template Student List (.csv)
+            </div>
           </div>
+          <Button
+            size='small'
+            icon={classNames('pi pi-upload')}
+            label='Upload Student List'
+            onClick={() => setVisibleAddFileStudentListDialog(true)}
+          />
         </div>
-        <Button
-          size='small'
-          icon={classNames('pi pi-upload')}
-          label='Upload Student List'
-        />
+        <DataTable
+          header={formatHeader}
+          value={[]}
+          showGridlines
+          stripedRows
+          style={{ maxWidth: '50rem' }}
+        >
+          <Column rowReorder style={{ width: '1rem' }} />
+          <Column field='no' header='No' sortable />
+          <Column field='studentId' header='Student Id' sortable />
+          <Column field='fullName' header='Full Name' sortable />
+          <Column
+            header='Actions'
+            style={{ maxWidth: '4rem' }}
+            body={formatActions}
+          />
+        </DataTable>
       </div>
-      <DataTable
-        header={formatHeader}
-        value={data}
-        showGridlines
-        stripedRows
-        style={{ maxWidth: '50rem' }}
-      >
-        <Column rowReorder style={{ width: '1rem' }} />
-        <Column field='name' header='Name' sortable />
-        <Column field='gradeScale' header='Scale' sortable />
-        <Column
-          header='Actions'
-          style={{ maxWidth: '4rem' }}
-          body={formatActions}
-        />
-      </DataTable>
+      <AddFileStudentListDialog
+        visible={visibleAddFileStudentListDialog}
+        setVisible={setVisibleAddFileStudentListDialog}
+        control={control}
+        errors={errors}
+        footer={footerComfirm}
+      />
     </div>
   );
 }
 
-GradeList.propTypes = {
-  setVisibleAddGradeCompositionDialog: PropTypes.func.isRequired,
-  data: PropTypes.object.isRequired,
-};
+GradeList.propTypes = {};
