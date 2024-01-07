@@ -149,7 +149,7 @@ const ViewListClass = () => {
                   <hr className='my-3 mx-0 border-top-1 border-bottom-none border-300' />
                   <div className='flex align-items-center'>
                     {/* <span className='font-bold text-2xl text-900'>${course.price}</span> */}
-                    <span className='ml-2 font-medium text-600'>welcome to course</span>
+                    <span className='ml-2 font-medium text-600'>Welcome to course</span>
                   </div>
                   <hr className='my-3 mx-0 border-top-1 border-bottom-none border-300' />
                   {/* <ul className='list-none p-0 m-0 flex-grow-1'>
