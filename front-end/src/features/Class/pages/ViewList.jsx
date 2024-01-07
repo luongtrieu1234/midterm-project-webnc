@@ -8,6 +8,7 @@ import { Button } from 'primereact/button';
 import { ScrollPanel } from 'primereact/scrollpanel';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
+import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
 
 const ViewListClass = () => {
@@ -118,6 +119,16 @@ const ViewListClass = () => {
             render={({ field }) => <InputText {...field} style={{ width: '70%' }} />}
           />
           {errors.name && <p className='text-red-500'>{errors.name.message}</p>}
+
+          <p className='mb-3'>Class Describe</p>
+          <Controller
+            name='description'
+            control={control}
+            defaultValue=''
+            rules={{ required: 'This field is required' }}
+            render={({ field }) => <InputTextarea {...field} style={{ width: '70%' }} />}
+          />
+          {errors.description && <p className='text-red-500'>{errors.description.message}</p>}
         </Dialog>
       </div>
       <ScrollPanel style={{ width: '100%', height: '550px' }}>

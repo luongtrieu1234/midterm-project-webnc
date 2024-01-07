@@ -52,7 +52,7 @@ const ClassDetail = () => {
 
   const items = [
     {
-      label: 'Infor Class',
+      label: 'Stream',
       icon: 'pi pi-fw pi-users',
       command: () => {
         setActiveTab('Infor Class');
@@ -220,10 +220,32 @@ const ClassDetail = () => {
           alignContent: 'center',
         }}
       >
-        {/* Infor Class */}
+        {/* Infor class */}
         {activeTab === 'Infor Class' && course && (
-          <div>
-            <h2>{course.name}</h2>
+          <div className='mr-8'>
+            <div
+              style={{
+                backgroundColor: 'rgba(110, 107, 241, 0.2)',
+                width: '70vw',
+                height: '40vh',
+                border: '1px solid #',
+                borderRadius: '5px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignContent: 'center',
+                marginTop: '2rem',
+              }}
+            >
+              <h2 className='mx-4 my-3'>{course.name}</h2>
+              <h3 className='mx-4 my-3'>
+                Course Code: <span style={{ color: '#555' }}>{course.classCode}</span>
+              </h3>
+              <h3 className='mx-4 my-3'>
+                Course description: <span style={{ color: '#555' }}>{course.description}</span>
+              </h3>
+            </div>
+            <h3 className='mx-4 my-3'>List post of class</h3>
           </div>
         )}
 

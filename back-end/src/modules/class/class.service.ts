@@ -52,7 +52,6 @@ export class ClassService {
   async createClass(ownerId: string, createClassDto: CreateClassDto) {
     const currentClass = await this.classModel.findOne({
       name: createClassDto.name,
-      description: createClassDto?.description ?? '',
     });
     console.log('check class ', currentClass);
     if (currentClass) {
@@ -74,6 +73,7 @@ export class ClassService {
       owner: classOwner._id,
       name: createClassDto.name,
       classCode: classCode,
+      description: createClassDto.description ?? '',
     });
     // const owner = await this.userModel.findById(ownerId);
     const teacherRole = await this.roleModel.findOne({
@@ -82,7 +82,7 @@ export class ClassService {
     newClass.teachers.push({ user: ownerId, classRole: 'teacher' });
     newClass.save();
     // const gradeStructure = await this.gradeStructureModel.create({
-    //   name: `Grade structure of class ${createClassDto.name}`,
+    //   name: Grade structure of class ${createClassDto.name},
     // });
     // newClass.gradeStructure = gradeStructure._id.toString();
     // newClass.save();
