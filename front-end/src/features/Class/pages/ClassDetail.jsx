@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 
@@ -203,12 +204,12 @@ const ClassDetail = () => {
         <Dialog
           header='Class invitation'
           visible={open}
-          style={{ width: '50vw' }}
+          style={{ width: '40vw' }}
           onHide={() => setOpen(false)}
         >
-          <p className='m-0' style={{ color: 'blue' }}>
-            {link}
-          </p>
+          <CopyToClipboard text={link}>
+            <Button className='ml-4'>Copy Link </Button>
+          </CopyToClipboard>
         </Dialog>
       </div>
 
