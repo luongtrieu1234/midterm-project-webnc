@@ -143,7 +143,7 @@ const ViewListClass = () => {
                   <div className=''>
                     <div className='text-900 font-medium text-xl mb-2'>{course.name}</div>
                     <li className='flex align-items-center gap-2'>
-                      <div className='text-600'>{course._id}</div>
+                      <div className='text-600'>{course.owner.fullname}</div>
                     </li>
                   </div>
                   <hr className='my-3 mx-0 border-top-1 border-bottom-none border-300' />
