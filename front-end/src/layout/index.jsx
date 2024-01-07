@@ -12,8 +12,7 @@ export default function Layout({ children }) {
   const location = useLocation();
   const currentPath = location.pathname;
   const toastRef = useRef(null);
-  const { layoutConfig, layoutState, setLayoutState } =
-    useContext(LayoutContext);
+  const { layoutConfig, layoutState, setLayoutState } = useContext(LayoutContext);
   if (currentPath === '/' && layoutState.staticMenuDesktopInactive === false) {
     setLayoutState((prevLayoutState) => ({
       ...prevLayoutState,
@@ -27,8 +26,7 @@ export default function Layout({ children }) {
     'layout-overlay': layoutConfig.menuMode === 'overlay',
     'layout-static': layoutConfig.menuMode === 'static',
     'layout-static-inactive':
-      layoutState.staticMenuDesktopInactive &&
-      layoutConfig.menuMode === 'static',
+      layoutState.staticMenuDesktopInactive && layoutConfig.menuMode === 'static',
     'layout-overlay-active': layoutState.overlayMenuActive,
     'layout-mobile-active': layoutState.staticMenuMobileActive,
     'p-input-filled': layoutConfig.inputStyle === 'filled',

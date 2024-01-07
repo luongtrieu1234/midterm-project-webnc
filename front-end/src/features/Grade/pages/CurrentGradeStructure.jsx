@@ -36,9 +36,7 @@ const CurrentGradeStructure = () => {
     <div>
       <TabMenu model={items} activeIndex={Number(activeTab)} />
       <div>
-        {activeTab === GRADE_PAGE_TAB_ENUM.GRADE_STRUCTURE && (
-          <GradeStructureTable />
-        )}
+        {activeTab === GRADE_PAGE_TAB_ENUM.GRADE_STRUCTURE && <GradeStructureTable />}
         {activeTab === GRADE_PAGE_TAB_ENUM.GRADE_LIST && <GradeList />}
       </div>
     </div>

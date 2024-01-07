@@ -37,13 +37,10 @@ function ResetPassword() {
     }
     console.log('Passwords match');
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/users/reset`,
-        {
-          password,
-          passwordConfirmed,
-        }
-      );
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/reset`, {
+        password,
+        passwordConfirmed,
+      });
       setMessage('Password has been reset');
       if (response.data.statusCode === 200) {
         console.log('Password has been reset');
@@ -72,10 +69,7 @@ function ResetPassword() {
           </div>
 
           <div>
-            <label
-              htmlFor='password'
-              className='block text-900 font-medium mb-2'
-            >
+            <label htmlFor='password' className='block text-900 font-medium mb-2'>
               New Password
             </label>
             <InputText
@@ -87,10 +81,7 @@ function ResetPassword() {
               onChange={(e) => setPassword(e.target.value)}
             />
 
-            <label
-              htmlFor='password'
-              className='block text-900 font-medium mb-2'
-            >
+            <label htmlFor='password' className='block text-900 font-medium mb-2'>
               Confirm Password
             </label>
             <InputText
@@ -103,11 +94,7 @@ function ResetPassword() {
             />
 
             <div className='flex align-items-center justify-content-end mr-4'>
-              <Button
-                label='Change'
-                className='w-2'
-                onClick={handleChangePassword}
-              />
+              <Button label='Change' className='w-2' onClick={handleChangePassword} />
             </div>
           </div>
         </div>

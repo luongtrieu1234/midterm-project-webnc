@@ -62,10 +62,7 @@ export default function CustomFileInput({
 
   return (
     <div className={`field ${get(errors, name) ? 'invalid-file-input' : ''}`}>
-      <label
-        htmlFor={name}
-        style={isFontWeightLabel ? { fontWeight: 900 } : {}}
-      >
+      <label htmlFor={name} style={isFontWeightLabel ? { fontWeight: 900 } : {}}>
         {label}{' '}
         {isRequired && (
           <span className='text-red-500' style={{ fontWeight: 900 }}>
@@ -135,10 +132,7 @@ CustomFileInput.propTypes = {
   setFileUrl: PropTypes.func,
   acceptOnly: PropTypes.string,
   // eslint-disable-next-line react/forbid-prop-types
-  innerRef: PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.shape({ current: PropTypes.any }),
-  ]),
+  innerRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.any })]),
 };
 
 CustomFileInput.defaultProps = {

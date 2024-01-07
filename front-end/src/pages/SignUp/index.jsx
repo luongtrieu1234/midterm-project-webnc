@@ -43,14 +43,11 @@ const SignUp = () => {
 
     try {
       // eslint-disable-next-line no-undef
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/users/signup`,
-        {
-          fullname: data.fullname,
-          email: data.email,
-          password: data.password,
-        }
-      );
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/signup`, {
+        fullname: data.fullname,
+        email: data.email,
+        password: data.password,
+      });
       setLoading(false); // Start loading state
 
       if (response.status === 200 || response.status === 201) {
@@ -94,14 +91,9 @@ const SignUp = () => {
               className='pi pi-user mb-3'
               style={{ fontSize: '2.5rem', color: 'var(--primary-color)' }}
             ></i>
-            <div className='text-900 text-3xl font-medium mb-3'>
-              Sign Up Account
-            </div>
+            <div className='text-900 text-3xl font-medium mb-3'>Sign Up Account</div>
           </div>
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className='flex flex-column gap-2'
-          >
+          <form onSubmit={handleSubmit(onSubmit)} className='flex flex-column gap-2'>
             <Toast ref={toast} />
 
             {/* Full name */}
@@ -123,10 +115,7 @@ const SignUp = () => {
                     <InputText
                       id={field.name}
                       value={field.value}
-                      className={classNames(
-                        { 'p-invalid': fieldState.error },
-                        'w-full'
-                      )}
+                      className={classNames({ 'p-invalid': fieldState.error }, 'w-full')}
                       onChange={(e) => field.onChange(e.target.value)}
                     />
                   </span>
@@ -153,10 +142,7 @@ const SignUp = () => {
                     <InputText
                       id={field.name}
                       value={field.value}
-                      className={classNames(
-                        { 'p-invalid': fieldState.error },
-                        'w-full'
-                      )}
+                      className={classNames({ 'p-invalid': fieldState.error }, 'w-full')}
                       onChange={(e) => field.onChange(e.target.value)}
                     />
                   </span>
@@ -184,10 +170,7 @@ const SignUp = () => {
                       id={field.name}
                       value={field.value}
                       type='password'
-                      className={classNames(
-                        { 'p-invalid': fieldState.error },
-                        'w-full'
-                      )}
+                      className={classNames({ 'p-invalid': fieldState.error }, 'w-full')}
                       onChange={(e) => field.onChange(e.target.value)}
                     />
                   </span>
@@ -197,16 +180,9 @@ const SignUp = () => {
             />
 
             <div>
-              <Button
-                label='Sign Up'
-                icon='pi pi-user'
-                type='submit'
-                className='w-full mt-5'
-              />
+              <Button label='Sign Up' icon='pi pi-user' type='submit' className='w-full mt-5' />
               <div className='text-center mt-5'>
-                <span className='text-600 font-medium line-height-3'>
-                  Do have an account?
-                </span>
+                <span className='text-600 font-medium line-height-3'>Do have an account?</span>
                 <Link
                   to='/sign-in'
                   className='font-medium no-underline ml-2 text-blue-500 cursor-pointer'

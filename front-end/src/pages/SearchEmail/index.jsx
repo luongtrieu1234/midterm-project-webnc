@@ -27,12 +27,9 @@ function SearchEmail() {
   };
   const handleNextClick = async () => {
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/users/reset-request`,
-        {
-          email,
-        }
-      );
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/reset-request`, {
+        email,
+      });
       console.log('response: ', response.data);
       if (response.data.status === 200) {
         showSuccess();
@@ -53,9 +50,7 @@ function SearchEmail() {
       <div className='flex align-items-center justify-content-center'>
         <div className='surface-card p-4 shadow-2 border-round w-full lg:w-6'>
           <div className='mb-5'>
-            <div className='text-center text-900 text-3xl font-medium mb-3'>
-              Find your account
-            </div>
+            <div className='text-center text-900 text-3xl font-medium mb-3'>Find your account</div>
             <span className='text-900 text-xl'>Please enter your email</span>
           </div>
 

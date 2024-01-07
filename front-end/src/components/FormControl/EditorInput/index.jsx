@@ -42,10 +42,7 @@ export default function EditorInput({
         control={control}
         defaultValue=''
         render={({ field: { value, onChange } }) => {
-          currentValue.current = (value ?? '')?.replace(
-            /<[^>]+>(<br>)+<\/[^>]+>/g,
-            ''
-          );
+          currentValue.current = (value ?? '')?.replace(/<[^>]+>(<br>)+<\/[^>]+>/g, '');
 
           if (currentValue.current !== value) {
             // update the rendered text at 1st.
@@ -58,26 +55,19 @@ export default function EditorInput({
               id={name}
               value={value}
               onTextChange={(e) => {
-                const htmlValue = (e.htmlValue ?? '')?.replace(
-                  /<[^>]+>(<br>)+<\/[^>]+>/g,
-                  ''
-                );
+                const htmlValue = (e.htmlValue ?? '')?.replace(/<[^>]+>(<br>)+<\/[^>]+>/g, '');
                 if (htmlValue !== currentValue?.current) {
                   onChange(htmlValue);
                 }
               }}
               style={{ height: `${height}` }}
               placeholder={placeholder}
-              className={classNames(
-                'relative',
-                'custom-tooltip-for-editor-input',
-                {
-                  'p-invalid': !!get(errors, name),
-                  'surface-200': disabled,
-                  'hide-image-button': true,
-                  'ql-container': true,
-                }
-              )}
+              className={classNames('relative', 'custom-tooltip-for-editor-input', {
+                'p-invalid': !!get(errors, name),
+                'surface-200': disabled,
+                'hide-image-button': true,
+                'ql-container': true,
+              })}
               readOnly={readOnly}
             />
           );

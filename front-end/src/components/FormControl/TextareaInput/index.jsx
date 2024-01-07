@@ -46,10 +46,7 @@ export default function TextareaInput({
             value={value}
             placeholder={placeholder}
             onChange={(e) => {
-              const formattedValue = e.target.value?.replace(
-                NON_PRINTABLE_REGEX,
-                ''
-              );
+              const formattedValue = e.target.value?.replace(NON_PRINTABLE_REGEX, '');
               onChange(formattedValue);
             }}
             rows={row}

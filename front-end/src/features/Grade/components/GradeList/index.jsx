@@ -1,70 +1,36 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Tooltip } from 'primereact/tooltip';
 import { useParams } from 'react-router-dom';
-import { getExcelTemplateList } from 'apis/grade.api';
-import { useQuery } from 'react-query';
-import { TOAST } from 'constant';
-import { toast } from 'layout';
+import { getExcelTemplateList, postUploadFileList } from 'apis/grade.api';
+import { useMutation } from 'react-query';
 import { classNames } from 'primereact/utils';
 import { useForm } from 'react-hook-form';
 import { FooterComfirm } from 'components/FormControl';
 import AddFileStudentListDialog from './AddGradeCompositionDialog';
+import { handleDownloadError, handleDownloadSuccess } from 'utils/func';
+import { toast } from 'layout';
+import { TOAST } from 'constant';
 
 export default function GradeList() {
   const { classId } = useParams();
-
+  const { mutate: downloadExcelTemplateMutate, isLoading: isDownloadExcelTemplateLoading } =
+    useMutation(getExcelTemplateList);
   const {
-    refetch: handleDownloadCsvTemplate,
-    isLoading: isDownloadCsvTemplateLoading,
-    isFetching: isDownloadCsvTemplateFetching,
-  } = useQuery(
-    ['downloadCsvTemplateStudentList', classId],
-    () => getExcelTemplateList(classId),
-    {
-      enabled: false,
-      onSuccess(res) {
-        if (res?.data) {
-          const file = new Blob([res.data]);
-          const filename = 'TemplateStudentList.xlsx';
-          const link = document.createElement('a');
-          link.href = URL.createObjectURL(file);
-          link.download = filename;
-          link.click();
-        }
-      },
-      onError() {
-        toast(TOAST.ERROR, 'API Error ');
-      },
-    }
-  );
-  const [visibleAddFileStudentListDialog, setVisibleAddFileStudentListDialog] =
-    useState(false);
+    mutate: uploadStudentListExcelFileMutate,
+    isLoading: isUploadStudentListExcelFileLoading,
+    isSuccess: isUploadStudentListExcelFileSuccess,
+  } = useMutation(postUploadFileList);
+
+  const [visibleAddFileStudentListDialog, setVisibleAddFileStudentListDialog] = useState(false);
   const {
     control,
     handleSubmit,
     // reset,
     formState: { errors },
   } = useForm();
-  const onSubmit = async (data) => {
-    console.log('Data:', data);
-  };
-  const footerComfirm = (
-    <FooterComfirm
-      isLoading={false}
-      action='Save'
-      setVisible={setVisibleAddFileStudentListDialog}
-      handleSubmit={handleSubmit(onSubmit)}
-    />
-  );
-  // useEffect(() => {
-  //   if (isAddGradeCompositionSuccess) {
-  //     setVisibleAddFileStudentListDialog(false);
-  //     refetch();
-  //   }
-  // }, [isAddGradeCompositionSuccess]);
 
   function formatHeader() {
     return (
@@ -90,31 +56,67 @@ export default function GradeList() {
       </div>
     );
   }
+
+  // call api
+  async function handleDownloadExcelTemplate() {
+    downloadExcelTemplateMutate(classId, {
+      onSuccess: (res) => handleDownloadSuccess(res, 'TemplateStudentList.xlsx'),
+      onError: handleDownloadError,
+    });
+  }
+  async function onAddStudentListExcelFileSubmit(data) {
+    console.log('Data:', data);
+    const addStudentListExcelFileSubmitFormData = new FormData();
+    addStudentListExcelFileSubmitFormData.append('excelFile', data.studentListFile);
+    uploadStudentListExcelFileMutate(addStudentListExcelFileSubmitFormData, {
+      onSuccess() {
+        toast(TOAST.SUCCESS, 'Student List Upload Successfully!');
+      },
+      onError() {
+        toast(TOAST.ERROR, 'Student List Upload Error!');
+      },
+    });
+  }
+  //end call api
+
+  const footerComfirm = (
+    <FooterComfirm
+      isLoading={false}
+      action='Save'
+      setVisible={setVisibleAddFileStudentListDialog}
+      handleSubmit={handleSubmit(onAddStudentListExcelFileSubmit)}
+    />
+  );
+
+  // before render
+  useEffect(() => {
+    if (isUploadStudentListExcelFileSuccess) {
+      setVisibleAddFileStudentListDialog(false);
+    }
+  }, [isUploadStudentListExcelFileSuccess]);
   return (
     <div>
       <div className='mt-2'>
         <div className='flex align-items-center justify-content-start gap-3 my-2'>
           <div
             className='flex flex align-items-center'
-            onClick={() => handleDownloadCsvTemplate()}
+            onClick={() => handleDownloadExcelTemplate()}
           >
             <i
               className={classNames('pi mr-1', {
-                'pi-spinner':
-                  isDownloadCsvTemplateLoading || isDownloadCsvTemplateFetching,
-                'pi-file-excel': !(
-                  isDownloadCsvTemplateLoading || isDownloadCsvTemplateFetching
-                ),
+                'pi-spinner': isDownloadExcelTemplateLoading,
+                'pi-file-excel': !isDownloadExcelTemplateLoading,
               })}
               style={{ color: 'green' }}
             ></i>
-            <div className='download-link'>
-              Download Template Student List (.csv)
-            </div>
+            <div className='download-link'>Download Template Student List (.csv)</div>
           </div>
           <Button
             size='small'
-            icon={classNames('pi pi-upload')}
+            icon={classNames('pi ', {
+              'pi-spinner': isUploadStudentListExcelFileLoading,
+              'pi-upload': !isUploadStudentListExcelFileLoading,
+            })}
             label='Upload Student List'
             onClick={() => setVisibleAddFileStudentListDialog(true)}
           />
@@ -129,11 +131,7 @@ export default function GradeList() {
           <Column field='no' header='No' sortable style={{ width: '1rem' }} />
           <Column field='studentId' header='Student Id' sortable />
           <Column field='fullName' header='Full Name' sortable />
-          <Column
-            header='Actions'
-            style={{ maxWidth: '4rem' }}
-            body={formatActions}
-          />
+          <Column header='Actions' style={{ maxWidth: '4rem' }} body={formatActions} />
         </DataTable>
       </div>
       <AddFileStudentListDialog

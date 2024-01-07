@@ -69,19 +69,10 @@ export default function TextInput({
             <InputText
               id={name}
               // eslint-disable-next-line no-nested-ternary
-              type={
-                type === 'password'
-                  ? isShowPassword
-                    ? 'text'
-                    : 'password'
-                  : type
-              }
+              type={type === 'password' ? (isShowPassword ? 'text' : 'password') : type}
               placeholder={placeholder}
               onChange={(e) => {
-                const formattedValue = e.target.value?.replace(
-                  NON_PRINTABLE_REGEX,
-                  ''
-                );
+                const formattedValue = e.target.value?.replace(NON_PRINTABLE_REGEX, '');
                 onChange(formattedValue);
               }}
               value={value}

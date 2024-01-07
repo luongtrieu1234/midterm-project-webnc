@@ -26,19 +26,11 @@ export default function GradeStructureTable() {
     data: gradeStructureData,
     // isLoading: isGradeStructureLoading,
     refetch,
-  } = useQuery(
-    ['gradeStructureData', classId],
-    () => getGradeStructure(classId),
-    { enabled: !!classId }
-  );
-  const gradeStructure = useMemo(
-    () => gradeStructureData?.data,
-    [gradeStructureData]
-  );
-  const [
-    visibleAddGradeCompositionDialog,
-    setVisibleAddGradeCompositionDialog,
-  ] = useState(false);
+  } = useQuery(['gradeStructureData', classId], () => getGradeStructure(classId), {
+    enabled: !!classId,
+  });
+  const gradeStructure = useMemo(() => gradeStructureData?.data, [gradeStructureData]);
+  const [visibleAddGradeCompositionDialog, setVisibleAddGradeCompositionDialog] = useState(false);
 
   const {
     control,
@@ -118,11 +110,7 @@ export default function GradeStructureTable() {
           <Column rowReorder style={{ width: '1rem' }} />
           <Column field='name' header='Name' sortable />
           <Column field='gradeScale' header='Scale' sortable />
-          <Column
-            header='Actions'
-            style={{ maxWidth: '4rem' }}
-            body={formatActions}
-          />
+          <Column header='Actions' style={{ maxWidth: '4rem' }} body={formatActions} />
         </DataTable>
       </div>
       <AddGradeCompositionDialog

@@ -8,7 +8,9 @@ export const addGradeComposition = (body = {}) =>
   instance.post(GRADE.POST_ADD_GRADE_COMPOSITION, body);
 
 export const getExcelTemplateList = (classId) =>
-  instance.get(GRADE.GET_EXCEL_TEMPLATE_LIST, { params: { classId: classId } });
+  instance.get(GRADE.GET_EXCEL_TEMPLATE_LIST, {
+    params: { classId: classId },
+    responseType: 'blob',
+  });
 
-export const postUploadFileList = (body = {}) =>
-  instance.post(GRADE.POST_UPLOAD_FILE_LIST, body);
+export const postUploadFileList = (body = {}) => instance.post(GRADE.POST_UPLOAD_FILE_LIST, body);

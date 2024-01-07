@@ -7,31 +7,14 @@ import { useTranslation } from 'react-i18next';
 import { addLocale } from 'primereact/api';
 import React from 'react';
 
-const dayNames = [
-  'sunday',
-  'monday',
-  'tuesday',
-  'wednesday',
-  'thursday',
-  'friday',
-  'saturday',
-];
+const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
-export default function DatePicker({
-  label,
-  name,
-  isRequired,
-  disabled,
-  control,
-  errors,
-}) {
+export default function DatePicker({ label, name, isRequired, disabled, control, errors }) {
   const { t } = useTranslation();
 
   addLocale('vi', {
     firstDayOfWeek: 1,
-    dayNames: dayNames.map((dayName) =>
-      t(`formControl.dateLocale.dayNames.${dayName}`)
-    ),
+    dayNames: dayNames.map((dayName) => t(`formControl.dateLocale.dayNames.${dayName}`)),
     dayNamesShort: dayNames.map((dayName) =>
       t(`formControl.dateLocale.dayNamesShort.${dayName.slice(0, 3)}`)
     ),

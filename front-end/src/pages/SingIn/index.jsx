@@ -45,13 +45,10 @@ const SignIn = () => {
     setLoading(true); // Start loading state
     try {
       // eslint-disable-next-line no-undef
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/users/login`,
-        {
-          email: data.email,
-          password: data.password,
-        }
-      );
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/login`, {
+        email: data.email,
+        password: data.password,
+      });
       setLoading(false); // Start loading state
 
       if (response.status === 200) {
@@ -103,10 +100,7 @@ const SignIn = () => {
             <Google />
           </div> */}
 
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className='flex flex-column gap-2'
-          >
+          <form onSubmit={handleSubmit(onSubmit)} className='flex flex-column gap-2'>
             <Toast ref={toast} />
 
             {/* Email */}
@@ -127,10 +121,7 @@ const SignIn = () => {
                     <InputText
                       id={field.name}
                       value={field.value}
-                      className={classNames(
-                        { 'p-invalid': fieldState.error },
-                        'w-full'
-                      )}
+                      className={classNames({ 'p-invalid': fieldState.error }, 'w-full')}
                       onChange={(e) => field.onChange(e.target.value)}
                     />
                   </span>
@@ -158,10 +149,7 @@ const SignIn = () => {
                       id={field.name}
                       value={field.value}
                       type='password'
-                      className={classNames(
-                        { 'p-invalid': fieldState.error },
-                        'w-full'
-                      )}
+                      className={classNames({ 'p-invalid': fieldState.error }, 'w-full')}
                       onChange={(e) => field.onChange(e.target.value)}
                     />
                   </span>
@@ -188,17 +176,10 @@ const SignIn = () => {
                 </Link>
               </div>
 
-              <Button
-                label='Sign In'
-                icon='pi pi-user'
-                type='submit'
-                className='w-full'
-              />
+              <Button label='Sign In' icon='pi pi-user' type='submit' className='w-full' />
 
               <div className='text-center mt-3'>
-                <span className='text-600 font-medium line-height-3'>
-                  Don't have an account?
-                </span>
+                <span className='text-600 font-medium line-height-3'>Don't have an account?</span>
                 <Link
                   to='/sign-up'
                   className='font-medium no-underline ml-2 text-blue-500 cursor-pointer'

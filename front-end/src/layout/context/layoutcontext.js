@@ -67,9 +67,7 @@ export function LayoutProvider({ children }) {
   );
   console.log('value:', value);
 
-  return (
-    <LayoutContext.Provider value={value}>{children}</LayoutContext.Provider>
-  );
+  return <LayoutContext.Provider value={value}>{children}</LayoutContext.Provider>;
 }
 
 LayoutProvider.propTypes = {

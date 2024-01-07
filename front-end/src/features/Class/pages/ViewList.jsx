@@ -35,24 +35,18 @@ const ViewListClass = () => {
     const fetchClassList = async () => {
       try {
         const token = localStorage.getItem('token'); // replace 'token' with your actual key
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/class/classes-of-user`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/class/classes-of-user`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (response.status === 200) {
           setClassList(response.data);
         } else {
           console.log('Error occurred while fetching class list');
         }
       } catch (error) {
-        console.error(
-          'An error occurred while fetching the class list:',
-          error
-        );
+        console.error('An error occurred while fetching the class list:', error);
       }
     };
 
@@ -71,16 +65,12 @@ const ViewListClass = () => {
   const addClass = async (data) => {
     try {
       const token = localStorage.getItem('token'); // replace 'token' with your actual key
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/class`,
-        data,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/class`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
       // Handle successful response
       if (response.status === 201) {
         console.log(response);
@@ -103,12 +93,7 @@ const ViewListClass = () => {
         onClick={() => setVisible(false)}
         className='p-button-text'
       />
-      <Button
-        label='Create'
-        icon='pi pi-check'
-        onClick={handleSubmit(addClass)}
-        autoFocus
-      />
+      <Button label='Create' icon='pi pi-check' onClick={handleSubmit(addClass)} autoFocus />
     </div>
   );
 
@@ -116,11 +101,7 @@ const ViewListClass = () => {
     <div className='grid mb-5'>
       <Toast ref={toast} />
       <div className='col-12'>
-        <Button
-          label='Create Class'
-          icon='pi pi-plus'
-          onClick={() => setVisible(true)}
-        />
+        <Button label='Create Class' icon='pi pi-plus' onClick={() => setVisible(true)} />
         <Dialog
           header='Create Class'
           visible={visible}
@@ -134,9 +115,7 @@ const ViewListClass = () => {
             control={control}
             defaultValue=''
             rules={{ required: 'This field is required' }}
-            render={({ field }) => (
-              <InputText {...field} style={{ width: '70%' }} />
-            )}
+            render={({ field }) => <InputText {...field} style={{ width: '70%' }} />}
           />
           {errors.name && <p className='text-red-500'>{errors.name.message}</p>}
         </Dialog>
@@ -151,9 +130,7 @@ const ViewListClass = () => {
                   style={{ borderRadius: '6px' }}
                 >
                   <div className=''>
-                    <div className='text-900 font-medium text-xl mb-2'>
-                      {course.name}
-                    </div>
+                    <div className='text-900 font-medium text-xl mb-2'>{course.name}</div>
                     <li className='flex align-items-center gap-2'>
                       <div className='text-600'>{course._id}</div>
                     </li>
@@ -161,9 +138,7 @@ const ViewListClass = () => {
                   <hr className='my-3 mx-0 border-top-1 border-bottom-none border-300' />
                   <div className='flex align-items-center'>
                     {/* <span className='font-bold text-2xl text-900'>${course.price}</span> */}
-                    <span className='ml-2 font-medium text-600'>
-                      welcome to course
-                    </span>
+                    <span className='ml-2 font-medium text-600'>welcome to course</span>
                   </div>
                   <hr className='my-3 mx-0 border-top-1 border-bottom-none border-300' />
                   {/* <ul className='list-none p-0 m-0 flex-grow-1'>

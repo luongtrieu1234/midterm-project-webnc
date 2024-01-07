@@ -29,12 +29,7 @@ export default function AddGradeCompositionDialog({
             />
           </div>
           <div className='col-6'>
-            <NumberInput
-              label='Grade Scale'
-              name='gradeScale'
-              control={control}
-              errors={errors}
-            />
+            <NumberInput label='Grade Scale' name='gradeScale' control={control} errors={errors} />
           </div>
         </div>
       </Dialog>

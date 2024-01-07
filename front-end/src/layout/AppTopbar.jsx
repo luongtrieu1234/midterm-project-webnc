@@ -33,12 +33,7 @@ export default function Header() {
           {token ? (
             <>
               <Link to='/me'>
-                <Button
-                  icon='pi pi-user'
-                  size='large'
-                  className='btn-user'
-                  link
-                ></Button>
+                <Button icon='pi pi-user' size='large' className='btn-user' link></Button>
               </Link>
               <Link to='/'>
                 <Button

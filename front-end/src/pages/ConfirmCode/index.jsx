@@ -27,12 +27,9 @@ function ConfirmCode() {
   };
   const handleEnterClick = async () => {
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/users/confirm-code`,
-        {
-          code,
-        }
-      );
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/confirm-code`, {
+        code,
+      });
       console.log('response: ', response.data);
       if (response.data.statusCode === 200) {
         showSuccess();
@@ -52,12 +49,8 @@ function ConfirmCode() {
       <div className='flex align-items-center justify-content-center'>
         <div className='surface-card p-4 shadow-2 border-round w-full lg:w-6'>
           <div className='mb-5'>
-            <div className='text-center text-900 text-3xl font-medium mb-3'>
-              Confirm Code
-            </div>
-            <span className='text-900 text-xl'>
-              Please enter the code sent to your email
-            </span>
+            <div className='text-center text-900 text-3xl font-medium mb-3'>Confirm Code</div>
+            <span className='text-900 text-xl'>Please enter the code sent to your email</span>
           </div>
 
           <div>
@@ -74,11 +67,7 @@ function ConfirmCode() {
             />
 
             <div className='flex align-items-center justify-content-end mr-4'>
-              <Button
-                label='Enter'
-                className='w-2'
-                onClick={handleEnterClick}
-              />
+              <Button label='Enter' className='w-2' onClick={handleEnterClick} />
             </div>
             <Toast ref={toast} />
           </div>

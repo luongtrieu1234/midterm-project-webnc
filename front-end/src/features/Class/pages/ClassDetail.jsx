@@ -196,11 +196,7 @@ const ClassDetail = () => {
     <div>
       <Toast ref={toast} />
       <div className='card flex mt-3 mb-3 gap-3'>
-        <Button
-          label='Class invitation'
-          icon='pi pi-external-link'
-          onClick={() => setOpen(true)}
-        />
+        <Button label='Class invitation' icon='pi pi-external-link' onClick={() => setOpen(true)} />
         <Link to={`/course/${id}/grade`}>
           <Button label='Grade' icon='pi pi-external-link' />
         </Link>
@@ -244,9 +240,7 @@ const ClassDetail = () => {
               className='flex align-items-center justify-content-between '
               style={{ color: '#333', borderBottom: '1px solid #6E6BF1' }}
             >
-              <span style={{ fontSize: '25px', color: '#6E6BF1' }}>
-                Teachers
-              </span>
+              <span style={{ fontSize: '25px', color: '#6E6BF1' }}>Teachers</span>
               <div className='card flex ' style={{ marginLeft: '30rem' }}>
                 <Button
                   size='small'
@@ -266,15 +260,11 @@ const ClassDetail = () => {
                       marginBottom: '20px',
                     }}
                   >
-                    <span style={{ fontSize: '18px', color: '#555' }}>
-                      {teacher.user.fullname}
-                    </span>
+                    <span style={{ fontSize: '18px', color: '#555' }}>{teacher.user.fullname}</span>
                   </li>
                 ))
               ) : (
-                <h2 style={{ color: '#555', fontSize: '18px' }}>
-                  There are no teachers
-                </h2>
+                <h2 style={{ color: '#555', fontSize: '18px' }}>There are no teachers</h2>
               )}
             </ul>
             <h2
@@ -285,9 +275,7 @@ const ClassDetail = () => {
                 marginTop: '20px',
               }}
             >
-              <span style={{ fontSize: '25px', color: '#6E6BF1' }}>
-                Students
-              </span>
+              <span style={{ fontSize: '25px', color: '#6E6BF1' }}>Students</span>
               <div className='card flex'>
                 <Button
                   size='small'
@@ -306,15 +294,11 @@ const ClassDetail = () => {
                       borderBottom: '1px solid #ddd',
                     }}
                   >
-                    <span style={{ fontSize: '18px', color: '#555' }}>
-                      {student.user.fullname}
-                    </span>
+                    <span style={{ fontSize: '18px', color: '#555' }}>{student.user.fullname}</span>
                   </li>
                 ))
               ) : (
-                <h2 style={{ color: '#555', fontSize: '18px' }}>
-                  There are no students
-                </h2>
+                <h2 style={{ color: '#555', fontSize: '18px' }}>There are no students</h2>
               )}
             </ul>
           </div>
@@ -343,9 +327,7 @@ const ClassDetail = () => {
             control={control}
             defaultValue=''
             rules={{ required: 'This field is required' }}
-            render={({ field }) => (
-              <InputText {...field} style={{ width: '70%' }} />
-            )}
+            render={({ field }) => <InputText {...field} style={{ width: '70%' }} />}
           />
           {/* {errors.name && <p className='text-red-500'>{errors.name.message}</p>} */}
         </Dialog>
@@ -364,9 +346,7 @@ const ClassDetail = () => {
             control={control}
             defaultValue=''
             rules={{ required: 'This field is required' }}
-            render={({ field }) => (
-              <InputText {...field} style={{ width: '70%' }} />
-            )}
+            render={({ field }) => <InputText {...field} style={{ width: '70%' }} />}
           />
           {/* {errors.name && <p className='text-red-500'>{errors.name.message}</p>} */}
         </Dialog>
