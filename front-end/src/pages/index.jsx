@@ -11,6 +11,7 @@ import ConfirmCodeSignUp from './ConfirmCodeSignUp';
 import ClassDetailPage from './ClassDetailPage';
 import GradePage from './GradePage';
 import TestPage from './TestPage';
+import HomePageAdminPage from './HomePageAdmin';
 
 export {
   HomePage,
@@ -26,4 +27,5 @@ export {
   ClassDetailPage,
   GradePage,
   TestPage,
+  HomePageAdminPage,
 };
