@@ -1,10 +1,10 @@
 import React from 'react';
 import { Button } from 'primereact/button';
 
-export default function ButtonLoginFacebook() {
+export default function ButtonLoginGoogle() {
   return (
     <div>
-      <a href={`${process.env.REACT_APP_API_URL}/users/facebook`}>
+      <a href={`${process.env.REACT_APP_API_URL}/users/google`}>
         <Button
           label='Google'
           icon='pi pi-google'

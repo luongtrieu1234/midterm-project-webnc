@@ -14,3 +14,8 @@ export const getExcelTemplateList = (classId) =>
   });
 
 export const postUploadFileList = (body = {}) => instance.post(GRADE.POST_UPLOAD_FILE_LIST, body);
+
+export const getClassGrades = (classId) =>
+  instance.get(GRADE.GET_CLASS_GRADES, {
+    params: { classId: classId },
+  });

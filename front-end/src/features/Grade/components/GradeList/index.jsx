@@ -1,11 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Tooltip } from 'primereact/tooltip';
 import { useParams } from 'react-router-dom';
-import { getExcelTemplateList, postUploadFileList } from 'apis/grade.api';
-import { useMutation } from 'react-query';
+import {
+  getClassGrades,
+  getExcelTemplateList,
+  getGradeStructure,
+  postUploadFileList,
+} from 'apis/grade.api';
+import { useMutation, useQuery } from 'react-query';
 import { classNames } from 'primereact/utils';
 import { useForm } from 'react-hook-form';
 import { FooterComfirm } from 'components/FormControl';
@@ -16,6 +21,10 @@ import { TOAST } from 'constant';
 
 export default function GradeList() {
   const { classId } = useParams();
+  //state
+  const [visibleAddFileStudentListDialog, setVisibleAddFileStudentListDialog] = useState(false);
+
+  // api
   const { mutate: downloadExcelTemplateMutate, isLoading: isDownloadExcelTemplateLoading } =
     useMutation(getExcelTemplateList);
   const {
@@ -24,7 +33,22 @@ export default function GradeList() {
     isSuccess: isUploadStudentListExcelFileSuccess,
   } = useMutation(postUploadFileList);
 
-  const [visibleAddFileStudentListDialog, setVisibleAddFileStudentListDialog] = useState(false);
+  const { data: gradeListData, isLoading: isGradeListLoading } = useQuery(
+    ['gradeListData', classId],
+    () => getClassGrades(classId)
+  );
+  const gradeList = useMemo(() => gradeListData?.data?.result, [gradeListData]);
+
+  const { data: gradeStructureData, isLoading: isGradeStructureLoading } = useQuery(
+    ['gradeStructureData', classId],
+    () => getGradeStructure(classId),
+    {
+      enabled: !!classId,
+    }
+  );
+  const gradeStructure = useMemo(() => gradeStructureData?.data, [gradeStructureData]);
+  console.log(gradeStructure);
+  //form
   const {
     control,
     handleSubmit,
@@ -94,6 +118,8 @@ export default function GradeList() {
       setVisibleAddFileStudentListDialog(false);
     }
   }, [isUploadStudentListExcelFileSuccess]);
+  // field={'studentDetails.gradeComposition.gradeCompositionDetails._id'}
+
   return (
     <div>
       <div className='mt-2'>
@@ -123,14 +149,22 @@ export default function GradeList() {
         </div>
         <DataTable
           header={formatHeader}
-          value={[]}
+          value={gradeList}
+          loading={isGradeListLoading || isGradeStructureLoading}
           showGridlines
           stripedRows
           style={{ maxWidth: '50rem' }}
         >
-          <Column field='no' header='No' sortable style={{ width: '1rem' }} />
-          <Column field='studentId' header='Student Id' sortable />
-          <Column field='fullName' header='Full Name' sortable />
+          {/* <Column field='no' header='No' sortable style={{ width: '1rem' }} /> */}
+          <Column field='studentDetails.studentId' header='Student Id' sortable />
+          <Column field='studentDetails.fullname' header='Full Name' sortable />
+          {gradeStructure?.map((item) => (
+            <Column
+              key={item?._id}
+              field={'studentDetails.gradeComposition.gradeCompositionDetails._id'}
+              header={item?.name}
+            />
+          ))}
           <Column header='Actions' style={{ maxWidth: '4rem' }} body={formatActions} />
         </DataTable>
       </div>
