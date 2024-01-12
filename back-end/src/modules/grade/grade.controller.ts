@@ -158,7 +158,8 @@ export class GradeController {
     @Req() req,
   ) {
     const gradeCompositionDocument =
-      await this.gradeService.getGradeDetailByGradeId(gradeCompositionId);
+      await this.gradeService.getGradeCompositionDetail(gradeCompositionId);
+    console.log('gradeCompositionDocument ', gradeCompositionDocument);
     const userRole = await this.classService.getUserRoleInClass(
       gradeCompositionDocument.result.class,
       req.user.id,
