@@ -786,7 +786,8 @@ export class GradeService {
       if (!classDocument) {
         throw new BadRequestException('Class not existed', 'Class not existed');
       }
-      const gradeCompositionDocuments = await classDocument.gradeComposition;
+      // const gradeCompositionDocuments = await classDocument.gradeComposition;
+      const gradeCompositionDocuments = await this.gradeCompositionModel.find({ class: classId });
       const studentDocument = await this.userModel.findById(userId);
       console.log('studentDocument ', studentDocument);
       if (!studentDocument) {
@@ -892,6 +893,9 @@ export class GradeService {
           gradeComposition: gradeComposition['_id'].toString(),
           student: studentDocument['_id'].toString(),
         });
+        // if (gradeComposition['isFinal'] === false) {
+        //   continue;
+        // }
         // gradeData.push(gradeDocument);
         let gradeData = { name: a?.name };
         gradeData['grade'] = gradeDocument?.value;
@@ -1080,7 +1084,10 @@ export class GradeService {
       return comment.order;
     });
     console.log('comments ', comments);
-    const orderMax = Math.max(...orders.map(Number));
+    let orderMax = Math.max(...orders.map(Number));
+    if (orderMax === -Infinity) {
+      orderMax = 0;
+    }
     const commentDocument = await this.commentModel.create({
       content: commentDto.content,
       user: userId,

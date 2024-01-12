@@ -74,9 +74,21 @@ async function runMigration() {
         ],
       },
     ];
-
     const createdClass = await ClassModel.create(classesData);
     console.log('Admin user created:', createdClass);
+    const classDocument = await ClassModel.findOne({ name: 'Class 1' });
+    const gradeCompositionData = [
+      {
+        class: classDocument._id.toString(),
+        name: 'Composition 1 Class 1',
+        gradeScale: 10,
+        position: 1,
+        content: 'Content Composition 1 Class 1',
+        isFinal: false,
+      },
+    ];
+    const createdGradeComposition = await GradeCompositionModel.create(gradeCompositionData);
+    console.log('Admin user created:', createdGradeComposition);
   } catch (error) {
     console.error('Migration error:', error);
   } finally {
