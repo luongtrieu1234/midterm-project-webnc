@@ -132,6 +132,15 @@ export class ClassController {
     return await this.classService.getListStudentClassesByUserId(req.user.id);
   }
 
+  @Get('all-classes-of-user')
+  @UseGuards(AuthGuardCustom)
+  // @Roles(UserRole.TEACHER)
+  @HttpCode(200)
+  async getAllClassesOfUser(@Req() req) {
+    console.log('req ', req.user);
+    return await this.classService.getAllClassesOfUser(req.user.id);
+  }
+
   @Get('users-list')
   @UseGuards(AuthGuardCustom)
   // @Roles(UserRole.TEACHER)
