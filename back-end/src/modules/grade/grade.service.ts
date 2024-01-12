@@ -322,22 +322,26 @@ export class GradeService {
         email: element.Email?.text ?? element.Email,
       });
       if (!student) {
-        notFoundStudents.push(element.Email?.text ?? element.Email);
-        continue;
-      }
-      if (student.studentId !== '') {
-        alreadyMappedStudents.push({
+        notFoundStudents.push({
           email: element.Email?.text ?? element.Email,
           studentId: element.StudentId,
         });
         continue;
       }
-      student.studentId = element.StudentId;
       await this.classService.addUsersToClass({
         name: classDocument.name.replace(/\+/g, ' '),
         students: [{ email: student.email }],
         teachers: [],
       });
+      if (student.studentId !== '') {
+        alreadyMappedStudents.push({
+          email: element.Email?.text ?? element.Email,
+          studentId: element.StudentId,
+          existedStudentId: student.studentId,
+        });
+        continue;
+      }
+      student.studentId = element.StudentId;
       updatedStudents.push({
         email: element.Email?.text ?? element.Email,
         studentId: element.StudentId,
