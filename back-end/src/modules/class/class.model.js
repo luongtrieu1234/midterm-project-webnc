@@ -27,6 +27,7 @@ exports.ClassSchema = new mongoose.Schema({
     gradeComposition: [{ type: mongoose.Schema.Types.ObjectId, ref: 'GradeComposition' }],
     classCode: { type: String },
     active: { type: Boolean, default: true },
+    description: { type: String, default: '' },
     deletedAt: { type: Date, default: null },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },

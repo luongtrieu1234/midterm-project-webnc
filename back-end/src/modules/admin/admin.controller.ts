@@ -17,7 +17,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
-import { ApiConsumes, ApiProperty, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiProperty, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { AuthService } from '~/others/auth/auth.service';
 import { AdminService } from './admin.service';
 import { AdminLoginRequestDto } from './dto/admin-login-request.dto';
@@ -91,6 +91,18 @@ export class AdminController {
   }
 
   @Get('all-classes')
+  @ApiQuery({
+    name: 'sortType',
+    description:
+      'sortType dùng cho việc sắp xếp các lớp theo thứ tự tăng dần hoặc giảm dần có giá trị (asc, desc) theo thời gian tạo lớp',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'filterOption',
+    description:
+      'filterOption dùng cho việc lọc các lớp theo các tiêu chí có giá trị (all, active, inactive)',
+    required: false,
+  })
   @HttpCode(200)
   @UseGuards(AuthGuardCustom)
   @Roles(UserRole.ADMIN)

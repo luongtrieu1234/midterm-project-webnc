@@ -15,6 +15,7 @@ exports.UserSchema = new mongoose.Schema({
     hobby: { type: [String], default: [] },
     role: { type: String, default: 'user' },
     studentId: { type: String, default: '' },
+    notifications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Notification' }],
     deletedAt: { type: Date, default: null },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
