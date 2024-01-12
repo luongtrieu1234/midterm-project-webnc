@@ -60,7 +60,9 @@ function HomePageAdmin() {
             Authorization: `Bearer ${token}`,
           },
           params: {
-            filterOption: filterOption.map((option) => option.code).join(','),
+            filterOption: filterOption
+              ? filterOption.map((option) => option.code).join(',')
+              : undefined,
           },
         });
         if (response.status === 200) {
@@ -72,7 +74,6 @@ function HomePageAdmin() {
         console.error('An error occurred while fetching the class list:', error);
       }
     };
-
     fetchUserList();
     fetchClassList();
     if (filterOption) {
