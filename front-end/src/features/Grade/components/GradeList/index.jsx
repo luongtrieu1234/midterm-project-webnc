@@ -10,22 +10,23 @@ import {
   getExcelTemplateList,
   getGradeStructure,
   postUploadFileList,
+  updateGrade,
 } from 'apis/grade.api';
 import { useMutation, useQuery } from 'react-query';
 import { classNames } from 'primereact/utils';
 import { useForm } from 'react-hook-form';
 import { FooterComfirm } from 'components/FormControl';
-import AddFileStudentListDialog from './AddGradeCompositionDialog';
+import AddFileStudentListDialog from './AddFileStudentListDialog';
 import { handleDownloadError, handleDownloadSuccess } from 'utils/func';
 import { toast } from 'layout';
 import { TOAST } from 'constant';
-// import { InputNumber } from 'primereact/inputnumber';
-// import { InputText } from 'primereact/inputtext';
+import UpdateGradeDialog from './UpdateGradeDialog';
 
 export default function GradeList() {
   const { classId } = useParams();
   //state
   const [visibleAddFileStudentListDialog, setVisibleAddFileStudentListDialog] = useState(false);
+  const [visibleUpdateGradeDialog, setVisibleUpdateGradeDialog] = useState(false);
 
   // api
   const { mutate: downloadExcelTemplateMutate, isLoading: isDownloadExcelTemplateLoading } =
@@ -35,6 +36,12 @@ export default function GradeList() {
     isLoading: isUploadStudentListExcelFileLoading,
     isSuccess: isUploadStudentListExcelFileSuccess,
   } = useMutation(postUploadFileList);
+  const {
+    mutate: updateGradeMutate,
+    isLoading: isUpdateGradeLoading,
+    // eslint-disable-next-line no-unused-vars
+    isSuccess: isUpdateGradeSuccess,
+  } = useMutation(updateGrade);
 
   const { data: gradeListData, isLoading: isGradeListLoading } = useQuery(
     ['gradeListData', classId],
@@ -50,12 +57,12 @@ export default function GradeList() {
     }
   );
   const gradeStructure = useMemo(() => gradeStructureData?.data, [gradeStructureData]);
-  console.log(gradeStructure);
   //form
   const {
     control,
+    setValue,
     handleSubmit,
-    // reset,
+    reset,
     formState: { errors },
   } = useForm();
 
@@ -66,6 +73,7 @@ export default function GradeList() {
         <div className='card'>
           <Tooltip target='.add-grade-composition' className='text-sm' />
           <Button
+            disabled
             className='add-grade-composition'
             icon='pi pi-plus'
             data-pr-tooltip='Add Grade Composition'
@@ -83,69 +91,27 @@ export default function GradeList() {
       </div>
     );
   }
-  // const isPositiveInteger = (val) => {
-  //   let str = String(val);
 
-  //   str = str.trim();
+  function formatGrade(value, gradeCompositionId) {
+    return (
+      <div
+        onClick={() => {
+          setValue('fullName', value.studentDetails.fullname);
+          setValue('userId', value.studentDetails._id);
+          setValue('gradeCompositionName', value.gradeComposition[gradeCompositionId].name);
+          setValue('gradeCompositionId', gradeCompositionId);
+          setValue('grade', value.gradeComposition[gradeCompositionId].grade);
+          setVisibleUpdateGradeDialog(true);
+        }}
+      >
+        {value.gradeComposition[gradeCompositionId].grade
+          ? value.gradeComposition[gradeCompositionId].grade
+          : '|'}
+      </div>
+    );
+  }
 
-  //   if (!str) {
-  //     return false;
-  //   }
-
-  //   str = str.replace(/^0+/, '') || '0';
-  //   let n = Math.floor(Number(str));
-
-  //   return n !== Infinity && String(n) === str && n >= 0;
-  // };
-  // const onCellEditComplete = (e) => {
-  //   let { rowData, newValue, field, originalEvent: event } = e;
-
-  //   switch (field) {
-  //     case 'quantity':
-  //     case 'price':
-  //       if (isPositiveInteger(newValue)) rowData[field] = newValue;
-  //       else event.preventDefault();
-  //       break;
-
-  //     default:
-  //       if (newValue.trim().length > 0) rowData[field] = newValue;
-  //       else event.preventDefault();
-  //       break;
-  //   }
-  // };
-
-  // const cellEditor = (options) => {
-  //   if (options.field === 'price') return priceEditor(options);
-  //   else return textEditor(options);
-  // };
-
-  // const textEditor = (options) => {
-  //   return (
-  //     <InputText
-  //       type='text'
-  //       value={options.value}
-  //       onChange={(e) => options.editorCallback(e.target.value)}
-  //     />
-  //   );
-  // };
-  // const priceEditor = (options) => {
-  //   return (
-  //     <InputNumber
-  //       value={options.value}
-  //       onValueChange={(e) => options.editorCallback(e.value)}
-  //       mode='currency'
-  //       currency='USD'
-  //       locale='en-US'
-  //     />
-  //   );
-  // };
-
-  // const priceBodyTemplate = (rowData) => {
-  //   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-  //     rowData.price
-  //   );
-  // };
-  // call api
+  // handle call api
   async function handleDownloadExcelTemplate() {
     downloadExcelTemplateMutate(classId, {
       onSuccess: (res) => handleDownloadSuccess(res, 'TemplateStudentList.xlsx'),
@@ -153,27 +119,55 @@ export default function GradeList() {
     });
   }
   async function onAddStudentListExcelFileSubmit(data) {
-    console.log('Data:', data);
     const addStudentListExcelFileSubmitFormData = new FormData();
     addStudentListExcelFileSubmitFormData.append('excelFile', data.studentListFile);
     uploadStudentListExcelFileMutate(addStudentListExcelFileSubmitFormData, {
       onSuccess() {
         toast(TOAST.SUCCESS, 'Student List Upload Successfully!');
+        reset();
       },
       onError() {
         toast(TOAST.ERROR, 'Student List Upload Error!');
       },
     });
   }
+  async function onUpdateGrade({ userId, gradeCompositionId, grade }) {
+    console.log('abcvao');
+    updateGradeMutate(
+      { userId, gradeCompositionId, value: grade },
+      {
+        onSuccess() {
+          toast(TOAST.SUCCESS, 'Update Grade Successfully!');
+          setVisibleUpdateGradeDialog(false);
+        },
+        onError() {
+          toast(TOAST.ERROR, 'Update GradeError!');
+        },
+      }
+    );
+  }
   //end call api
 
-  const footerComfirm = (
-    <FooterComfirm
-      isLoading={false}
-      action='Save'
-      setVisible={setVisibleAddFileStudentListDialog}
-      handleSubmit={handleSubmit(onAddStudentListExcelFileSubmit)}
-    />
+  function footerComfirm(setVisible, handleSubmit, isLoading) {
+    return (
+      <FooterComfirm
+        isLoading={isLoading || false}
+        action='Save'
+        setVisible={setVisible}
+        handleSubmit={handleSubmit}
+      />
+    );
+  }
+
+  const footerComfirmAddFile = footerComfirm(
+    setVisibleAddFileStudentListDialog,
+    handleSubmit(onAddStudentListExcelFileSubmit),
+    isUploadStudentListExcelFileLoading
+  );
+  const footerComfirmUpdateGrade = footerComfirm(
+    setVisibleUpdateGradeDialog,
+    handleSubmit(onUpdateGrade),
+    isUpdateGradeLoading
   );
 
   // before render
@@ -182,8 +176,6 @@ export default function GradeList() {
       setVisibleAddFileStudentListDialog(false);
     }
   }, [isUploadStudentListExcelFileSuccess]);
-  // field={'studentDetails.gradeComposition.gradeCompositionDetails._id'}
-
   return (
     <div>
       <div className='mt-2'>
@@ -203,10 +195,7 @@ export default function GradeList() {
           </div>
           <Button
             size='small'
-            icon={classNames('pi ', {
-              'pi-spinner': isUploadStudentListExcelFileLoading,
-              'pi-upload': !isUploadStudentListExcelFileLoading,
-            })}
+            icon='pi pi-upload'
             label='Upload Student List'
             onClick={() => setVisibleAddFileStudentListDialog(true)}
           />
@@ -214,22 +203,27 @@ export default function GradeList() {
         <DataTable
           header={formatHeader}
           value={gradeList}
-          editMode='cell'
           loading={isGradeListLoading || isGradeStructureLoading}
           showGridlines
           stripedRows
           style={{ maxWidth: '50rem' }}
         >
           {/* <Column field='no' header='No' sortable style={{ width: '1rem' }} /> */}
-          <Column field='studentDetails.studentId' header='Student Id' sortable />
+          <Column
+            field='studentDetails.studentId'
+            header='Student Id'
+            style={{ maxWidth: '2.5rem' }}
+            sortable
+          />
           <Column field='studentDetails.fullname' header='Full Name' sortable />
           {gradeStructure?.map((item) => (
             <Column
               key={item?._id}
-              field={'studentDetails.gradeComposition.gradeCompositionDetails._id'}
+              field={`gradeComposition.${item?._id}.grade`}
+              body={(value) => formatGrade(value, item?._id)}
               header={item?.name}
-              // editor={(options) => cellEditor(options)}
-              // onCellEditComplete={onCellEditComplete}
+              style={{ maxWidth: '1rem' }}
+              bodyClassName='text-center'
             />
           ))}
           <Column header='Actions' style={{ maxWidth: '4rem' }} body={formatActions} />
@@ -240,7 +234,14 @@ export default function GradeList() {
         setVisible={setVisibleAddFileStudentListDialog}
         control={control}
         errors={errors}
-        footer={footerComfirm}
+        footer={footerComfirmAddFile}
+      />
+      <UpdateGradeDialog
+        visible={visibleUpdateGradeDialog}
+        setVisible={setVisibleUpdateGradeDialog}
+        control={control}
+        errors={errors}
+        footer={footerComfirmUpdateGrade}
       />
     </div>
   );
