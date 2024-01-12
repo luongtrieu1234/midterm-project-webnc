@@ -56,8 +56,8 @@ export class GradeService {
     private readonly gradeModel: Model<GradeModel>,
     @InjectModel('Comment')
     private readonly commentModel: Model<CommentModel>, // @InjectModel('User')
-    // private readonly userModel: Model<UserModel>,
-  ) {}
+  ) // private readonly userModel: Model<UserModel>,
+  {}
   async showGradeStructure(classId: string) {
     try {
       // const classDocument = await this.classModel
@@ -441,7 +441,7 @@ export class GradeService {
       if (currentGradeDocument) {
         currentGradeDocument.value = element.Grade;
         await currentGradeDocument.save();
-        updatedGradeStudents.push(element.StudentId);
+        updatedGradeStudents.push({ student: element.StudentId, grade: element.Grade });
         continue;
       }
       const gradeDocument = await this.gradeModel.create({
@@ -659,7 +659,7 @@ export class GradeService {
       for (const student of studentDocuments) {
         let studentData = { studentDetails: student.user };
         let gradeCompositionData = {};
-        // let gradeData = [];
+        let gradeTotalOfStudent = 0;
         for (const gradeComposition of gradeCompositionDocuments) {
           const a = await this.gradeCompositionModel.findById(gradeComposition).select('name');
           // gradeCompositionData.push(a);
@@ -674,9 +674,11 @@ export class GradeService {
           // studentData['grade'] = gradeDocument;
           // gradeCompositionData.push(gradeData);
           // console.log('studentData ', studentData);
-          // console.log('gradeDocument ', gradeDocument);
+          console.log('gradeDocument ', gradeDocument);
           gradeCompositionData[gradeComposition['_id'].toString()] = gradeData;
+          gradeTotalOfStudent += gradeDocument?.value ?? 0;
         }
+        studentData[`total`] = gradeTotalOfStudent;
         studentData[`gradeComposition`] = gradeCompositionData;
         // studentData['grade'] = gradeData;
 

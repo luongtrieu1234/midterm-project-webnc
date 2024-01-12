@@ -135,6 +135,7 @@ export class GradeController {
     @Req() req,
   ) {
     const userRole = await this.classService.getUserRoleInClass(classId, req.user.id);
+    if (!userRole) throw new BadRequestException('You are not in this class');
     if (userRole.role !== 'teacher')
       throw new BadRequestException('You are not a teacher of this class');
     const { buffer, className } = await this.gradeService.downloadTemplateFileList(
@@ -164,6 +165,7 @@ export class GradeController {
       gradeCompositionDocument.result.class,
       req.user.id,
     );
+    if (!userRole) throw new BadRequestException('You are not in this class');
     if (userRole.role !== 'teacher')
       throw new BadRequestException('You are not a teacher of this class');
     const { buffer, gradeCompositionName } = await this.gradeService.downloadTemplateFileGrade(
@@ -187,6 +189,7 @@ export class GradeController {
     @Req() req,
   ) {
     const userRole = await this.classService.getUserRoleInClass(classId, req.user.id);
+    if (!userRole) throw new BadRequestException('You are not in this class');
     if (userRole.role !== 'teacher')
       throw new BadRequestException('You are not a teacher of this class');
     const { buffer, className } = await this.gradeService.exportFileGrade(response, classId);
@@ -296,7 +299,6 @@ export class GradeController {
       gradeDocument.result.class,
       req.user.id,
     );
-    if (!userRole) throw new BadRequestException('You are not in this class');
     if (!userRole) throw new BadRequestException('You are not in this class');
     console.log('gradeDocument ', gradeDocument);
     console.log('userRole ', userRole);
