@@ -870,7 +870,33 @@ export class GradeService {
           },
         },
       ]);
-      return { result, statusCode: 200, message: 'success' };
+      let dataReturn = [];
+      let studentData = { studentDetails: studentDocument };
+      let gradeCompositionData = {};
+      // let gradeData = [];
+      for (const gradeComposition of gradeCompositionDocuments) {
+        const a = await this.gradeCompositionModel.findById(gradeComposition).select('name');
+        // gradeCompositionData.push(a);
+        const gradeDocument = await this.gradeModel.findOne({
+          gradeComposition: gradeComposition['_id'].toString(),
+          student: studentDocument['_id'].toString(),
+        });
+        // gradeData.push(gradeDocument);
+        let gradeData = { name: a?.name };
+        gradeData['grade'] = gradeDocument?.value;
+        console.log('value ', gradeDocument?.value ?? null);
+        // studentData['grade'] = gradeDocument;
+        // gradeCompositionData.push(gradeData);
+        // console.log('studentData ', studentData);
+        // console.log('gradeDocument ', gradeDocument);
+        gradeCompositionData[gradeComposition['_id'].toString()] = gradeData;
+      }
+      studentData[`gradeComposition`] = gradeCompositionData;
+      // studentData['grade'] = gradeData;
+
+      dataReturn.push(studentData);
+      return { result: dataReturn, statusCode: 200, message: 'success' };
+      // return { result, statusCode: 200, message: 'success' };
     } catch (error) {
       console.log('Error retrieving data ', error);
       throw new BadRequestException('Error', error.response.message);

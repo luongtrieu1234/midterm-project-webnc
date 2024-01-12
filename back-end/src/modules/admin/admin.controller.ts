@@ -103,6 +103,19 @@ export class AdminController {
     return await this.adminService.getListClasses(sortType, filterOption);
   }
 
+  @Get('all-users')
+  @HttpCode(200)
+  @UseGuards(AuthGuardCustom)
+  @Roles(UserRole.ADMIN)
+  async getListUsers(
+    @Req() req,
+    // @Query('filterOption') filterOption: string,
+    // @Query('sortType') sortType: string,
+  ) {
+    console.log('req ', req.user);
+    return await this.adminService.getListUsers();
+  }
+
   @Post('inactivate-class/:classId')
   @HttpCode(200)
   @UseGuards(AuthGuardCustom)
