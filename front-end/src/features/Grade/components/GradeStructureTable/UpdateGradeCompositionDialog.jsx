@@ -3,7 +3,7 @@ import { NumberInput, TextInput, TextareaInput } from 'components/FormControl';
 import { Dialog } from 'primereact/dialog';
 import React from 'react';
 
-export default function AddGradeCompositionDialog({
+export default function UpdateGradeCompositionDialog({
   visible,
   setVisible,
   control,
@@ -13,17 +13,17 @@ export default function AddGradeCompositionDialog({
   return (
     <div className='card flex justify-content-center ml-6 mb-2'>
       <Dialog
-        header='Add Grade Composition'
+        header='Update grade composition'
         visible={visible}
         style={{ width: '50vw' }}
         onHide={() => setVisible(false)}
         footer={footer}
       >
         <div className='grid p-fluid'>
-          <div className='grid col-12'>
+          <div className='col-12 grid'>
             <div className='col-6'>
               <TextInput
-                label='Grade Composition'
+                label='Grade composition'
                 name='gradeCompositionName'
                 control={control}
                 errors={errors}
@@ -53,7 +53,7 @@ export default function AddGradeCompositionDialog({
   );
 }
 
-AddGradeCompositionDialog.propTypes = {
+UpdateGradeCompositionDialog.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: PropTypes.shape({}).isRequired,
   footer: PropTypes.element.isRequired,

@@ -6,10 +6,30 @@ export const getGradeStructure = (classId) =>
 
 export const addGradeComposition = (body = {}) =>
   instance.post(GRADE.POST_ADD_GRADE_COMPOSITION, body);
+export const updateGradeComposition = (body = {}) =>
+  instance.patch(GRADE.PATCH_UPDATE_GRADE_COMPOSITION, body);
+export const deleteGradeComposition = (body = {}) =>
+  instance.post(
+    GRADE.POST_DELETE_GRADE_COMPOSITION,
+    {},
+    { params: { gradeCompositionId: body.gradeCompositionId } }
+  );
 
 export const getExcelTemplateList = (classId) =>
   instance.get(GRADE.GET_EXCEL_TEMPLATE_LIST, {
     params: { classId: classId },
+    responseType: 'blob',
+  });
+
+export const getExcelTemplateGrade = (classId) =>
+  instance.get(GRADE.GET_EXPORT_FILE_GRADE, {
+    params: { classId: classId },
+    responseType: 'blob',
+  });
+
+export const exportFileGrade = (gradeCompositionId) =>
+  instance.get(GRADE.GET_EXCEL_TEMPLATE_GRADE, {
+    params: { gradeCompositionId: gradeCompositionId },
     responseType: 'blob',
   });
 
