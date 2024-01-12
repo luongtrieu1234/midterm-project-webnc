@@ -170,10 +170,11 @@ export class GradeService {
       { header: 'No', key: 'no' },
       { header: 'StudentId', key: 'studentId' },
       { header: 'Fullname', key: 'fullname' },
+      { header: 'Email', key: 'email' },
     ];
     const buffer = await workbook.xlsx.writeBuffer();
-    const classCode = classDocument.classCode;
-    return { buffer, classCode };
+    const className = classDocument.name;
+    return { buffer, className };
   }
 
   async downloadTemplateFileGrade(response: Response, gradeCompositionId: string) {
@@ -264,7 +265,7 @@ export class GradeService {
     const nameWithoutExtension = parts.slice(0, -1).join('.');
     console.log(nameWithoutExtension);
     const classDocument = await this.classModel.findOne({
-      classCode: nameWithoutExtension,
+      name: nameWithoutExtension,
     });
     console.log('classDocument ', classDocument);
     const workbook = new ExcelJS.Workbook();
@@ -280,40 +281,74 @@ export class GradeService {
     let keys = data[0].slice(1); // Get the keys from the first subarray, excluding the first empty item
     let values = data.slice(1); // Get the values from the rest of the subarrays
 
-    let result: { No: any; StudentId: any; Fullname: any }[] = values.map((subarray) => {
-      let obj: { No: any; StudentId: any; Fullname: any } = {
-        No: undefined,
-        StudentId: undefined,
-        Fullname: undefined,
-      };
-      keys.forEach((key, index) => {
-        obj[key] = subarray[index + 1]; // Assign the value to the corresponding key in the object, excluding the first empty item in the subarray
-      });
-      // if (obj.Email === undefined) {
-      //   obj.Email = ;
-      // }
-      return obj;
-    });
+    let result: { No: any; StudentId: any; Fullname: any; Email: any }[] = values.map(
+      (subarray) => {
+        let obj: { No: any; StudentId: any; Fullname: any; Email: any } = {
+          No: undefined,
+          StudentId: undefined,
+          Fullname: undefined,
+          Email: undefined,
+        };
+        keys.forEach((key, index) => {
+          obj[key] = subarray[index + 1]; // Assign the value to the corresponding key in the object, excluding the first empty item in the subarray
+        });
+        // if (obj.Email === undefined) {
+        //   obj.Email = ;
+        // }
+        return obj;
+      },
+    );
 
     console.log('result ', result);
+    // let notFoundStudents = [];
+    // let updatedStudents = [];
+    // for (const element of result) {
+    //   const student = await this.userModel.findOne({
+    //     studentId: element.StudentId,
+    //   });
+    //   if (!student) {
+    //     notFoundStudents.push(element.StudentId);
+    //     continue;
+    //   }
+    //   student.fullname = element.Fullname;
+    //   updatedStudents.push(element.StudentId);
+    //   await student.save();
+    // }
     let notFoundStudents = [];
     let updatedStudents = [];
+    let alreadyMappedStudents = [];
     for (const element of result) {
       const student = await this.userModel.findOne({
-        studentId: element.StudentId,
+        email: element.Email?.text ?? element.Email,
       });
       if (!student) {
-        notFoundStudents.push(element.StudentId);
+        notFoundStudents.push(element.Email?.text ?? element.Email);
         continue;
       }
-      student.fullname = element.Fullname;
-      updatedStudents.push(element.StudentId);
+      if (student.studentId !== '') {
+        alreadyMappedStudents.push({
+          email: element.Email?.text ?? element.Email,
+          studentId: element.StudentId,
+        });
+        continue;
+      }
+      student.studentId = element.StudentId;
+      await this.classService.addUsersToClass({
+        name: classDocument.name.replace(/\+/g, ' '),
+        students: [{ email: student.email }],
+        teachers: [],
+      });
+      updatedStudents.push({
+        email: element.Email?.text ?? element.Email,
+        studentId: element.StudentId,
+      });
       await student.save();
     }
 
     return {
       notFoundStudents,
       updatedStudents,
+      alreadyMappedStudents,
       message: 'success',
       statusCode: 200,
     };
