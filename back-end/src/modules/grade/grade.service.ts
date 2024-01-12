@@ -56,8 +56,8 @@ export class GradeService {
     private readonly gradeModel: Model<GradeModel>,
     @InjectModel('Comment')
     private readonly commentModel: Model<CommentModel>, // @InjectModel('User')
-  ) // private readonly userModel: Model<UserModel>,
-  {}
+    // private readonly userModel: Model<UserModel>,
+  ) {}
   async showGradeStructure(classId: string) {
     try {
       // const classDocument = await this.classModel
@@ -727,19 +727,30 @@ export class GradeService {
         throw new BadRequestException('Grade composition not existed');
       }
 
-      const gradeDocument = await this.gradeModel.findOneAndUpdate(
-        {
-          gradeComposition: dto.gradeCompositionId,
-          student: dto.userId,
-        },
-        { value: dto.value },
-        { new: true },
-      );
+      const gradeDocument = await this.gradeModel.findOne({
+        gradeComposition: dto.gradeCompositionId,
+        student: dto.userId,
+      });
 
       if (!gradeDocument) {
-        throw new BadRequestException('Grade not found');
-      }
+        const classDocument = await this.classModel.findById(gradeCompositionDocument.class);
+        const gradeDocument = await this.gradeModel.create({
+          value: dto.value,
+          gradeComposition: dto.gradeCompositionId,
+          student: dto.userId,
+          class: classDocument._id.toString(),
+        });
 
+        gradeCompositionDocument.grades.push(gradeDocument._id.toString());
+        gradeCompositionDocument.save();
+        return {
+          message: 'Success',
+          statusCode: 200,
+          data: gradeDocument,
+        };
+      }
+      gradeDocument.value = dto.value;
+      gradeDocument.save();
       return {
         message: 'Success',
         statusCode: 200,
@@ -870,7 +881,33 @@ export class GradeService {
           },
         },
       ]);
-      return { result, statusCode: 200, message: 'success' };
+      let dataReturn = [];
+      let studentData = { studentDetails: studentDocument };
+      let gradeCompositionData = {};
+      // let gradeData = [];
+      for (const gradeComposition of gradeCompositionDocuments) {
+        const a = await this.gradeCompositionModel.findById(gradeComposition).select('name');
+        // gradeCompositionData.push(a);
+        const gradeDocument = await this.gradeModel.findOne({
+          gradeComposition: gradeComposition['_id'].toString(),
+          student: studentDocument['_id'].toString(),
+        });
+        // gradeData.push(gradeDocument);
+        let gradeData = { name: a?.name };
+        gradeData['grade'] = gradeDocument?.value;
+        console.log('value ', gradeDocument?.value ?? null);
+        // studentData['grade'] = gradeDocument;
+        // gradeCompositionData.push(gradeData);
+        // console.log('studentData ', studentData);
+        // console.log('gradeDocument ', gradeDocument);
+        gradeCompositionData[gradeComposition['_id'].toString()] = gradeData;
+      }
+      studentData[`gradeComposition`] = gradeCompositionData;
+      // studentData['grade'] = gradeData;
+
+      dataReturn.push(studentData);
+      return { result: dataReturn, statusCode: 200, message: 'success' };
+      // return { result, statusCode: 200, message: 'success' };
     } catch (error) {
       console.log('Error retrieving data ', error);
       throw new BadRequestException('Error', error.response.message);

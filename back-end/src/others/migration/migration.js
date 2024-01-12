@@ -49,11 +49,11 @@ var grade_structure_model_1 = require("../../modules/grade/grade-structure.model
 (0, dotenv_1.config)();
 function runMigration() {
     return __awaiter(this, void 0, void 0, function () {
-        var hashedPassword1, usersData, createdUser, error_1;
+        var hashedPassword1, hashedPassword2, hashedPassword3, hashedPassword4, usersData, createdUser, student, teacher, classesData, createdClass, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 10, 11, 13]);
+                    _a.trys.push([0, 16, 17, 19]);
                     console.log('Connecting to database...', process.env.DATABASE_URL, process.env.DATABASE_NAME);
                     return [4 /*yield*/, (0, mongoose_1.connect)("".concat(process.env.DATABASE_URL, "/").concat(process.env.DATABASE_NAME))];
                 case 1:
@@ -76,34 +76,91 @@ function runMigration() {
                     return [4 /*yield*/, grade_model_1.GradeModel.createCollection()];
                 case 7:
                     _a.sent();
-                    return [4 /*yield*/, bcrypt.hash('admin', 12)];
+                    return [4 /*yield*/, bcrypt.hash('adminaccount', 12)];
                 case 8:
                     hashedPassword1 = _a.sent();
+                    return [4 /*yield*/, bcrypt.hash('teacher', 12)];
+                case 9:
+                    hashedPassword2 = _a.sent();
+                    return [4 /*yield*/, bcrypt.hash('student', 12)];
+                case 10:
+                    hashedPassword3 = _a.sent();
+                    return [4 /*yield*/, bcrypt.hash('useraccount', 12)];
+                case 11:
+                    hashedPassword4 = _a.sent();
                     usersData = [
                         {
                             fullname: 'Admin',
                             email: 'admin@admin.com',
                             password: hashedPassword1,
                             role: 'admin',
+                            active: true,
+                        },
+                        {
+                            fullname: 'User',
+                            email: 'user@user.com',
+                            password: hashedPassword4,
+                            roles: 'user',
+                            active: true,
+                        },
+                        {
+                            fullname: 'Teacher',
+                            email: 'teacher@teacher.com',
+                            password: hashedPassword2,
+                            roles: 'user',
+                            active: true,
+                        },
+                        {
+                            fullname: 'Student',
+                            email: 'student@student.com',
+                            password: hashedPassword3,
+                            roles: 'user',
+                            active: true,
                         },
                     ];
                     return [4 /*yield*/, users_model_1.UserModel.create(usersData)];
-                case 9:
+                case 12:
                     createdUser = _a.sent();
                     console.log('Admin user created:', createdUser);
-                    return [3 /*break*/, 13];
-                case 10:
+                    return [4 /*yield*/, users_model_1.UserModel.findOne({ email: 'student@student.com' })];
+                case 13:
+                    student = _a.sent();
+                    return [4 /*yield*/, users_model_1.UserModel.findOne({ email: 'teacher@teacher.com' })];
+                case 14:
+                    teacher = _a.sent();
+                    classesData = [
+                        {
+                            name: 'Class 1',
+                            code: '123456',
+                            teachers: [
+                                {
+                                    user: student._id.toString(),
+                                },
+                            ],
+                            students: [
+                                {
+                                    user: teacher._id.toString(),
+                                },
+                            ],
+                        },
+                    ];
+                    return [4 /*yield*/, class_model_1.ClassModel.create(classesData)];
+                case 15:
+                    createdClass = _a.sent();
+                    console.log('Admin user created:', createdClass);
+                    return [3 /*break*/, 19];
+                case 16:
                     error_1 = _a.sent();
                     console.error('Migration error:', error_1);
-                    return [3 /*break*/, 13];
-                case 11:
+                    return [3 /*break*/, 19];
+                case 17:
                     // Close the connection
                     console.log('Closing connection...');
                     return [4 /*yield*/, mongoose_1.connection.close()];
-                case 12:
+                case 18:
                     _a.sent();
                     return [7 /*endfinally*/];
-                case 13: return [2 /*return*/];
+                case 19: return [2 /*return*/];
             }
         });
     });

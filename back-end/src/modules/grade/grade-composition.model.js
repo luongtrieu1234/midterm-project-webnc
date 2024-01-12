@@ -9,6 +9,7 @@ exports.GradeCompositionSchema = new mongoose.Schema({
     name: { type: String },
     gradeScale: { type: Number },
     position: { type: Number },
+    content: { type: String, default: '' },
     isFinal: { type: Boolean, default: false },
 });
 exports.GradeCompositionModel = mongoose.model('GradeComposition', exports.GradeCompositionSchema);

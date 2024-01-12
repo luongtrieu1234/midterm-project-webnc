@@ -21,19 +21,62 @@ async function runMigration() {
     await GradeModel.createCollection();
 
     const hashedPassword1 = await bcrypt.hash('adminaccount', 12);
-
+    const hashedPassword2 = await bcrypt.hash('teacher', 12);
+    const hashedPassword3 = await bcrypt.hash('student', 12);
+    const hashedPassword4 = await bcrypt.hash('useraccount', 12);
     const usersData = [
       {
         fullname: 'Admin',
-        email: 'admin@gmail.com',
+        email: 'admin@admin.com',
         password: hashedPassword1,
         role: 'admin',
         active: true,
       },
+      {
+        fullname: 'User',
+        email: 'user@user.com',
+        password: hashedPassword4,
+        roles: 'user',
+        active: true,
+      },
+      {
+        fullname: 'Teacher',
+        email: 'teacher@teacher.com',
+        password: hashedPassword2,
+        roles: 'user',
+        active: true,
+      },
+      {
+        fullname: 'Student',
+        email: 'student@student.com',
+        password: hashedPassword3,
+        roles: 'user',
+        active: true,
+      },
     ];
-
     const createdUser = await UserModel.create(usersData);
     console.log('Admin user created:', createdUser);
+    const student = await UserModel.findOne({ email: 'student@student.com' });
+    const teacher = await UserModel.findOne({ email: 'teacher@teacher.com' });
+    const classesData = [
+      {
+        name: 'Class 1',
+        code: '123456',
+        students: [
+          {
+            user: student._id.toString(),
+          },
+        ],
+        teachers: [
+          {
+            user: teacher._id.toString(),
+          },
+        ],
+      },
+    ];
+
+    const createdClass = await ClassModel.create(classesData);
+    console.log('Admin user created:', createdClass);
   } catch (error) {
     console.error('Migration error:', error);
   } finally {
