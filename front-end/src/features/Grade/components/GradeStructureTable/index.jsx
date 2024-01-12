@@ -11,6 +11,7 @@ import {
   getExcelTemplateGrade,
   getGradeStructure,
   updateGradeComposition,
+  uploadFileGrade,
 } from 'apis/grade.api';
 import { TOAST } from 'constant';
 import { toast } from 'layout';
@@ -20,6 +21,8 @@ import { useParams } from 'react-router-dom';
 import { footerComfirm, handleDownloadError, handleDownloadSuccess } from 'utils/func';
 import UpdateGradeCompositionDialog from './UpdateGradeCompositionDialog';
 import DeleteGradeCompositionDialog from './DeleteGradeCompositionDialog';
+import { classNames } from 'primereact/utils';
+import AddFileGradeCompositionDialog from './AddFileGradeCompositionDialog';
 
 export default function GradeStructureTable() {
   const { classId } = useParams();
@@ -30,6 +33,8 @@ export default function GradeStructureTable() {
     useState(false);
   const [visibleDeleteGradeCompositionDialog, setVisibleDeleteGradeCompositionDialog] =
     useState(false);
+  const [visibleAddFileGradeCompositionDialog, setVisibleAddFileGradeCompositionDialog] =
+    useState(false);
 
   // query
   const { mutate: addGradeCompositionMutate, isLoading: isAddGradeCompositionLoading } =
@@ -38,9 +43,12 @@ export default function GradeStructureTable() {
     useMutation(updateGradeComposition);
   const { mutate: deleteGradeCompositionMutate, isLoading: isDeleteGradeCompositionLoading } =
     useMutation(deleteGradeComposition);
-  // eslint-disable-next-line no-unused-vars
-  const { mutate: getExcelTemplateGradeMutate, isLoading: isGetExcelTemplateGradeLoading } =
-    useMutation(getExcelTemplateGrade);
+  const {
+    mutate: getExcelTemplateGradeCompositionMutate,
+    isLoading: isGetExcelTemplateGradeCompositionLoading,
+  } = useMutation(getExcelTemplateGrade);
+  const { mutate: addFileGradeCompositionMutate, isLoading: isAddFileGradeCompositionLoading } =
+    useMutation(uploadFileGrade);
   const {
     data: gradeStructureData,
     isLoading: isGradeStructureLoading,
@@ -127,8 +135,24 @@ export default function GradeStructureTable() {
       }
     );
   }
+  async function onUploadFileGradeCompositionSubmit(data) {
+    const formData = new FormData();
+    formData.append('excelFile', data.excelFile);
+    addFileGradeCompositionMutate(formData, {
+      onSuccess() {
+        toast(TOAST.SUCCESS, 'Upload file grade composition successfully!');
+        reset();
+        refetch();
+        setVisibleAddFileGradeCompositionDialog(false);
+      },
+      onError() {
+        toast(TOAST.ERROR, 'Server error!');
+      },
+    });
+  }
+
   async function handleGetExcelTemplateGrade(gradeCompositionId) {
-    getExcelTemplateGradeMutate(gradeCompositionId, {
+    getExcelTemplateGradeCompositionMutate(gradeCompositionId, {
       onSuccess: (res) => handleDownloadSuccess(res),
       onError: handleDownloadError,
     });
@@ -178,10 +202,22 @@ export default function GradeStructureTable() {
         />
         <Button
           className='action'
-          icon='pi pi-download'
+          icon={classNames('pi ', {
+            'pi-download': !isGetExcelTemplateGradeCompositionLoading,
+            'pi-spinner': isGetExcelTemplateGradeCompositionLoading,
+          })}
           severity='info'
-          data-pr-tooltip='Download template grade'
+          data-pr-tooltip='Download template grade composition'
+          data-pr-position='left'
           onClick={() => handleGetExcelTemplateGrade(value._id)}
+        />
+        <Button
+          className='action'
+          icon='pi pi-upload '
+          severity='info'
+          data-pr-tooltip='Upload file grade composition'
+          data-pr-position='left'
+          onClick={() => setVisibleAddFileGradeCompositionDialog(true)}
         />
         <Button className='action' icon='pi pi-check' data-pr-tooltip='Mark as finalized' />
         <Tooltip target='.action' className='text-sm' />
@@ -202,6 +238,11 @@ export default function GradeStructureTable() {
     setVisible: setVisibleDeleteGradeCompositionDialog,
     handleSubmit: handleSubmit(onDeleteCompositionSubmit),
     isLoading: isDeleteGradeCompositionLoading,
+  });
+  const footerComfirmAddFileGradeComposition = footerComfirm({
+    setVisible: setVisibleAddFileGradeCompositionDialog,
+    handleSubmit: handleSubmit(onUploadFileGradeCompositionSubmit),
+    isLoading: isAddFileGradeCompositionLoading,
   });
 
   return (
@@ -242,6 +283,13 @@ export default function GradeStructureTable() {
         control={control}
         errors={errors}
         footer={footerComfirmDeleteGradeComposition}
+      />
+      <AddFileGradeCompositionDialog
+        visible={visibleAddFileGradeCompositionDialog}
+        setVisible={setVisibleAddFileGradeCompositionDialog}
+        control={control}
+        errors={errors}
+        footer={footerComfirmAddFileGradeComposition}
       />
     </div>
   );

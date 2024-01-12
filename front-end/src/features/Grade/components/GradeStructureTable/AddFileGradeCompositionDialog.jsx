@@ -3,7 +3,13 @@ import { CustomFileInput } from 'components/FormControl';
 import { Dialog } from 'primereact/dialog';
 import React from 'react';
 
-export default function AddFileStudentListDialog({ visible, setVisible, control, errors, footer }) {
+export default function AddFileGradeCompositionDialog({
+  visible,
+  setVisible,
+  control,
+  errors,
+  footer,
+}) {
   return (
     <div className='card flex justify-content-center ml-6 mb-2'>
       <Dialog
@@ -15,7 +21,7 @@ export default function AddFileStudentListDialog({ visible, setVisible, control,
       >
         <div className='p-fluid'>
           <CustomFileInput
-            name='studentListFile'
+            name='excelFile'
             // defaultNameFile={'StudentList.xlsx'}
             control={control}
             errors={errors}
@@ -28,7 +34,7 @@ export default function AddFileStudentListDialog({ visible, setVisible, control,
   );
 }
 
-AddFileStudentListDialog.propTypes = {
+AddFileGradeCompositionDialog.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: PropTypes.shape({}).isRequired,
   footer: PropTypes.element.isRequired,

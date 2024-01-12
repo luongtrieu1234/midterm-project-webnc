@@ -28,12 +28,13 @@ export const getExcelTemplateGrade = (gradeCompositionId) =>
   });
 
 export const exportFileGrade = (gradeCompositionId) =>
-  instance.get(GRADE.GET_EXCEL_TEMPLATE_GRADE, {
+  instance.get(GRADE.GET_EXPORT_FILE_GRADE, {
     params: { gradeCompositionId: gradeCompositionId },
     responseType: 'blob',
   });
 
 export const postUploadFileList = (body = {}) => instance.post(GRADE.POST_UPLOAD_FILE_LIST, body);
+export const uploadFileGrade = (body = {}) => instance.post(GRADE.POST_UPLOAD_FILE_GRADE, body);
 
 export const getClassGrades = (classId) =>
   instance.get(GRADE.GET_CLASS_GRADES, {

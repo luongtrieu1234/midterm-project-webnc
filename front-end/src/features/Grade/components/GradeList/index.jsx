@@ -67,10 +67,9 @@ export default function GradeList() {
         <div className='card'>
           <Tooltip target='.add-grade-composition' className='text-sm' />
           <Button
-            disabled
             className='add-grade-composition'
             icon='pi pi-plus'
-            data-pr-tooltip='Add Grade Composition'
+            data-pr-tooltip='Upload student list'
             onClick={() => setVisibleAddFileStudentListDialog(true)}
           />
         </div>
@@ -101,7 +100,7 @@ export default function GradeList() {
             setVisibleUpdateGradeDialog(true);
           }}
         >
-          {value.gradeComposition[gradeCompositionId].grade
+          {value.gradeComposition[gradeCompositionId]?.grade
             ? value.gradeComposition[gradeCompositionId].grade
             : '|'}
         </div>
@@ -161,11 +160,7 @@ export default function GradeList() {
   });
 
   // before render
-  // useEffect(() => {
-  //   if (isUploadStudentListExcelFileSuccess) {
-  //     setVisibleAddFileStudentListDialog(false);
-  //   }
-  // }, [isUploadStudentListExcelFileSuccess]);
+
   return (
     <div>
       <div className='mt-2'>
@@ -209,7 +204,6 @@ export default function GradeList() {
           {gradeStructure?.map((item) => (
             <Column
               key={item?._id}
-              field={`gradeComposition.${item?._id}.grade`}
               body={(value) => formatGrade(value, item?._id)}
               header={item?.name}
               style={{ maxWidth: '1rem' }}
