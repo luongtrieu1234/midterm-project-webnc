@@ -1,12 +1,15 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 
 function ResetPassword() {
   const toast = useRef(null);
+  const [search] = useSearchParams();
+  const token = search.get('token');
+  console.log(token);
   const showSuccess = () => {
     toast.current.show({
       severity: 'success',
@@ -37,10 +40,19 @@ function ResetPassword() {
     }
     console.log('Passwords match');
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/reset`, {
-        password,
-        passwordConfirmed,
-      });
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/users/reset`,
+        {
+          password,
+          passwordConfirmed,
+          token,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Thêm token vào header
+          },
+        }
+      );
       setMessage('Password has been reset');
       if (response.data.statusCode === 200) {
         console.log('Password has been reset');
