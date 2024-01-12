@@ -1,5 +1,7 @@
+import { FooterComfirm } from 'components/FormControl';
 import { TOAST } from 'constant';
 import { toast } from 'layout';
+import React from 'react';
 
 export function handleDownloadSuccess(res, fileName = 'default.txt') {
   const contentDispositionHeader = res.headers['content-disposition'];
@@ -17,4 +19,15 @@ export function handleDownloadSuccess(res, fileName = 'default.txt') {
 
 export function handleDownloadError() {
   toast(TOAST.ERROR, 'API Error ');
+}
+
+export function footerComfirm({ setVisible, handleSubmit, isLoading }) {
+  return (
+    <FooterComfirm
+      isLoading={isLoading || false}
+      action='Save'
+      setVisible={setVisible}
+      handleSubmit={handleSubmit}
+    />
+  );
 }

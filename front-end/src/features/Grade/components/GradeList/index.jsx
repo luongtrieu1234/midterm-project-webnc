@@ -1,4 +1,4 @@
-/* eslint-disable indent */
+// eslint-disable-next-line no-unused-vars
 import React, { useEffect, useMemo, useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -15,9 +15,8 @@ import {
 import { useMutation, useQuery } from 'react-query';
 import { classNames } from 'primereact/utils';
 import { useForm } from 'react-hook-form';
-import { FooterComfirm } from 'components/FormControl';
 import AddFileStudentListDialog from './AddFileStudentListDialog';
-import { handleDownloadError, handleDownloadSuccess } from 'utils/func';
+import { footerComfirm, handleDownloadError, handleDownloadSuccess } from 'utils/func';
 import { toast } from 'layout';
 import { TOAST } from 'constant';
 import UpdateGradeDialog from './UpdateGradeDialog';
@@ -34,19 +33,14 @@ export default function GradeList() {
   const {
     mutate: uploadStudentListExcelFileMutate,
     isLoading: isUploadStudentListExcelFileLoading,
-    isSuccess: isUploadStudentListExcelFileSuccess,
   } = useMutation(postUploadFileList);
-  const {
-    mutate: updateGradeMutate,
-    isLoading: isUpdateGradeLoading,
-    // eslint-disable-next-line no-unused-vars
-    isSuccess: isUpdateGradeSuccess,
-  } = useMutation(updateGrade);
+  const { mutate: updateGradeMutate, isLoading: isUpdateGradeLoading } = useMutation(updateGrade);
 
-  const { data: gradeListData, isLoading: isGradeListLoading } = useQuery(
-    ['gradeListData', classId],
-    () => getClassGrades(classId)
-  );
+  const {
+    data: gradeListData,
+    isLoading: isGradeListLoading,
+    refetch,
+  } = useQuery(['gradeListData', classId], () => getClassGrades(classId));
   const gradeList = useMemo(() => gradeListData?.data?.result, [gradeListData]);
 
   const { data: gradeStructureData, isLoading: isGradeStructureLoading } = useQuery(
@@ -94,20 +88,25 @@ export default function GradeList() {
 
   function formatGrade(value, gradeCompositionId) {
     return (
-      <div
-        onClick={() => {
-          setValue('fullName', value.studentDetails.fullname);
-          setValue('userId', value.studentDetails._id);
-          setValue('gradeCompositionName', value.gradeComposition[gradeCompositionId].name);
-          setValue('gradeCompositionId', gradeCompositionId);
-          setValue('grade', value.gradeComposition[gradeCompositionId].grade);
-          setVisibleUpdateGradeDialog(true);
-        }}
-      >
-        {value.gradeComposition[gradeCompositionId].grade
-          ? value.gradeComposition[gradeCompositionId].grade
-          : '|'}
-      </div>
+      <>
+        <div
+          className='grade cursor-pointer'
+          data-pr-tooltip='Edit grade'
+          onClick={() => {
+            setValue('fullName', value.studentDetails.fullname);
+            setValue('userId', value.studentDetails._id);
+            setValue('gradeCompositionName', value.gradeComposition[gradeCompositionId].name);
+            setValue('gradeCompositionId', gradeCompositionId);
+            setValue('grade', value.gradeComposition[gradeCompositionId].grade);
+            setVisibleUpdateGradeDialog(true);
+          }}
+        >
+          {value.gradeComposition[gradeCompositionId].grade
+            ? value.gradeComposition[gradeCompositionId].grade
+            : '|'}
+        </div>
+        <Tooltip target='.grade' className='text-sm' />
+      </>
     );
   }
 
@@ -124,7 +123,9 @@ export default function GradeList() {
     uploadStudentListExcelFileMutate(addStudentListExcelFileSubmitFormData, {
       onSuccess() {
         toast(TOAST.SUCCESS, 'Student List Upload Successfully!');
+        setVisibleAddFileStudentListDialog(false);
         reset();
+        refetch();
       },
       onError() {
         toast(TOAST.ERROR, 'Student List Upload Error!');
@@ -132,13 +133,13 @@ export default function GradeList() {
     });
   }
   async function onUpdateGrade({ userId, gradeCompositionId, grade }) {
-    console.log('abcvao');
     updateGradeMutate(
       { userId, gradeCompositionId, value: grade },
       {
         onSuccess() {
           toast(TOAST.SUCCESS, 'Update Grade Successfully!');
           setVisibleUpdateGradeDialog(false);
+          refetch();
         },
         onError() {
           toast(TOAST.ERROR, 'Update GradeError!');
@@ -148,34 +149,23 @@ export default function GradeList() {
   }
   //end call api
 
-  function footerComfirm(setVisible, handleSubmit, isLoading) {
-    return (
-      <FooterComfirm
-        isLoading={isLoading || false}
-        action='Save'
-        setVisible={setVisible}
-        handleSubmit={handleSubmit}
-      />
-    );
-  }
-
-  const footerComfirmAddFile = footerComfirm(
-    setVisibleAddFileStudentListDialog,
-    handleSubmit(onAddStudentListExcelFileSubmit),
-    isUploadStudentListExcelFileLoading
-  );
-  const footerComfirmUpdateGrade = footerComfirm(
-    setVisibleUpdateGradeDialog,
-    handleSubmit(onUpdateGrade),
-    isUpdateGradeLoading
-  );
+  const footerComfirmAddFile = footerComfirm({
+    setVisible: setVisibleAddFileStudentListDialog,
+    handleSubmit: handleSubmit(onAddStudentListExcelFileSubmit),
+    isLoading: isUploadStudentListExcelFileLoading,
+  });
+  const footerComfirmUpdateGrade = footerComfirm({
+    setVisible: setVisibleUpdateGradeDialog,
+    handleSubmit: handleSubmit(onUpdateGrade),
+    isLoading: isUpdateGradeLoading,
+  });
 
   // before render
-  useEffect(() => {
-    if (isUploadStudentListExcelFileSuccess) {
-      setVisibleAddFileStudentListDialog(false);
-    }
-  }, [isUploadStudentListExcelFileSuccess]);
+  // useEffect(() => {
+  //   if (isUploadStudentListExcelFileSuccess) {
+  //     setVisibleAddFileStudentListDialog(false);
+  //   }
+  // }, [isUploadStudentListExcelFileSuccess]);
   return (
     <div>
       <div className='mt-2'>
