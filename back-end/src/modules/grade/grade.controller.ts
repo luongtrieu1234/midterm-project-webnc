@@ -38,6 +38,7 @@ import { CommentDto } from './dto/comment.dto';
 import { MarkDecisionDto } from './dto/mark-decition.dto';
 import { ClassService } from '../class/class.service';
 import { UsersService } from '../users/users.service';
+import { MapStudentIdToAccountDto } from './dto/map-student-account.dto';
 
 @Controller('grade')
 @ApiTags('grade')
@@ -375,5 +376,12 @@ export class GradeController {
     if (userRole.role !== 'teacher')
       throw new BadRequestException('You are not a teacher of this class');
     return await this.gradeService.markFinalDecisionGrade(markDecisionDto);
+  }
+
+  @Post('map-student')
+  @HttpCode(200)
+  @UseGuards(AuthGuardCustom)
+  async mapStudentIdToAccount(@Body() dto: MapStudentIdToAccountDto, @Req() req) {
+    return await this.usersService.mapStudentIdToAccount(dto.studentId, dto.userId);
   }
 }

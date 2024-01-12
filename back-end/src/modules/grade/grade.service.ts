@@ -56,8 +56,8 @@ export class GradeService {
     private readonly gradeModel: Model<GradeModel>,
     @InjectModel('Comment')
     private readonly commentModel: Model<CommentModel>, // @InjectModel('User')
-    // private readonly userModel: Model<UserModel>,
-  ) {}
+  ) // private readonly userModel: Model<UserModel>,
+  {}
   async showGradeStructure(classId: string) {
     try {
       // const classDocument = await this.classModel
@@ -211,6 +211,36 @@ export class GradeService {
       { header: 'StudentId', key: 'studentId' },
       { header: 'Grade', key: 'grade' },
     ];
+    let listStudentIds = [];
+    const classDocument = await this.classModel.findOne({ gradeComposition: gradeCompositionId });
+    for (const student of classDocument.students) {
+      const studentDocument = await this.userModel.findById(student.user);
+      listStudentIds.push(studentDocument.studentId);
+    }
+    let data = [
+      // { no: '1', name: 'Muhammad Ichsan' },
+      // { no: '2', name: 'Muhammad Amin' },
+    ];
+    const promises = listStudentIds?.map(async (student, index) => {
+      // console.log('student ', student.user['fullname']);
+      // data.push({
+      //   no: index + 1,
+      //   studentId: student.user['_id'],
+      //   fullname: student.user['fullname'],
+      // });
+      let studentData = { no: index + 1 }; // Initialize with 'no' key
+      studentData['studentId'] = student; // Add 'studentId' key
+      data.push(studentData);
+      return studentData;
+    });
+    await Promise.all(promises);
+    // console.log('mapData ', mapData);
+    console.log('data ', data);
+
+    data.forEach((val, i, _) => {
+      worksheet.addRow(val);
+    });
+
     const buffer = await workbook.xlsx.writeBuffer();
     return { buffer, gradeCompositionName };
   }
@@ -468,7 +498,7 @@ export class GradeService {
       });
       gradeCompositionDocument.grades.push(gradeDocument._id.toString());
       console.log('element.StudentId ', element.StudentId);
-      createdGradeStudents.push(element.StudentId);
+      createdGradeStudents.push({ student: element.StudentId, grade: element.Grade });
       await gradeCompositionDocument.save();
     }
     // await this.addGrade({
@@ -1170,5 +1200,21 @@ export class GradeService {
       statusCode: 200,
       updatedGradeDocument: updatedGradeDocument,
     };
+  }
+
+  async mapStudentIdToAccount(studentId: string, userId: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    if (user.studentId) {
+      throw new BadRequestException('User already mapped');
+    }
+    const users = await this.userModel.find();
+    const studentIdExists = users.find((user) => user.studentId === studentId);
+    if (studentIdExists) {
+      throw new BadRequestException('Student Id already existed');
+    }
+    return await this.userModel.findByIdAndUpdate(userId, { studentId });
   }
 }

@@ -121,6 +121,11 @@ export class ClassService {
             (existingStudent) =>
               existingStudent?.user?.toString() === studentAdd._id.toString() &&
               existingStudent?.classRole?.toString() === 'student',
+          ) &&
+          !currentClass.teachers.some(
+            (existingTeacher) =>
+              existingTeacher?.user?.toString() === studentAdd._id.toString() &&
+              existingTeacher?.classRole?.toString() === 'teacher',
           )
         ) {
           currentClass.students.push({
@@ -146,6 +151,11 @@ export class ClassService {
             (existingTeacher) =>
               existingTeacher?.user?.toString() === teacherAdd._id.toString() &&
               existingTeacher?.classRole?.toString() === 'teacher',
+          ) &&
+          !currentClass.students.some(
+            (existingStudent) =>
+              existingStudent?.user?.toString() === teacherAdd._id.toString() &&
+              existingStudent?.classRole?.toString() === 'student',
           )
         ) {
           currentClass.teachers.push({
