@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 import React, { useEffect, useMemo, useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -18,6 +19,8 @@ import AddFileStudentListDialog from './AddGradeCompositionDialog';
 import { handleDownloadError, handleDownloadSuccess } from 'utils/func';
 import { toast } from 'layout';
 import { TOAST } from 'constant';
+// import { InputNumber } from 'primereact/inputnumber';
+// import { InputText } from 'primereact/inputtext';
 
 export default function GradeList() {
   const { classId } = useParams();
@@ -80,7 +83,68 @@ export default function GradeList() {
       </div>
     );
   }
+  // const isPositiveInteger = (val) => {
+  //   let str = String(val);
 
+  //   str = str.trim();
+
+  //   if (!str) {
+  //     return false;
+  //   }
+
+  //   str = str.replace(/^0+/, '') || '0';
+  //   let n = Math.floor(Number(str));
+
+  //   return n !== Infinity && String(n) === str && n >= 0;
+  // };
+  // const onCellEditComplete = (e) => {
+  //   let { rowData, newValue, field, originalEvent: event } = e;
+
+  //   switch (field) {
+  //     case 'quantity':
+  //     case 'price':
+  //       if (isPositiveInteger(newValue)) rowData[field] = newValue;
+  //       else event.preventDefault();
+  //       break;
+
+  //     default:
+  //       if (newValue.trim().length > 0) rowData[field] = newValue;
+  //       else event.preventDefault();
+  //       break;
+  //   }
+  // };
+
+  // const cellEditor = (options) => {
+  //   if (options.field === 'price') return priceEditor(options);
+  //   else return textEditor(options);
+  // };
+
+  // const textEditor = (options) => {
+  //   return (
+  //     <InputText
+  //       type='text'
+  //       value={options.value}
+  //       onChange={(e) => options.editorCallback(e.target.value)}
+  //     />
+  //   );
+  // };
+  // const priceEditor = (options) => {
+  //   return (
+  //     <InputNumber
+  //       value={options.value}
+  //       onValueChange={(e) => options.editorCallback(e.value)}
+  //       mode='currency'
+  //       currency='USD'
+  //       locale='en-US'
+  //     />
+  //   );
+  // };
+
+  // const priceBodyTemplate = (rowData) => {
+  //   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
+  //     rowData.price
+  //   );
+  // };
   // call api
   async function handleDownloadExcelTemplate() {
     downloadExcelTemplateMutate(classId, {
@@ -150,6 +214,7 @@ export default function GradeList() {
         <DataTable
           header={formatHeader}
           value={gradeList}
+          editMode='cell'
           loading={isGradeListLoading || isGradeStructureLoading}
           showGridlines
           stripedRows
@@ -163,6 +228,8 @@ export default function GradeList() {
               key={item?._id}
               field={'studentDetails.gradeComposition.gradeCompositionDetails._id'}
               header={item?.name}
+              // editor={(options) => cellEditor(options)}
+              // onCellEditComplete={onCellEditComplete}
             />
           ))}
           <Column header='Actions' style={{ maxWidth: '4rem' }} body={formatActions} />
