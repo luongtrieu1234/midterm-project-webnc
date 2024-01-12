@@ -56,8 +56,8 @@ export class GradeService {
     private readonly gradeModel: Model<GradeModel>,
     @InjectModel('Comment')
     private readonly commentModel: Model<CommentModel>, // @InjectModel('User')
-  ) // private readonly userModel: Model<UserModel>,
-  {}
+    // private readonly userModel: Model<UserModel>,
+  ) {}
   async showGradeStructure(classId: string) {
     try {
       // const classDocument = await this.classModel
@@ -235,10 +235,10 @@ export class GradeService {
       { header: 'StudentId', key: 'studentId' },
       { header: 'Name', key: 'name' },
     ];
-    for (let i = 0; i < classData?.result?.[0]?.gradeComposition?.length; i++) {
+    for (let i = 0; i < Object.keys(classData?.result?.[0]?.gradeComposition).length; i++) {
       columnData.push({
         header: gradeCompositions?.[i]?.['name'],
-        key: gradeCompositions?.[i]?.['name'],
+        key: gradeCompositions?.[i]?.['name'].replace(/\s/g, ''),
       });
     }
     console.log(
@@ -256,7 +256,7 @@ export class GradeService {
       // { no: '1', name: 'Muhammad Ichsan' },
       // { no: '2', name: 'Muhammad Amin' },
     ];
-    classData?.result?.map((student, index) => {
+    const promises = classData?.result?.map(async (student, index) => {
       // console.log('student ', student.user['fullname']);
       // data.push({
       //   no: index + 1,
@@ -266,13 +266,30 @@ export class GradeService {
       let studentData = { no: index + 1 }; // Initialize with 'no' key
       studentData['studentId'] = student.studentDetails['studentId']; // Add 'studentId' key
       studentData['name'] = student.studentDetails['fullname']; // Add 'name' key
+      studentData['total'] = student.total; // Add 'total' key
 
-      columns.forEach((column, index) => {
-        studentData[column.key] = student.gradeComposition?.[index]?.grade?.['value']; // Add keys from columnData
-      });
+      await Promise.all(
+        columns.map(async (column, index) => {
+          const gradeComposition = await this.gradeCompositionModel.findOne({
+            name: column.header,
+          });
+          console.log('column.key ', column.key);
+          studentData[column.key] =
+            student.gradeComposition?.[gradeComposition._id.toString()]?.grade; // Add keys from columnData
+          console.log(
+            'student.gradeComposition ',
+            student.gradeComposition?.[gradeComposition._id.toString()]?.grade,
+          );
+        }),
+      );
+      console.log('studentData ', studentData);
 
       data.push(studentData);
+      return studentData;
     });
+    await Promise.all(promises);
+    // console.log('mapData ', mapData);
+    console.log('data ', data);
 
     data.forEach((val, i, _) => {
       worksheet.addRow(val);
@@ -887,7 +904,7 @@ export class GradeService {
       let dataReturn = [];
       let studentData = { studentDetails: studentDocument };
       let gradeCompositionData = {};
-      // let gradeData = [];
+      let gradeTotalData = 0;
       for (const gradeComposition of gradeCompositionDocuments) {
         const a = await this.gradeCompositionModel.findById(gradeComposition).select('name');
         // gradeCompositionData.push(a);
@@ -907,8 +924,10 @@ export class GradeService {
         // console.log('studentData ', studentData);
         // console.log('gradeDocument ', gradeDocument);
         gradeCompositionData[gradeComposition['_id'].toString()] = gradeData;
+        gradeTotalData += gradeDocument?.value ?? 0;
       }
       studentData[`gradeComposition`] = gradeCompositionData;
+      studentData[`total`] = gradeTotalData;
       // studentData['grade'] = gradeData;
 
       dataReturn.push(studentData);
