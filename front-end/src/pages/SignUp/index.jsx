@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 
 import { useForm, Controller } from 'react-hook-form';
 
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import axios from 'axios'; // Import Axios library
 
@@ -13,8 +13,6 @@ import { InputText } from 'primereact/inputtext';
 // import Loading from '../../components/Loading';
 
 const SignUp = () => {
-  const navigate = useNavigate();
-
   // Logic
   // eslint-disable-next-line no-unused-vars
   const [loading, setLoading] = useState(false);
@@ -51,12 +49,9 @@ const SignUp = () => {
       setLoading(false); // Start loading state
 
       if (response.status === 200 || response.status === 201) {
-        show('Sign up successfully', 'success');
+        show('Please check your email', 'success');
         // Redirect to signin page
-        setTimeout(() => {
-          navigate('/confirm-code-sign-up');
-          reset();
-        }, 2000);
+        reset();
       } else {
         show('Sign up failed', 'error');
         console.log('no success');

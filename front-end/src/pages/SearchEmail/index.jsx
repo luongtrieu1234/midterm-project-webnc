@@ -1,12 +1,10 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 
 function SearchEmail() {
-  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const toast = useRef(null);
   const showSuccess = () => {
@@ -33,9 +31,6 @@ function SearchEmail() {
       console.log('response: ', response.data);
       if (response.data.status === 200) {
         showSuccess();
-        setTimeout(() => {
-          navigate('/confirm-code');
-        }, 2000);
       } else {
         console.log('error: ', response.data.message);
         showError();
