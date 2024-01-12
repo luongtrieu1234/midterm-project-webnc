@@ -97,14 +97,14 @@ export class GradeController {
     @Query('classId') classId: string,
     @Req() req,
   ) {
-    const { buffer, classCode } = await this.gradeService.downloadTemplateFileList(
+    const { buffer, className } = await this.gradeService.downloadTemplateFileList(
       response,
       classId,
     );
-    // response.set('Content-Disposition', `attachment; filename=${classCode}.xlsx`);
+    // response.set('Content-Disposition', `attachment; filename=${className}.xlsx`);
     response.set({
       'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'Content-Disposition': `attachment; filename=${classCode}.xlsx`,
+      'Content-Disposition': `attachment; filename=${className}.xlsx`,
     });
     response.send(buffer);
   }

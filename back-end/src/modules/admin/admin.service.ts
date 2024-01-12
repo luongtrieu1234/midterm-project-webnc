@@ -220,15 +220,28 @@ export class AdminService {
 
     console.log('result ', result);
     let notFoundUsers = [];
+    let updatedUsers = [];
+    let alreadyMappedUsers = [];
     for (const element of result) {
       const student = await this.userModel.findOne({
         email: element.Email?.text ?? element.Email,
       });
       if (!student) {
-        notFoundUsers.push(element.Email);
+        notFoundUsers.push(element.Email?.text ?? element.Email);
+        continue;
+      }
+      if (student.studentId !== '') {
+        alreadyMappedUsers.push({
+          email: element.Email?.text ?? element.Email,
+          studentId: element.StudentId,
+        });
         continue;
       }
       student.studentId = element.StudentId;
+      updatedUsers.push({
+        email: element.Email?.text ?? element.Email,
+        studentId: element.StudentId,
+      });
       await student.save();
     }
 
