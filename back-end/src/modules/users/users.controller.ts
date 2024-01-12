@@ -166,8 +166,8 @@ export class UsersController {
   }
 
   @Post('/reset')
-  async resetPassword(@Body() userResetPasswordDto: UserResetPasswordDto, @Query('token') token) {
-    return await this.usersService.resetPassword(userResetPasswordDto, token);
+  async resetPassword(@Body() userResetPasswordDto: UserResetPasswordDto) {
+    return await this.usersService.resetPassword(userResetPasswordDto, userResetPasswordDto.token);
   }
 
   @Post('/confirm-code')

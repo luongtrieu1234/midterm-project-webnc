@@ -10,4 +10,6 @@ export class UserResetPasswordDto {
   @ApiProperty()
   @IsNotEmpty()
   readonly passwordConfirmed: string;
+
+  token: string;
 }

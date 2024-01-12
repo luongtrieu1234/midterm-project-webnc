@@ -15,8 +15,11 @@ import {
   ClassDetailPage,
   TestPage,
   GradePage,
+  HomePageAdminPage,
 } from './pages';
 import { PageError, Loading, NotLogged } from './components';
+
+import SignInAdmin from 'features/Admin/pages/SignInAdmin';
 
 import './App.css';
 
@@ -45,6 +48,10 @@ function App() {
       <Route path='/course/:classId/grade' element={<GradePage />} />
       {!token && <Route path='/home-page' element={<NotLogged />} />}
       <Route path='*' element={<PageError />} />
+
+      {/* Admin */}
+      <Route path='/sign-in-admin' element={<SignInAdmin />} />
+      <Route path='/admin' element={<HomePageAdminPage />} />
     </Routes>
   );
 }

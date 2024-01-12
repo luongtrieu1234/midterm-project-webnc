@@ -2,18 +2,17 @@ import React, { useRef, useState } from 'react';
 
 import { useForm, Controller } from 'react-hook-form';
 
-import { Link } from 'react-router-dom';
-
-import axios from 'axios'; // Import Axios library
+import axios from 'axios';
 
 import { Button } from 'primereact/button';
 import { classNames } from 'primereact/utils';
 import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
-// import Loading from '../../components/Loading';
+import { Checkbox } from 'primereact/checkbox';
 
-const SignUp = () => {
-  // Logic
+const SignInAdmin = () => {
+  const [checked, setChecked] = useState(false);
+
   // eslint-disable-next-line no-unused-vars
   const [loading, setLoading] = useState(false);
 
@@ -24,7 +23,6 @@ const SignUp = () => {
   };
 
   const defaultValues = {
-    fullname: '',
     email: '',
     password: '',
   };
@@ -38,26 +36,33 @@ const SignUp = () => {
 
   const onSubmit = async (data) => {
     setLoading(true); // Start loading state
-
     try {
       // eslint-disable-next-line no-undef
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/signup`, {
-        fullname: data.fullname,
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/admin/login`, {
         email: data.email,
         password: data.password,
       });
       setLoading(false); // Start loading state
 
-      if (response.status === 200 || response.status === 201) {
-        show('Please check your email', 'success');
+      if (response.status === 200) {
+        show('Form submitted successfully', 'success');
+        console.log('success');
+
+        const token = response?.data.jwt; // Assuming the token is returned in response.data.jwt
+        // Save token to localStorage
+        localStorage.setItem('token', token);
+
         // Redirect to signin page
-        reset();
+        setTimeout(() => {
+          window.location.href = '/admin';
+          reset();
+        }, 2000);
       } else {
-        show('Sign up failed', 'error');
+        show('Form submission failed', 'error');
         console.log('no success');
       }
     } catch (error) {
-      show('Server Error', 'error');
+      show('Form submission failed', 'error');
       console.log('no success catch');
     }
   };
@@ -69,10 +74,6 @@ const SignUp = () => {
       <small className='p-error'>&nbsp;</small>
     );
   };
-  // End Logic
-  // if (loading) {
-  //   return <Loading />;
-  // }
 
   return (
     <div>
@@ -81,43 +82,19 @@ const SignUp = () => {
         style={{ backgroundColor: 'rgba(0,0,0,0.05)' }}
       >
         <div className='surface-card p-4 shadow-2 border-round w-full lg:w-6'>
-          <div className='text-center mb-5'>
+          <div className='text-center mb-3'>
             <i
               className='pi pi-user mb-3'
               style={{ fontSize: '2.5rem', color: 'var(--primary-color)' }}
             ></i>
-            <div className='text-900 text-3xl font-medium mb-3'>Sign Up Account</div>
+            <div className='text-900 text-3xl font-medium mb-2'>Sign In Admin</div>
           </div>
+          {/* <div className='text-center mb-5'>
+            <Google />
+          </div> */}
+
           <form onSubmit={handleSubmit(onSubmit)} className='flex flex-column gap-2'>
             <Toast ref={toast} />
-
-            {/* Full name */}
-            <label htmlFor='fullname' className='block text-900 font-medium'>
-              Full Name
-            </label>
-            <Controller
-              name='fullname'
-              control={control}
-              rules={{ required: 'Full name is required.' }}
-              render={({ field, fieldState }) => (
-                <>
-                  <label
-                    htmlFor={field.name}
-                    // @ts-ignore
-                    className={classNames({ 'p-error': errors.value })}
-                  ></label>
-                  <span className='p-float-label'>
-                    <InputText
-                      id={field.name}
-                      value={field.value}
-                      className={classNames({ 'p-invalid': fieldState.error }, 'w-full')}
-                      onChange={(e) => field.onChange(e.target.value)}
-                    />
-                  </span>
-                  {getFormErrorMessage(field.name)}
-                </>
-              )}
-            />
 
             {/* Email */}
             <label htmlFor='fullname' className='block text-900 font-medium'>
@@ -153,7 +130,7 @@ const SignUp = () => {
             <Controller
               name='password'
               control={control}
-              rules={{ required: 'Password is required.', minLength: 6 }}
+              rules={{ required: 'Password is required.', minLength: 5 }}
               render={({ field, fieldState }) => (
                 <>
                   <label
@@ -173,18 +150,20 @@ const SignUp = () => {
                 </>
               )}
             />
-
             <div>
-              <Button label='Sign Up' icon='pi pi-user' type='submit' className='w-full mt-5' />
-              <div className='text-center mt-5'>
-                <span className='text-600 font-medium line-height-3'>Do have an account?</span>
-                <Link
-                  to='/sign-in'
-                  className='font-medium no-underline ml-2 text-blue-500 cursor-pointer'
-                >
-                  Sign In
-                </Link>
+              <div className='flex align-items-center justify-content-between mb-3'>
+                <div className='flex align-items-center'>
+                  <Checkbox
+                    id='rememberme'
+                    onChange={(e) => setChecked(e.checked)}
+                    checked={checked}
+                    className='mr-2'
+                  />
+                  <label htmlFor='rememberme'>Remember me</label>
+                </div>
               </div>
+
+              <Button label='Sign In' icon='pi pi-user' type='submit' className='w-full' />
             </div>
           </form>
         </div>
@@ -193,4 +172,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default SignInAdmin;

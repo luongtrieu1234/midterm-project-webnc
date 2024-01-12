@@ -3,7 +3,7 @@ import { LayoutProvider } from 'layout/context/layoutcontext';
 import React from 'react';
 import HomePageAdmin from 'features/Admin/pages/HomePage';
 
-export default function TestPage() {
+export default function HomePageAdminPage() {
   return (
     <LayoutProvider>
       <Layout>

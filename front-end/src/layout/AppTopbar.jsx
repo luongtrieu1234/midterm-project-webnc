@@ -47,11 +47,14 @@ export default function Header() {
             </>
           ) : (
             <>
+              <Link to='/sign-in-admin'>
+                <Button className='btn-sign'>Admin</Button>
+              </Link>
               <Link to='/sign-in'>
-                <Button className='btn-sign'>Sign In</Button>
+                <Button className='btn-sign'>SignIn</Button>
               </Link>
               <Link to='/sign-up'>
-                <Button className='btn-sign'>Sign Up</Button>
+                <Button className='btn-sign'>SignUp</Button>
               </Link>
             </>
           )}

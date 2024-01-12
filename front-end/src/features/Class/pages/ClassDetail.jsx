@@ -283,7 +283,9 @@ const ClassDetail = () => {
                       marginBottom: '20px',
                     }}
                   >
-                    <span style={{ fontSize: '18px', color: '#555' }}>{teacher.user.fullname}</span>
+                    <span style={{ fontSize: '18px', color: '#555' }}>
+                      {teacher.user?.fullname}
+                    </span>
                   </li>
                 ))
               ) : (
@@ -317,7 +319,9 @@ const ClassDetail = () => {
                       borderBottom: '1px solid #ddd',
                     }}
                   >
-                    <span style={{ fontSize: '18px', color: '#555' }}>{student.user.fullname}</span>
+                    <span style={{ fontSize: '18px', color: '#555' }}>
+                      {student.user?.fullname}
+                    </span>
                   </li>
                 ))
               ) : (
