@@ -8,6 +8,7 @@ import AddGradeCompositionDialog from './AddGradeCompositionDialog';
 import {
   addGradeComposition,
   deleteGradeComposition,
+  getExcelTemplateGrade,
   getGradeStructure,
   updateGradeComposition,
 } from 'apis/grade.api';
@@ -16,7 +17,7 @@ import { toast } from 'layout';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
-import { footerComfirm } from 'utils/func';
+import { footerComfirm, handleDownloadError, handleDownloadSuccess } from 'utils/func';
 import UpdateGradeCompositionDialog from './UpdateGradeCompositionDialog';
 import DeleteGradeCompositionDialog from './DeleteGradeCompositionDialog';
 
@@ -37,6 +38,9 @@ export default function GradeStructureTable() {
     useMutation(updateGradeComposition);
   const { mutate: deleteGradeCompositionMutate, isLoading: isDeleteGradeCompositionLoading } =
     useMutation(deleteGradeComposition);
+  // eslint-disable-next-line no-unused-vars
+  const { mutate: getExcelTemplateGradeMutate, isLoading: isGetExcelTemplateGradeLoading } =
+    useMutation(getExcelTemplateGrade);
   const {
     data: gradeStructureData,
     isLoading: isGradeStructureLoading,
@@ -123,6 +127,12 @@ export default function GradeStructureTable() {
       }
     );
   }
+  async function handleGetExcelTemplateGrade(gradeCompositionId) {
+    getExcelTemplateGradeMutate(gradeCompositionId, {
+      onSuccess: (res) => handleDownloadSuccess(res),
+      onError: handleDownloadError,
+    });
+  }
 
   function formatHeader() {
     return (
@@ -171,6 +181,7 @@ export default function GradeStructureTable() {
           icon='pi pi-download'
           severity='info'
           data-pr-tooltip='Download template grade'
+          onClick={() => handleGetExcelTemplateGrade(value._id)}
         />
         <Button className='action' icon='pi pi-check' data-pr-tooltip='Mark as finalized' />
         <Tooltip target='.action' className='text-sm' />

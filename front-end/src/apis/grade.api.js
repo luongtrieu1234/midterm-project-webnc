@@ -21,9 +21,9 @@ export const getExcelTemplateList = (classId) =>
     responseType: 'blob',
   });
 
-export const getExcelTemplateGrade = (classId) =>
-  instance.get(GRADE.GET_EXPORT_FILE_GRADE, {
-    params: { classId: classId },
+export const getExcelTemplateGrade = (gradeCompositionId) =>
+  instance.get(GRADE.GET_EXCEL_TEMPLATE_GRADE, {
+    params: { gradeCompositionId: gradeCompositionId },
     responseType: 'blob',
   });
 
