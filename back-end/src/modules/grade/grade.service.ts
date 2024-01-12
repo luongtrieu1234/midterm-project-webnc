@@ -56,8 +56,8 @@ export class GradeService {
     private readonly gradeModel: Model<GradeModel>,
     @InjectModel('Comment')
     private readonly commentModel: Model<CommentModel>, // @InjectModel('User')
-    // private readonly userModel: Model<UserModel>,
-  ) {}
+  ) // private readonly userModel: Model<UserModel>,
+  {}
   async showGradeStructure(classId: string) {
     try {
       // const classDocument = await this.classModel
@@ -115,6 +115,28 @@ export class GradeService {
       return gradeComposition;
     } catch (error) {
       console.error('Error adding grade composition:', error.message);
+      throw error;
+    }
+  }
+
+  async getGradeCompositionDetail(gradeCompositionId: string) {
+    try {
+      const gradeCompositionDocument = await this.gradeCompositionModel
+        .findById(gradeCompositionId)
+        .populate('grades')
+        .exec();
+
+      if (!gradeCompositionDocument) {
+        throw new BadRequestException('Grade composition not found');
+      }
+
+      return {
+        message: 'success',
+        statusCode: 200,
+        result: gradeCompositionDocument,
+      };
+    } catch (error) {
+      console.error('Error retrieving grade composition detail:', error);
       throw error;
     }
   }
@@ -636,7 +658,7 @@ export class GradeService {
       let dataReturn = [];
       for (const student of studentDocuments) {
         let studentData = { studentDetails: student.user };
-        let gradeCompositionData = [];
+        let gradeCompositionData = {};
         // let gradeData = [];
         for (const gradeComposition of gradeCompositionDocuments) {
           const a = await this.gradeCompositionModel.findById(gradeComposition).select('name');
@@ -646,14 +668,16 @@ export class GradeService {
             student: student.user['_id'].toString(),
           });
           // gradeData.push(gradeDocument);
-          let gradeData = { gradeCompositionDetails: a };
-          gradeData['grade'] = gradeDocument;
+          let gradeData = { name: a?.name };
+          gradeData['grade'] = gradeDocument?.value;
+          console.log('value ', gradeDocument?.value ?? null);
           // studentData['grade'] = gradeDocument;
-          gradeCompositionData.push(gradeData);
+          // gradeCompositionData.push(gradeData);
           // console.log('studentData ', studentData);
           // console.log('gradeDocument ', gradeDocument);
+          gradeCompositionData[gradeComposition['_id'].toString()] = gradeData;
         }
-        studentData['gradeComposition'] = gradeCompositionData;
+        studentData[`gradeComposition`] = gradeCompositionData;
         // studentData['grade'] = gradeData;
 
         dataReturn.push(studentData);
