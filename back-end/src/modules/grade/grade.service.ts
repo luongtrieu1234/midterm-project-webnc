@@ -55,8 +55,8 @@ export class GradeService {
     private readonly gradeModel: Model<GradeModel>,
     @InjectModel('Comment')
     private readonly commentModel: Model<CommentModel>, // @InjectModel('User')
-    // private readonly userModel: Model<UserModel>,
-  ) {}
+  ) // private readonly userModel: Model<UserModel>,
+  {}
   async showGradeStructure(classId: string) {
     try {
       // const classDocument = await this.classModel
@@ -1142,7 +1142,9 @@ export class GradeService {
   }
 
   async getGradeCompositionDetailById(gradeId: string) {
-    const gradeDocument = await this.gradeModel.findById(gradeId).populate('comments');
+    const gradeDocument = await this.gradeModel
+      .findById(gradeId)
+      .populate({ path: 'comments', options: { sort: { created_at: 1 } } });
     const gradeCompositionDocument = await this.gradeCompositionModel.findOne({ grades: gradeId });
     return {
       message: 'success',
