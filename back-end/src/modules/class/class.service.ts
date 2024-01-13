@@ -359,14 +359,15 @@ export class ClassService {
   async getUserRoleInClass(classId, userId) {
     // Check in the students array
     const classDocument = await this.classModel.findById(classId);
-    const student = classDocument.students.find((student) => student.user.toString() === userId);
+    console.log('check classDocument ', classDocument);
+    const student = classDocument?.students?.find((student) => student.user.toString() === userId);
 
     if (student) {
       return { message: 'success', statusCode: HttpStatus.OK, role: 'student' };
     }
 
     // Check in the teachers array
-    const teacher = classDocument.teachers.find((teacher) => teacher.user.toString() === userId);
+    const teacher = classDocument?.teachers?.find((teacher) => teacher.user.toString() === userId);
 
     if (teacher) {
       return {
@@ -447,7 +448,7 @@ export class ClassService {
       students: [{ email: email }],
       teachers: [],
     });
-    console.log('ad ', ad);
+    // console.log('ad ', ad);
     return {
       message: 'Verify success',
       statusCode: HttpStatus.OK,

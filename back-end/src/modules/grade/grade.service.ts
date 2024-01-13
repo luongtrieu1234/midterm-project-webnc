@@ -55,8 +55,8 @@ export class GradeService {
     private readonly gradeModel: Model<GradeModel>,
     @InjectModel('Comment')
     private readonly commentModel: Model<CommentModel>, // @InjectModel('User')
-  ) // private readonly userModel: Model<UserModel>,
-  {}
+    // private readonly userModel: Model<UserModel>,
+  ) {}
   async showGradeStructure(classId: string) {
     try {
       // const classDocument = await this.classModel
@@ -1144,7 +1144,7 @@ export class GradeService {
   async getGradeCompositionDetailById(gradeId: string) {
     const gradeDocument = await this.gradeModel
       .findById(gradeId)
-      .populate({ path: 'comments', options: { sort: { created_at: 1 } } });
+      .populate({ path: 'comments', options: { sort: { order: 1 } } });
     const gradeCompositionDocument = await this.gradeCompositionModel.findOne({ grades: gradeId });
     return {
       message: 'success',
@@ -1178,7 +1178,12 @@ export class GradeService {
     const currentGradeDocument = await this.gradeModel
       .findById(commentDto.gradeId)
       .populate({ path: 'comments', options: { sort: { created_at: -1 } } });
-    const user = await this.classService.getUserRoleInClass(currentGradeDocument.class, userId);
+    console.log('currentGradeDocument ', currentGradeDocument);
+    const gradeCompositionDocument = await this.gradeCompositionModel.findById(
+      gradeDocument.gradeComposition,
+    );
+    const user = await this.classService.getUserRoleInClass(gradeCompositionDocument.class, userId);
+    console.log('user ', user);
     const userRole = user.role;
     if (userRole === 'teacher') {
       const student = await this.userModel.findById(currentGradeDocument.student);
@@ -1188,7 +1193,7 @@ export class GradeService {
       );
     } else if (userRole === 'student') {
       const teachers = await this.classModel
-        .findById(currentGradeDocument.class)
+        .findById(gradeCompositionDocument.class)
         .populate('teachers');
       const teacherIds = teachers.teachers.map((teacher) => teacher.user.toString());
       teacherIds.map(async (teacherId) => {
