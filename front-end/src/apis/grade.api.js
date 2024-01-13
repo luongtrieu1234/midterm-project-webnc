@@ -27,9 +27,9 @@ export const getExcelTemplateGrade = (gradeCompositionId) =>
     responseType: 'blob',
   });
 
-export const exportFileGrade = (gradeCompositionId) =>
+export const exportFileGrade = (classId) =>
   instance.get(GRADE.GET_EXPORT_FILE_GRADE, {
-    params: { gradeCompositionId: gradeCompositionId },
+    params: { classId: classId },
     responseType: 'blob',
   });
 
@@ -40,5 +40,18 @@ export const getClassGrades = (classId) =>
   instance.get(GRADE.GET_CLASS_GRADES, {
     params: { classId: classId },
   });
+export const getGradeOfStudent = (classId, userId) =>
+  instance.get(GRADE.GET_GRADE_OF_STUDENT, {
+    params: { classId: classId, userId: userId },
+  });
 
 export const updateGrade = (body = {}) => instance.post(GRADE.POST_UPDATE_GRADE, body);
+
+export const markGradeCompositionFinal = (body = {}) =>
+  instance.post(
+    GRADE.POST_MARK_GRADE_COMPOSITION_FINAL,
+    {},
+    {
+      params: { gradeCompositionId: body.gradeCompositionId },
+    }
+  );

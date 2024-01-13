@@ -4,8 +4,9 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Tooltip } from 'primereact/tooltip';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
+  exportFileGrade,
   getClassGrades,
   getExcelTemplateList,
   getGradeStructure,
@@ -23,6 +24,7 @@ import UpdateGradeDialog from './UpdateGradeDialog';
 
 export default function GradeList() {
   const { classId } = useParams();
+  const navigate = useNavigate();
   //state
   const [visibleAddFileStudentListDialog, setVisibleAddFileStudentListDialog] = useState(false);
   const [visibleUpdateGradeDialog, setVisibleUpdateGradeDialog] = useState(false);
@@ -35,6 +37,8 @@ export default function GradeList() {
     isLoading: isUploadStudentListExcelFileLoading,
   } = useMutation(postUploadFileList);
   const { mutate: updateGradeMutate, isLoading: isUpdateGradeLoading } = useMutation(updateGrade);
+  const { mutate: exportFileGradeMutate, isLoading: isExportFileGradeLoading } =
+    useMutation(exportFileGrade);
 
   const {
     data: gradeListData,
@@ -68,18 +72,25 @@ export default function GradeList() {
           <Tooltip target='.add-grade-composition' className='text-sm' />
           <Button
             className='add-grade-composition'
-            icon='pi pi-plus'
-            data-pr-tooltip='Upload student list'
-            onClick={() => setVisibleAddFileStudentListDialog(true)}
+            icon={classNames('pi ', {
+              'pi-download': !isExportFileGradeLoading,
+              'pi-spinner': isExportFileGradeLoading,
+            })}
+            data-pr-tooltip='Download file full grade'
+            onClick={() => handleExportFileGrade()}
           />
         </div>
       </div>
     );
   }
-  function formatActions() {
+  function formatActions(value) {
     return (
       <div className='card flex flex-wrap justify-content-center gap-3'>
-        <Button icon='pi pi-pencil' severity='warning' />
+        <Button
+          icon='pi pi-pencil'
+          severity='warning'
+          onClick={() => navigate(`/course/${classId}/grade-student/${value.studentDetails._id}`)}
+        />
         <Button icon='pi pi-trash' severity='danger' />
       </div>
     );
@@ -113,6 +124,12 @@ export default function GradeList() {
   async function handleDownloadExcelTemplate() {
     downloadExcelTemplateMutate(classId, {
       onSuccess: (res) => handleDownloadSuccess(res, 'TemplateStudentList.xlsx'),
+      onError: handleDownloadError,
+    });
+  }
+  async function handleExportFileGrade() {
+    exportFileGradeMutate(classId, {
+      onSuccess: (res) => handleDownloadSuccess(res),
       onError: handleDownloadError,
     });
   }
@@ -210,6 +227,12 @@ export default function GradeList() {
               bodyClassName='text-center'
             />
           ))}
+          <Column
+            field='total'
+            header='Total'
+            bodyClassName='text-center'
+            style={{ maxWidth: '2rem' }}
+          />
           <Column header='Actions' style={{ maxWidth: '4rem' }} body={formatActions} />
         </DataTable>
       </div>
