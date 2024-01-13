@@ -55,8 +55,8 @@ export class GradeService {
     private readonly gradeModel: Model<GradeModel>,
     @InjectModel('Comment')
     private readonly commentModel: Model<CommentModel>, // @InjectModel('User')
-  ) // private readonly userModel: Model<UserModel>,
-  {}
+    // private readonly userModel: Model<UserModel>,
+  ) {}
   async showGradeStructure(classId: string) {
     try {
       // const classDocument = await this.classModel
@@ -821,7 +821,7 @@ export class GradeService {
     }
   }
 
-  async markFinalGradeComposition(gradeCompositionId: string) {
+  async markFinalGradeComposition(gradeCompositionId: string, currentPath: string) {
     const gradeCompositionDocument = await this.gradeCompositionModel.findById(gradeCompositionId);
     gradeCompositionDocument.isFinal = true;
     gradeCompositionDocument.save();
@@ -832,6 +832,7 @@ export class GradeService {
     await this.notificationService.notifyStudentsGradeCompositionFinalized(
       gradeCompositionId,
       studentIds,
+      currentPath,
     );
     return {
       message: 'success',
@@ -1012,6 +1013,7 @@ export class GradeService {
     await this.notificationService.notifyTeachersGradeReviewRequest(
       reviewRequestDto.gradeId,
       teacherIds,
+      reviewRequestDto.currentPath,
     );
     if (!updatedGradeDocument) {
       throw new BadRequestException('Grade not found');
@@ -1125,7 +1127,43 @@ export class GradeService {
         },
       },
     ]);
-    return { result, statusCode: 200, message: 'success' };
+    let data = [];
+    let dataReturn = {};
+    dataReturn['classId'] = classId;
+    dataReturn['gradeCompositions'] = [];
+    const gradeCompositionDocuments = await this.gradeCompositionModel.find({ class: classId });
+    console.log('gradedadasd ', gradeCompositionDocuments);
+    for (const gradeCompositionDocument of gradeCompositionDocuments) {
+      console.log('gradeCompositionDocument', gradeCompositionDocument);
+      let dataComposition = {};
+      const gradeComposition = await this.gradeCompositionModel.findById(gradeCompositionDocument);
+      dataComposition['gradeCompositionName'] = gradeCompositionDocument?.name ?? '';
+      dataComposition['gradeCompositionId'] = gradeCompositionDocument?._id ?? '';
+      dataComposition['grade'] = [];
+      const grades = await this.gradeModel.find({
+        gradeComposition: gradeCompositionDocument._id.toString(),
+        // requestReview: true,
+      });
+      for (const grade of grades) {
+        let dataGrade = {};
+        let dt = {};
+        const gradeDocument = await this.gradeModel.findById(grade._id).populate('comments');
+        dataGrade['value'] = grade?.value ?? '';
+        dataGrade['userId'] = grade?.student ?? '';
+        dataComposition['grade'].push(dataGrade);
+        dt['grade'] = grade?.value ?? '';
+        dt['gradeId'] = grade?._id ?? '';
+        dt['userId'] = grade?.student ?? '';
+        dt['comments'] = gradeDocument?.comments ?? '';
+        dt['gradeCompositionName'] = gradeCompositionDocument?.name ?? '';
+        dt['gradeCompositionId'] = gradeCompositionDocument?._id ?? '';
+        dt['explanation'] = grade?.explanation ?? '';
+        dt['expectationGrade'] = grade?.expectedGrade ?? '';
+        data.push(dt);
+      }
+      dataReturn['gradeCompositions'].push(dataComposition);
+    }
+    return { data, statusCode: 200, message: 'success' };
   }
 
   async getGradeReviewRequestDetail(classId: string, gradeId: string) {
@@ -1195,6 +1233,7 @@ export class GradeService {
       await this.notificationService.notifyStudentGradeReviewReply(
         student._id.toString(),
         currentGradeDocument._id.toString(),
+        commentDto.currentPath,
       );
     } else if (userRole === 'student') {
       const teachers = await this.classModel

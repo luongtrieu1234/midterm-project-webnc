@@ -17,6 +17,7 @@ export const NotificationSchema = new mongoose.Schema({
   relatedGrade: { type: mongoose.Types.ObjectId, ref: 'Grade' },
   message: { type: String, required: true },
   read: { type: Boolean, default: false },
+  currentPath: { type: String, default: '' },
   deletedAt: { type: Date, default: null }, // Set default value for deletedAt
   createdAt: { type: Date, default: Date.now }, // Set default value for createdAt to the current date and time
   updatedAt: { type: Date, default: Date.now },
@@ -32,6 +33,7 @@ export interface NotificationModel {
   relatedGrade?: mongoose.Types.ObjectId; // Reference to Grade model
   message: string;
   read: boolean;
+  currentPath: string;
   deletedAt: Date;
   createdAt: Date;
   updatedAt: Date;

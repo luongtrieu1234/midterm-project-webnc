@@ -9,4 +9,6 @@ export class CommentDto {
   @ApiProperty({ required: false })
   // @IsNotEmpty()
   readonly content: string;
+
+  currentPath: string;
 }
