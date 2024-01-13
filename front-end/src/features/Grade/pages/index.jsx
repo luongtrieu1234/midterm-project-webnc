@@ -1,3 +1,4 @@
 import CurrentGradeStructure from './CurrentGradeStructure';
 import GradeStudent from './GradeStudent';
-export { CurrentGradeStructure, GradeStudent };
+import GradeStudentDetail from './GradeStudentDetail';
+export { CurrentGradeStructure, GradeStudent, GradeStudentDetail };

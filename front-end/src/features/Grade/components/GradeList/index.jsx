@@ -4,7 +4,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Tooltip } from 'primereact/tooltip';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   exportFileGrade,
   getClassGrades,
@@ -24,6 +24,7 @@ import UpdateGradeDialog from './UpdateGradeDialog';
 
 export default function GradeList() {
   const { classId } = useParams();
+  const navigate = useNavigate();
   //state
   const [visibleAddFileStudentListDialog, setVisibleAddFileStudentListDialog] = useState(false);
   const [visibleUpdateGradeDialog, setVisibleUpdateGradeDialog] = useState(false);
@@ -82,10 +83,14 @@ export default function GradeList() {
       </div>
     );
   }
-  function formatActions() {
+  function formatActions(value) {
     return (
       <div className='card flex flex-wrap justify-content-center gap-3'>
-        <Button icon='pi pi-pencil' severity='warning' />
+        <Button
+          icon='pi pi-pencil'
+          severity='warning'
+          onClick={() => navigate(`/course/${classId}/grade-student/${value.studentDetails._id}`)}
+        />
         <Button icon='pi pi-trash' severity='danger' />
       </div>
     );

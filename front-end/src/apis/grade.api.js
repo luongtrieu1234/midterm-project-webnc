@@ -40,9 +40,9 @@ export const getClassGrades = (classId) =>
   instance.get(GRADE.GET_CLASS_GRADES, {
     params: { classId: classId },
   });
-export const getGradeOfStudent = (classId) =>
+export const getGradeOfStudent = (classId, userId) =>
   instance.get(GRADE.GET_GRADE_OF_STUDENT, {
-    params: { classId: classId },
+    params: { classId: classId, userId: userId },
   });
 
 export const updateGrade = (body = {}) => instance.post(GRADE.POST_UPDATE_GRADE, body);

@@ -6,48 +6,32 @@ import { Button } from 'primereact/button';
 import { Tooltip } from 'primereact/tooltip';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
-// import { useForm } from 'react-hook-form';
 import { getGradeOfStudent } from 'apis/grade.api';
 import { Loading } from 'components';
 
 export default function GradeListStudent() {
-  const { classId } = useParams();
+  const { classId, userId } = useParams();
   const navigate = useNavigate();
   //state
 
   // api
 
-  const {
-    data: gradeStudentListData,
-    isLoading: isGradeStudentListLoading,
-    // refetch,
-  } = useQuery(['gradeStudentListData', classId], () => getGradeOfStudent(classId));
+  const { data: gradeStudentListData, isLoading: isGradeStudentListLoading } = useQuery(
+    ['gradeStudentListData', classId],
+    () => getGradeOfStudent(classId, userId)
+  );
   const gradeStudentList = useMemo(
     () => gradeStudentListData?.data?.result,
     [gradeStudentListData]
   );
-
-  //form
-  // const {
-  //   control,
-  //   setValue,
-  //   handleSubmit,
-  //   reset,
-  //   formState: { errors },
-  // } = useForm();
 
   function formatHeader() {
     return (
       <div className='flex align-items-center justify-content-between'>
         <div className='text-xl'>Grade List</div>
         <div className='card'>
-          <div>{gradeStudentList?.studentDetails?.total}</div>
-          {/* <Tooltip target='.add-grade-composition' className='text-sm' />
-          <Button
-            className='add-grade-composition'
-            icon='pi pi-download'
-            data-pr-tooltip='Download file full grade'
-          /> */}
+          <div>{gradeStudentList?.studentDetails?.fullname}</div>
+          <div>{gradeStudentList?.total}</div>
         </div>
       </div>
     );
@@ -55,8 +39,8 @@ export default function GradeListStudent() {
   function formatActions() {
     return (
       <div className='card flex flex-wrap justify-content-center gap-3'>
-        <Button icon='pi pi-pencil' severity='warning' />
-        <Button icon='pi pi-trash' severity='danger' />
+        <Button icon='pi pi-pencil' severity='warning' disabled />
+        <Button icon='pi pi-trash' severity='danger' disabled />
       </div>
     );
   }
@@ -66,9 +50,11 @@ export default function GradeListStudent() {
       <>
         <div
           className='grade cursor-pointer'
-          data-pr-tooltip='Edit grade'
+          data-pr-tooltip='View detail'
           onClick={() => navigate(`/course/${classId}/grade-student/grade/${value.gradeId}`)}
-        ></div>
+        >
+          {value.grade}
+        </div>
         <Tooltip target='.grade' className='text-sm' />
       </>
     );
@@ -86,17 +72,12 @@ export default function GradeListStudent() {
       <div className='mt-2'>
         <DataTable
           header={formatHeader}
-          value={gradeStudentList?.gradeCompositions || []}
+          value={gradeStudentList?.gradeComposition || []}
           showGridlines
           stripedRows
           style={{ maxWidth: '50rem' }}
         >
-          <Column
-            field=''
-            header='Grade composition'
-            style={{ maxWidth: '3rem' }}
-            bodyClassName='text-center'
-          />
+          <Column field='name' header='Grade composition' style={{ maxWidth: '2rem' }} />
           <Column
             body={(value) => formatGrade(value)}
             header='Grade'

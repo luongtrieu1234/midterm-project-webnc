@@ -13,6 +13,7 @@ import GradePage from './GradePage';
 import TestPage from './TestPage';
 import HomePageAdminPage from './HomePageAdmin';
 import GradeStudentPage from './GradeStudentPage';
+import GradeStudentDetailPage from './GradeStudentDetailPage';
 export {
   HomePage,
   LandingPage,
@@ -27,6 +28,7 @@ export {
   ClassDetailPage,
   GradePage,
   GradeStudentPage,
+  GradeStudentDetailPage,
   TestPage,
   HomePageAdminPage,
 };
