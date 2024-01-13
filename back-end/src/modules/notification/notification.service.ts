@@ -51,14 +51,19 @@ export class NotificationService {
     private readonly notificationModel: Model<NotificationModel>,
   ) {}
 
-  async notifyStudentsGradeCompositionFinalized(gradeCompositionId: string, students: string[]) {
-    const message = 'A grade composition has been finalized';
+  async notifyStudentsGradeCompositionFinalized(
+    gradeCompositionId: string,
+    students: string[],
+    currentPath: string,
+  ) {
+    const message = `A grade composition has been finalized `;
     students.forEach(async (student) => {
       const notification = {
         type: NotificationType.TEACHER_FINALIZES_GRADE,
         recipient: student,
         relatedGradeComposition: gradeCompositionId,
         message,
+        currentPath,
       };
       await this.notificationModel.create(notification);
     });
@@ -68,13 +73,14 @@ export class NotificationService {
     };
   }
 
-  async notifyStudentGradeReviewReply(studentId: string, gradeId: string) {
-    const message = 'Your grade review request has been replied';
+  async notifyStudentGradeReviewReply(studentId: string, gradeId: string, currentPath: string) {
+    const message = `Your grade review request has been replied`;
     const notification = {
       type: NotificationType.TEACHER_REPLIES_TO_REVIEW,
       recipient: studentId,
       relatedGrade: gradeId,
       message,
+      currentPath,
     };
     await this.notificationModel.create(notification);
     return {
@@ -94,7 +100,7 @@ export class NotificationService {
     await this.notificationModel.create(notification);
   }
 
-  async notifyTeachersGradeReviewRequest(gradeId: string, teachers: string[]) {
+  async notifyTeachersGradeReviewRequest(gradeId: string, teachers: string[], currentPath: string) {
     const message = 'A student has requested a review for a grade composition';
     // const grade = await this.gradeModel.findById(gradeId).populate('class').exec();
     // const gradeCompositionDocument = await this.gradeCompositionModel
@@ -108,6 +114,7 @@ export class NotificationService {
         // relatedClass: gradeId,
         relatedGrade: gradeId,
         message,
+        currentPath,
       };
       await this.notificationModel.create(notification);
     });

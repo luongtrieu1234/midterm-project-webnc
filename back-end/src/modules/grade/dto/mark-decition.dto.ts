@@ -9,4 +9,6 @@ export class MarkDecisionDto {
   @ApiProperty({ required: true })
   @IsNotEmpty()
   readonly updatedGrade: number;
+
+  currentPath: string;
 }

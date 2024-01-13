@@ -14,4 +14,6 @@ export class ReviewRequestDto {
   @ApiProperty({ required: true })
   @IsNotEmpty()
   readonly expectedGrade: number;
+
+  currentPath: string;
 }
