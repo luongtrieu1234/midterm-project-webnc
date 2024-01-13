@@ -56,8 +56,8 @@ export class GradeService {
     private readonly gradeModel: Model<GradeModel>,
     @InjectModel('Comment')
     private readonly commentModel: Model<CommentModel>, // @InjectModel('User')
-    // private readonly userModel: Model<UserModel>,
-  ) {}
+  ) // private readonly userModel: Model<UserModel>,
+  {}
   async showGradeStructure(classId: string) {
     try {
       // const classDocument = await this.classModel
@@ -724,6 +724,7 @@ export class GradeService {
           // gradeData.push(gradeDocument);
           let gradeData = { name: a?.name };
           gradeData['grade'] = gradeDocument?.value;
+          gradeData['gradeId'] = gradeDocument?.id;
           console.log('value ', gradeDocument?.value ?? null);
           // studentData['grade'] = gradeDocument;
           // gradeCompositionData.push(gradeData);
