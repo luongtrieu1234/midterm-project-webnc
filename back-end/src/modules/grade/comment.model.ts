@@ -15,4 +15,4 @@ export interface CommentModel {
   date: Date;
 }
 
-export const Comment = mongoose.model<CommentModel>('Comment', CommentSchema);
+export const CommentModel = mongoose.model<CommentModel>('Comment', CommentSchema);
