@@ -18,7 +18,6 @@ const ClassDetail = () => {
   const { id } = useParams();
   const [course, setCourse] = useState(null);
   const [link, setLink] = useState(null);
-  console.log('link: ', link);
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('Infor Class');
   const [visibleAddTeacherDialog, setVisibleAddTeacherDialog] = useState(false);

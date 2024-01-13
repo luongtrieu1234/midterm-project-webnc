@@ -24,6 +24,7 @@ export const GRADE = {
   GET_READ_FILE: '/grade/read-file',
   GET_CLASS_GRADES: '/grade/class-grades',
   POST_ADD_GRADE: '/grade/add-grade',
-  POST_UPDATE_GRADE: 'grade/update-grade',
-  POST_SET_FINAL: '/grade/set-final',
+  POST_UPDATE_GRADE: '/grade/update-grade',
+  POST_MARK_GRADE_COMPOSITION_FINAL: '/grade/mark-grade-composition-final',
+  GET_GRADE_OF_STUDENT: '/grade/grade-of-student',
 };

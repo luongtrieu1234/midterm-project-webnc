@@ -10,7 +10,9 @@ import {
   deleteGradeComposition,
   getExcelTemplateGrade,
   getGradeStructure,
+  markGradeCompositionFinal,
   updateGradeComposition,
+  uploadFileGrade,
 } from 'apis/grade.api';
 import { TOAST } from 'constant';
 import { toast } from 'layout';
@@ -20,6 +22,8 @@ import { useParams } from 'react-router-dom';
 import { footerComfirm, handleDownloadError, handleDownloadSuccess } from 'utils/func';
 import UpdateGradeCompositionDialog from './UpdateGradeCompositionDialog';
 import DeleteGradeCompositionDialog from './DeleteGradeCompositionDialog';
+import AddFileGradeCompositionDialog from './AddFileGradeCompositionDialog';
+import { Loading } from 'components';
 
 export default function GradeStructureTable() {
   const { classId } = useParams();
@@ -30,6 +34,8 @@ export default function GradeStructureTable() {
     useState(false);
   const [visibleDeleteGradeCompositionDialog, setVisibleDeleteGradeCompositionDialog] =
     useState(false);
+  const [visibleAddFileGradeCompositionDialog, setVisibleAddFileGradeCompositionDialog] =
+    useState(false);
 
   // query
   const { mutate: addGradeCompositionMutate, isLoading: isAddGradeCompositionLoading } =
@@ -38,9 +44,14 @@ export default function GradeStructureTable() {
     useMutation(updateGradeComposition);
   const { mutate: deleteGradeCompositionMutate, isLoading: isDeleteGradeCompositionLoading } =
     useMutation(deleteGradeComposition);
-  // eslint-disable-next-line no-unused-vars
-  const { mutate: getExcelTemplateGradeMutate, isLoading: isGetExcelTemplateGradeLoading } =
-    useMutation(getExcelTemplateGrade);
+  const {
+    mutate: getExcelTemplateGradeCompositionMutate,
+    isLoading: isGetExcelTemplateGradeCompositionLoading,
+  } = useMutation(getExcelTemplateGrade);
+  const { mutate: addFileGradeCompositionMutate, isLoading: isAddFileGradeCompositionLoading } =
+    useMutation(uploadFileGrade);
+  const { mutate: markGradeCompositionFinalMutate, isLoading: isMarkGradeCompositionFinalLoading } =
+    useMutation(markGradeCompositionFinal);
   const {
     data: gradeStructureData,
     isLoading: isGradeStructureLoading,
@@ -127,11 +138,43 @@ export default function GradeStructureTable() {
       }
     );
   }
+  async function onAddFileGradeCompositionSubmit(data) {
+    const formData = new FormData();
+    formData.append('gradeCompositionId', data.gradeCompositionId);
+    formData.append('excelFile', data.excelFile);
+    addFileGradeCompositionMutate(formData, {
+      onSuccess() {
+        toast(TOAST.SUCCESS, 'Upload file grade composition successfully!');
+        reset();
+        refetch();
+        setVisibleAddFileGradeCompositionDialog(false);
+      },
+      onError() {
+        toast(TOAST.ERROR, 'Server error!');
+      },
+    });
+  }
+
   async function handleGetExcelTemplateGrade(gradeCompositionId) {
-    getExcelTemplateGradeMutate(gradeCompositionId, {
+    getExcelTemplateGradeCompositionMutate(gradeCompositionId, {
       onSuccess: (res) => handleDownloadSuccess(res),
       onError: handleDownloadError,
     });
+  }
+  async function handleMarkGradeCompositionFinal(gradeCompositionId) {
+    markGradeCompositionFinalMutate(
+      { gradeCompositionId },
+      {
+        onSuccess() {
+          toast(TOAST.SUCCESS, 'Mark grade composition finalize successfully!');
+          reset();
+          refetch();
+        },
+        onError() {
+          toast(TOAST.ERROR, 'Server error!');
+        },
+      }
+    );
   }
 
   function formatHeader() {
@@ -180,10 +223,27 @@ export default function GradeStructureTable() {
           className='action'
           icon='pi pi-download'
           severity='info'
-          data-pr-tooltip='Download template grade'
+          data-pr-tooltip='Download template grade composition'
+          data-pr-position='left'
           onClick={() => handleGetExcelTemplateGrade(value._id)}
         />
-        <Button className='action' icon='pi pi-check' data-pr-tooltip='Mark as finalized' />
+        <Button
+          className='action'
+          icon='pi pi-upload '
+          severity='info'
+          data-pr-tooltip='Upload file grade composition'
+          data-pr-position='left'
+          onClick={() => {
+            setValue('gradeCompositionId', value._id);
+            setVisibleAddFileGradeCompositionDialog(true);
+          }}
+        />
+        <Button
+          className='action'
+          icon='pi pi-check'
+          data-pr-tooltip='Mark as finalized'
+          onClick={() => handleMarkGradeCompositionFinal(value._id)}
+        />
         <Tooltip target='.action' className='text-sm' />
       </div>
     );
@@ -203,46 +263,62 @@ export default function GradeStructureTable() {
     handleSubmit: handleSubmit(onDeleteCompositionSubmit),
     isLoading: isDeleteGradeCompositionLoading,
   });
+  const footerComfirmAddFileGradeComposition = footerComfirm({
+    setVisible: setVisibleAddFileGradeCompositionDialog,
+    handleSubmit: handleSubmit(onAddFileGradeCompositionSubmit),
+    isLoading: isAddFileGradeCompositionLoading,
+  });
 
   return (
-    <div>
-      <div className='current-grade-structure mt-2'>
-        <DataTable
-          header={formatHeader}
-          value={gradeStructure}
-          loading={isGradeStructureLoading}
-          showGridlines
-          stripedRows
-          style={{ maxWidth: '70rem' }}
-        >
-          <Column rowReorder style={{ width: '1rem' }} />
-          <Column field='name' header='Name' sortable />
-          <Column field='content' header='Content' />
-          <Column field='gradeScale' header='Scale' sortable style={{ maxWidth: '2rem' }} />
-          <Column header='Actions' body={formatActions} style={{ maxWidth: '5rem' }} />
-        </DataTable>
+    <>
+      {isMarkGradeCompositionFinalLoading ||
+        (isGetExcelTemplateGradeCompositionLoading && <Loading />)}
+      <div>
+        <div className='current-grade-structure mt-2'>
+          <DataTable
+            header={formatHeader}
+            value={gradeStructure}
+            loading={isGradeStructureLoading}
+            showGridlines
+            stripedRows
+            style={{ maxWidth: '70rem' }}
+          >
+            <Column rowReorder style={{ width: '1rem' }} />
+            <Column field='name' header='Name' sortable />
+            <Column field='content' header='Content' />
+            <Column field='gradeScale' header='Scale' sortable style={{ maxWidth: '2rem' }} />
+            <Column header='Actions' body={formatActions} style={{ maxWidth: '6rem' }} />
+          </DataTable>
+        </div>
+        <AddGradeCompositionDialog
+          visible={visibleAddGradeCompositionDialog}
+          setVisible={setVisibleAddGradeCompositionDialog}
+          control={control}
+          errors={errors}
+          footer={footerComfirmAddGradeComposition}
+        />
+        <UpdateGradeCompositionDialog
+          visible={visibleUpdateGradeCompositionDialog}
+          setVisible={setVisibleUpdateGradeCompositionDialog}
+          control={control}
+          errors={errors}
+          footer={footerComfirmUpdateGradeComposition}
+        />
+        <DeleteGradeCompositionDialog
+          visible={visibleDeleteGradeCompositionDialog}
+          setVisible={setVisibleDeleteGradeCompositionDialog}
+          control={control}
+          errors={errors}
+          footer={footerComfirmDeleteGradeComposition}
+        />
+        <AddFileGradeCompositionDialog
+          visible={visibleAddFileGradeCompositionDialog}
+          setVisible={setVisibleAddFileGradeCompositionDialog}
+          control={control}
+          errors={errors}
+          footer={footerComfirmAddFileGradeComposition}
+        />
       </div>
-      <AddGradeCompositionDialog
-        visible={visibleAddGradeCompositionDialog}
-        setVisible={setVisibleAddGradeCompositionDialog}
-        control={control}
-        errors={errors}
-        footer={footerComfirmAddGradeComposition}
-      />
-      <UpdateGradeCompositionDialog
-        visible={visibleUpdateGradeCompositionDialog}
-        setVisible={setVisibleUpdateGradeCompositionDialog}
-        control={control}
-        errors={errors}
-        footer={footerComfirmUpdateGradeComposition}
-      />
-      <DeleteGradeCompositionDialog
-        visible={visibleDeleteGradeCompositionDialog}
-        setVisible={setVisibleDeleteGradeCompositionDialog}
-        control={control}
-        errors={errors}
-        footer={footerComfirmDeleteGradeComposition}
-      />
-    </div>
+    </>
   );
 }

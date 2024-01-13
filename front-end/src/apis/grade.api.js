@@ -27,17 +27,31 @@ export const getExcelTemplateGrade = (gradeCompositionId) =>
     responseType: 'blob',
   });
 
-export const exportFileGrade = (gradeCompositionId) =>
-  instance.get(GRADE.GET_EXCEL_TEMPLATE_GRADE, {
-    params: { gradeCompositionId: gradeCompositionId },
+export const exportFileGrade = (classId) =>
+  instance.get(GRADE.GET_EXPORT_FILE_GRADE, {
+    params: { classId: classId },
     responseType: 'blob',
   });
 
 export const postUploadFileList = (body = {}) => instance.post(GRADE.POST_UPLOAD_FILE_LIST, body);
+export const uploadFileGrade = (body = {}) => instance.post(GRADE.POST_UPLOAD_FILE_GRADE, body);
 
 export const getClassGrades = (classId) =>
   instance.get(GRADE.GET_CLASS_GRADES, {
     params: { classId: classId },
   });
+export const getGradeOfStudent = (classId, userId) =>
+  instance.get(GRADE.GET_GRADE_OF_STUDENT, {
+    params: { classId: classId, userId: userId },
+  });
 
 export const updateGrade = (body = {}) => instance.post(GRADE.POST_UPDATE_GRADE, body);
+
+export const markGradeCompositionFinal = (body = {}) =>
+  instance.post(
+    GRADE.POST_MARK_GRADE_COMPOSITION_FINAL,
+    {},
+    {
+      params: { gradeCompositionId: body.gradeCompositionId },
+    }
+  );
