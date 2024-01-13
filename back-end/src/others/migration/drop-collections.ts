@@ -13,6 +13,7 @@ async function runMigration() {
     await connection.db.dropCollection('gradecompositions');
     await connection.db.dropCollection('grades');
     await connection.db.dropCollection('comments');
+    await connection.db.dropCollection('notifications');
   } catch (error) {
     console.error('Migration error:', error);
   } finally {
