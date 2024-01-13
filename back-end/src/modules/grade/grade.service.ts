@@ -427,12 +427,13 @@ export class GradeService {
     };
   }
 
-  async readExcelFileGrade(buffer: Buffer, originalname: string) {
+  async readExcelFileGrade(buffer: Buffer, originalname: string, gradeCompositionId: string) {
     const parts = originalname.split('.');
     const nameWithoutExtension = parts.slice(0, -1).join('.');
     console.log(nameWithoutExtension);
     const gradeCompositionDocument = await this.gradeCompositionModel.findOne({
       name: nameWithoutExtension,
+      _id: gradeCompositionId,
     });
     console.log('gradeCompositionDocument ', gradeCompositionDocument);
     const workbook = new ExcelJS.Workbook();
@@ -486,6 +487,7 @@ export class GradeService {
         student: student._id.toString(),
       });
       if (currentGradeDocument) {
+        console.log('currentGradeDocument.value ', currentGradeDocument.value);
         currentGradeDocument.value = element.Grade;
         await currentGradeDocument.save();
         updatedGradeStudents.push({ student: element.StudentId, grade: element.Grade });
@@ -546,7 +548,7 @@ export class GradeService {
       const gradeCompositionDocuments = await classDocument.gradeComposition;
       const studentDocuments = await classDocument.students;
 
-      console.log('classDocument ', classDocument);
+      console.log('classDocument ', JSON.stringify(classDocument));
       console.log('gradeCompositionDocuments ', gradeCompositionDocuments);
       // console.log('studentDocuments ', studentDocuments);
       // const result = await this.classModel.aggregate([
@@ -714,6 +716,8 @@ export class GradeService {
             gradeComposition: gradeComposition['_id'].toString(),
             student: student.user['_id'].toString(),
           });
+          console.log(`gradeComposition['_id'].toString() `, gradeComposition['_id'].toString());
+          console.log(`student.user['_id'].toString() `, student.user['_id'].toString());
           // gradeData.push(gradeDocument);
           let gradeData = { name: a?.name };
           gradeData['grade'] = gradeDocument?.value;

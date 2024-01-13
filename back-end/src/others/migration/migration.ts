@@ -8,6 +8,7 @@ import { GradeCompositionModel } from '../../modules/grade/grade-composition.mod
 import { GradeModel } from '../../modules/grade/grade.model';
 import { config } from 'dotenv';
 import { GradeStructureModel } from '../../modules/grade/grade-structure.model';
+import { CommentModel } from '../../modules/grade/comment.model';
 config();
 async function runMigration() {
   try {
@@ -19,6 +20,7 @@ async function runMigration() {
     await GradeStructureModel.createCollection();
     await GradeCompositionModel.createCollection();
     await GradeModel.createCollection();
+    await CommentModel.createCollection();
 
     const hashedPassword1 = await bcrypt.hash('adminaccount', 12);
     const hashedPassword2 = await bcrypt.hash('teacher', 12);
@@ -55,7 +57,7 @@ async function runMigration() {
       },
     ];
     const createdUser = await UserModel.create(usersData);
-    console.log('Admin user created:', createdUser);
+    console.log('Users created:', createdUser);
     const student = await UserModel.findOne({ email: 'student@student.com' });
     const teacher = await UserModel.findOne({ email: 'teacher@teacher.com' });
     const classesData = [
@@ -75,7 +77,7 @@ async function runMigration() {
       },
     ];
     const createdClass = await ClassModel.create(classesData);
-    console.log('Admin user created:', createdClass);
+    console.log('Class created:', createdClass);
     const classDocument = await ClassModel.findOne({ name: 'Class 1' });
     const gradeCompositionData = [
       {
@@ -88,7 +90,27 @@ async function runMigration() {
       },
     ];
     const createdGradeComposition = await GradeCompositionModel.create(gradeCompositionData);
-    console.log('Admin user created:', createdGradeComposition);
+    console.log('Grade composition created:', createdGradeComposition);
+    const gradeCompositionDocument = await GradeCompositionModel.findOne({
+      name: 'Composition 1 Class 1',
+    });
+    classDocument.gradeComposition.push(gradeCompositionDocument._id.toString());
+    await classDocument.save();
+    const gradeData = [
+      {
+        value: 10,
+        name: 'Grade 1 Composition 1 Class 1',
+        gradeComposition: gradeCompositionDocument._id.toString(),
+        student: student._id.toString(),
+        class: classDocument._id.toString(),
+        requestReview: false,
+      },
+    ];
+    const createdGrade = await GradeModel.create(gradeData);
+    console.log('Grade created:', createdGrade);
+    const gradeDocument = await GradeModel.findOne({ name: 'Grade 1 Composition 1 Class 1' });
+    gradeCompositionDocument.grades.push(gradeDocument._id.toString());
+    await gradeCompositionDocument.save();
   } catch (error) {
     console.error('Migration error:', error);
   } finally {
