@@ -9,10 +9,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation } from 'react-query';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 export default function CommentList({ listComment, refetch }) {
+  console.log('listComment:', listComment);
   const { gradeId } = useParams();
+  const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
   const { mutate: postCommentMutate, isLoading: isPostCommentMutateLoading } =
@@ -44,8 +46,13 @@ export default function CommentList({ listComment, refetch }) {
   return (
     <div>
       <div style={{ height: '260px', overflowY: 'scroll' }}>
-        {listComment?.map(({ content, _id }) => (
-          <div key={_id}>
+        {listComment?.map(({ content, currentPath, _id }) => (
+          <div
+            key={_id}
+            onClick={() => {
+              navigate(currentPath);
+            }}
+          >
             <Card subTitle={content} className='mt-1 border-1 surface-border' />
           </div>
         ))}
