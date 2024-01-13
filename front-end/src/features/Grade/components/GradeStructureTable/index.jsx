@@ -135,8 +135,9 @@ export default function GradeStructureTable() {
       }
     );
   }
-  async function onUploadFileGradeCompositionSubmit(data) {
+  async function onAddFileGradeCompositionSubmit(data) {
     const formData = new FormData();
+    formData.append('gradeCompositionId', data.gradeCompositionId);
     formData.append('excelFile', data.excelFile);
     addFileGradeCompositionMutate(formData, {
       onSuccess() {
@@ -217,7 +218,10 @@ export default function GradeStructureTable() {
           severity='info'
           data-pr-tooltip='Upload file grade composition'
           data-pr-position='left'
-          onClick={() => setVisibleAddFileGradeCompositionDialog(true)}
+          onClick={() => {
+            setValue('gradeCompositionId', value._id);
+            setVisibleAddFileGradeCompositionDialog(true);
+          }}
         />
         <Button className='action' icon='pi pi-check' data-pr-tooltip='Mark as finalized' />
         <Tooltip target='.action' className='text-sm' />
@@ -241,7 +245,7 @@ export default function GradeStructureTable() {
   });
   const footerComfirmAddFileGradeComposition = footerComfirm({
     setVisible: setVisibleAddFileGradeCompositionDialog,
-    handleSubmit: handleSubmit(onUploadFileGradeCompositionSubmit),
+    handleSubmit: handleSubmit(onAddFileGradeCompositionSubmit),
     isLoading: isAddFileGradeCompositionLoading,
   });
 
