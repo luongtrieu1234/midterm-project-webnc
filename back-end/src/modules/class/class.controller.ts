@@ -196,6 +196,7 @@ export class ClassController {
 
   @Post('confirm-class-code')
   @HttpCode(200)
+  @UseGuards(AuthGuardCustom)
   async confirmClassCode(@Body() dto: ConfirmClassCodeDto, @Req() req, @Res() res: Response) {
     await this.classService.confirmClassCode(dto, req.user.email);
     const urlJoinClass = `${process.env.CLIENT_URL}/home-page`;
