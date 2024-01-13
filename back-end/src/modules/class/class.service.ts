@@ -44,8 +44,8 @@ export class ClassService {
     private readonly classModel: Model<ClassModel>,
     @InjectModel('Role')
     private readonly roleModel: Model<RoleModel>, // @InjectModel('Grade')
-    // @InjectModel('GradeStructure')
-  ) // private readonly gradeModel: Model<GradeModel>,
+    // private readonly gradeModel: Model<GradeModel>,
+  ) // @InjectModel('GradeStructure')
   // private readonly gradeStructureModel: Model<GradeStructureModel>,
   {}
 
@@ -435,7 +435,7 @@ export class ClassService {
 
   async confirmClassCode(dto: ConfirmClassCodeDto, email: string) {
     const classCode = dto.code;
-    const classDocument = await this.classModel.findById(dto.classId);
+    const classDocument = await this.classModel.findOne({ classCode: classCode });
     if (!classDocument) {
       throw new BadRequestException('Class not found');
     }
