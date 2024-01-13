@@ -4,6 +4,7 @@ export const USER = {
   ME: '/users/me',
   UPDATE: '/users/update',
   LOGIN_FACEBOOK: '/users/facebook',
+  GET_LIST_NOTIFICATIONS: '/users/list-notifications',
 };
 
 export const CLASS = {
@@ -29,4 +30,5 @@ export const GRADE = {
   GET_GRADE_OF_STUDENT: '/grade/grade-of-student',
   GET_GRADE_COMPOSITION_DETAIL_BY_ID: '/grade/grade-composition-detail-by-id',
   POST_COMMENT: '/grade/comment',
+  POST_REVIEW_REQUEST: '/grade/review-request',
 };

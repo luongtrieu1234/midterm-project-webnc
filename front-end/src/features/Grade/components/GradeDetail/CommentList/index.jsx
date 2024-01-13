@@ -9,11 +9,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation } from 'react-query';
-import { useParams } from 'react-router';
+import { useLocation, useParams } from 'react-router-dom';
 
 export default function CommentList({ listComment, refetch }) {
   const { gradeId } = useParams();
-
+  const location = useLocation();
+  const currentPath = location.pathname;
   const { mutate: postCommentMutate, isLoading: isPostCommentMutateLoading } =
     useMutation(postComment);
 
@@ -27,7 +28,7 @@ export default function CommentList({ listComment, refetch }) {
   } = useForm({ defaultValues: { content: '' } });
   async function onSubmit(data) {
     postCommentMutate(
-      { gradeId, content: data.content },
+      { gradeId, content: data.content, currentPath: currentPath },
       {
         onSuccess() {
           toast(TOAST.SUCCESS, 'Post comment Successfully!');

@@ -13,7 +13,7 @@ export default function Header() {
     { id: 'about', label: 'About', to: '/' },
     { id: 'course', label: 'Course', to: '/' },
     { id: 'blog', label: 'Blog', to: '/' },
-    { id: 'contact', label: 'Contact', to: '/' },
+    { id: 'notification', label: 'Notification', to: '/notification' },
   ];
   return (
     <>

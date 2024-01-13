@@ -18,7 +18,7 @@ import { TOAST } from 'constant';
 import { toast } from 'layout';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery } from 'react-query';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { footerComfirm, handleDownloadError, handleDownloadSuccess } from 'utils/func';
 import UpdateGradeCompositionDialog from './UpdateGradeCompositionDialog';
 import DeleteGradeCompositionDialog from './DeleteGradeCompositionDialog';
@@ -27,7 +27,8 @@ import { Loading } from 'components';
 
 export default function GradeStructureTable() {
   const { classId } = useParams();
-
+  const location = useLocation();
+  const currentPath = location.pathname;
   // state
   const [visibleAddGradeCompositionDialog, setVisibleAddGradeCompositionDialog] = useState(false);
   const [visibleUpdateGradeCompositionDialog, setVisibleUpdateGradeCompositionDialog] =
@@ -163,7 +164,7 @@ export default function GradeStructureTable() {
   }
   async function handleMarkGradeCompositionFinal(gradeCompositionId) {
     markGradeCompositionFinalMutate(
-      { gradeCompositionId },
+      { gradeCompositionId: gradeCompositionId, currentPath: currentPath },
       {
         onSuccess() {
           toast(TOAST.SUCCESS, 'Mark grade composition finalize successfully!');

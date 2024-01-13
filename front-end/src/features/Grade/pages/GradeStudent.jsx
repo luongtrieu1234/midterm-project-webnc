@@ -16,7 +16,7 @@ const GradeStudent = () => {
   }, [activeTab]);
   const items = [
     {
-      label: 'Grade List Student',
+      label: 'Grade List Of Student',
       icon: 'pi pi-fw pi-sitemap',
       command: () => {
         setActiveTab(GRADE_PAGE_STUDENT_TAB_ENUM.GRADE_LIST_STUDENT);

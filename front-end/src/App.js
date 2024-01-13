@@ -18,6 +18,7 @@ import {
   HomePageAdminPage,
   GradeStudentPage,
   GradeStudentDetailPage,
+  NotificationPage,
 } from './pages';
 import { PageError, Loading, NotLogged } from './components';
 
@@ -54,6 +55,7 @@ function App() {
         path='/course/:classId/grade-student/grade/:gradeId'
         element={<GradeStudentDetailPage />}
       />
+      <Route path='/notification' element={<NotificationPage />} />
       {!token && <Route path='/home-page' element={<NotLogged />} />}
       <Route path='*' element={<PageError />} />
 

@@ -14,6 +14,7 @@ import TestPage from './TestPage';
 import HomePageAdminPage from './HomePageAdmin';
 import GradeStudentPage from './GradeStudentPage';
 import GradeStudentDetailPage from './GradeStudentDetailPage';
+import NotificationPage from './NotificationPage';
 export {
   HomePage,
   LandingPage,
@@ -31,4 +32,5 @@ export {
   GradeStudentDetailPage,
   TestPage,
   HomePageAdminPage,
+  NotificationPage,
 };

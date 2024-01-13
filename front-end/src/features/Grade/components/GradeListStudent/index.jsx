@@ -5,16 +5,24 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Tooltip } from 'primereact/tooltip';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery } from 'react-query';
-import { getGradeOfStudent } from 'apis/grade.api';
+import { useMutation, useQuery } from 'react-query';
+import { getGradeOfStudent, postReviewRequest } from 'apis/grade.api';
 import { Loading } from 'components';
+import { useForm } from 'react-hook-form';
+import { toast } from 'layout';
+import { TOAST } from 'constant';
+import AddReviewRequestDialog from './AddReviewRequestDialog';
+import { footerComfirm } from 'utils/func';
 
 export default function GradeListStudent() {
   const { classId, userId } = useParams();
   const navigate = useNavigate();
   //state
+  const [visibleReviewRequestDialog, setVisibleReviewRequestDialog] = useState(false);
 
   // api
+  const { mutate: reviewRequestMutate, isLoading: isReviewRequestLoading } =
+    useMutation(postReviewRequest);
 
   const { data: gradeStudentListData, isLoading: isGradeStudentListLoading } = useQuery(
     ['gradeStudentListData', classId],
@@ -25,22 +33,42 @@ export default function GradeListStudent() {
     [gradeStudentListData]
   );
 
+  //form
+  const {
+    control,
+    setValue,
+    reset,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
   function formatHeader() {
     return (
       <div className='flex align-items-center justify-content-between'>
-        <div className='text-xl'>Grade List</div>
+        <div className='text-xl'>Grade List Of Student</div>
         <div className='card'>
           <div>{gradeStudentList?.studentDetails?.fullname}</div>
-          <div>{gradeStudentList?.total}</div>
+          <div>Total:{gradeStudentList?.total}</div>
         </div>
       </div>
     );
   }
-  function formatActions() {
+  function formatActions(value) {
+    console.log('value:', value);
     return (
       <div className='card flex flex-wrap justify-content-center gap-3'>
-        <Button icon='pi pi-pencil' severity='warning' disabled />
-        <Button icon='pi pi-trash' severity='danger' disabled />
+        <Button
+          className='action'
+          icon='pi pi-plus'
+          data-pr-tooltip='Add review request'
+          onClick={() => {
+            setValue('gradeId', value?.gradeId);
+            setValue('fullName', gradeStudentList?.studentDetails?.fullname);
+            setValue('gradeCompositionName', value?.name);
+            setVisibleReviewRequestDialog(true);
+          }}
+        />
+        <Tooltip target='.action' className='text-sm' />
       </div>
     );
   }
@@ -61,9 +89,28 @@ export default function GradeListStudent() {
   }
 
   // handle call api
+  async function onReviewRequest(data) {
+    reviewRequestMutate(
+      { gradeId: data.gradeId, explanation: data.explanation, expectedGrade: data.expectedGrade },
+      {
+        onSuccess() {
+          toast(TOAST.SUCCESS, 'Update Grade Successfully!');
+          reset();
 
+          setVisibleReviewRequestDialog(false);
+        },
+        onError() {
+          toast(TOAST.ERROR, 'Update GradeError!');
+        },
+      }
+    );
+  }
   //end call api
-
+  const footerComfirmAddReviewRequest = footerComfirm({
+    setVisible: setVisibleReviewRequestDialog,
+    handleSubmit: handleSubmit(onReviewRequest),
+    isLoading: isReviewRequestLoading,
+  });
   // before render
 
   return (
@@ -84,9 +131,16 @@ export default function GradeListStudent() {
             style={{ maxWidth: '2rem' }}
             bodyClassName='text-center'
           />
-          <Column header='Actions' style={{ maxWidth: '4rem' }} body={formatActions} />
+          <Column header='Actions' style={{ maxWidth: '2rem' }} body={formatActions} />
         </DataTable>
       </div>
+      <AddReviewRequestDialog
+        visible={visibleReviewRequestDialog}
+        setVisible={setVisibleReviewRequestDialog}
+        control={control}
+        errors={errors}
+        footer={footerComfirmAddReviewRequest}
+      />
     </div>
   );
 }

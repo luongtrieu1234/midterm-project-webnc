@@ -72,13 +72,6 @@ const ClassDetail = () => {
         setActiveTab('Classwork');
       },
     },
-    {
-      label: 'Grade Structure',
-      icon: 'pi pi-fw pi-sitemap',
-      command: () => {
-        setActiveTab('GradeStructure');
-      },
-    },
   ];
 
   useEffect(() => {

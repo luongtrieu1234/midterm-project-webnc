@@ -62,3 +62,4 @@ export const getGradeCompositionDetailById = (gradeId) =>
   });
 
 export const postComment = (body = {}) => instance.post(GRADE.POST_COMMENT, body);
+export const postReviewRequest = (body = {}) => instance.post(GRADE.POST_REVIEW_REQUEST, body);

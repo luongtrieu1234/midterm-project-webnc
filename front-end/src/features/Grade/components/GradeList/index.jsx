@@ -87,11 +87,12 @@ export default function GradeList() {
     return (
       <div className='card flex flex-wrap justify-content-center gap-3'>
         <Button
-          icon='pi pi-pencil'
-          severity='warning'
+          className='action'
+          data-pr-tooltip='View grades of a student'
+          icon='pi pi-eye'
           onClick={() => navigate(`/course/${classId}/grade-student/${value.studentDetails._id}`)}
         />
-        <Button icon='pi pi-trash' severity='danger' />
+        <Tooltip target='.action' className='text-sm' />
       </div>
     );
   }
