@@ -9,6 +9,7 @@ import { GradeModel } from '../../modules/grade/grade.model';
 import { config } from 'dotenv';
 import { GradeStructureModel } from '../../modules/grade/grade-structure.model';
 import { CommentModel } from '../../modules/grade/comment.model';
+import { NotificationModel } from '../../modules/notification/notification.model';
 config();
 async function runMigration() {
   try {
@@ -21,6 +22,7 @@ async function runMigration() {
     await GradeCompositionModel.createCollection();
     await GradeModel.createCollection();
     await CommentModel.createCollection();
+    await NotificationModel.createCollection();
 
     const hashedPassword1 = await bcrypt.hash('adminaccount', 12);
     const hashedPassword2 = await bcrypt.hash('teacher', 12);
@@ -64,6 +66,7 @@ async function runMigration() {
       {
         name: 'Class 1',
         code: '123456',
+        owner: teacher._id.toString(),
         students: [
           {
             user: student._id.toString(),

@@ -56,8 +56,8 @@ export class GradeService {
     private readonly gradeModel: Model<GradeModel>,
     @InjectModel('Comment')
     private readonly commentModel: Model<CommentModel>, // @InjectModel('User')
-  ) // private readonly userModel: Model<UserModel>,
-  {}
+    // private readonly userModel: Model<UserModel>,
+  ) {}
   async showGradeStructure(classId: string) {
     try {
       // const classDocument = await this.classModel
@@ -264,6 +264,7 @@ export class GradeService {
       { header: 'No', key: 'no' },
       { header: 'StudentId', key: 'studentId' },
       { header: 'Name', key: 'name' },
+      // { header: 'Total', key: 'total' },
     ];
     for (let i = 0; i < Object.keys(classData?.result?.[0]?.gradeComposition).length; i++) {
       columnData.push({
@@ -275,11 +276,11 @@ export class GradeService {
       'classData?.result?.[0]?.gradeComposition ',
       classData?.result?.[0]?.gradeComposition,
     );
-    worksheet.columns = columnData;
     let columns = [...columnData];
     columns.shift();
     columns.shift();
     columns.shift();
+    // columns.shift();
     console.log('columnData ', columnData);
     console.log('columns ', columns);
     let data = [
@@ -320,6 +321,8 @@ export class GradeService {
     await Promise.all(promises);
     // console.log('mapData ', mapData);
     console.log('data ', data);
+    columnData.push({ header: 'Total', key: 'total' });
+    worksheet.columns = columnData;
 
     data.forEach((val, i, _) => {
       worksheet.addRow(val);
