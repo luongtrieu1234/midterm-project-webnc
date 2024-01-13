@@ -26,8 +26,8 @@ export const ClassSchema = new mongoose.Schema({
   classCode: { type: String },
   active: { type: Boolean, default: true },
   description: { type: String, default: '' },
-  deletedAt: { type: Date, default: null }, // Set default value for deletedAt
-  createdAt: { type: Date, default: Date.now }, // Set default value for createdAt to the current date and time
+  deletedAt: { type: Date, default: null },
+  createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 
