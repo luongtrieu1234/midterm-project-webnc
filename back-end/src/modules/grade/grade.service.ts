@@ -1244,6 +1244,7 @@ export class GradeService {
         await this.notificationService.notifyTeacherStudentGradeReviewReply(
           teacherId,
           currentGradeDocument._id.toString(),
+          commentDto.currentPath,
         );
       });
     }
@@ -1272,6 +1273,7 @@ export class GradeService {
     await this.notificationService.notifyStudentFinalMarkReviewDecision(
       student._id.toString(),
       updatedGradeDocument._id.toString(),
+      markDecisionDto.currentPath,
     );
     return {
       message: 'Success',
