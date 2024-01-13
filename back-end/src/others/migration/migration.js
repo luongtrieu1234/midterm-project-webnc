@@ -47,6 +47,7 @@ var grade_model_1 = require("../../modules/grade/grade.model");
 var dotenv_1 = require("dotenv");
 var grade_structure_model_1 = require("../../modules/grade/grade-structure.model");
 var comment_model_1 = require("../../modules/grade/comment.model");
+var notification_model_1 = require("../../modules/notification/notification.model");
 (0, dotenv_1.config)();
 function runMigration() {
     return __awaiter(this, void 0, void 0, function () {
@@ -54,7 +55,7 @@ function runMigration() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 24, 25, 27]);
+                    _a.trys.push([0, 25, 26, 28]);
                     console.log('Connecting to database...', process.env.DATABASE_URL, process.env.DATABASE_NAME);
                     return [4 /*yield*/, (0, mongoose_1.connect)("".concat(process.env.DATABASE_URL, "/").concat(process.env.DATABASE_NAME))];
                 case 1:
@@ -80,17 +81,20 @@ function runMigration() {
                     return [4 /*yield*/, comment_model_1.CommentModel.createCollection()];
                 case 8:
                     _a.sent();
-                    return [4 /*yield*/, bcrypt.hash('adminaccount', 12)];
+                    return [4 /*yield*/, notification_model_1.NotificationModel.createCollection()];
                 case 9:
+                    _a.sent();
+                    return [4 /*yield*/, bcrypt.hash('adminaccount', 12)];
+                case 10:
                     hashedPassword1 = _a.sent();
                     return [4 /*yield*/, bcrypt.hash('teacher', 12)];
-                case 10:
+                case 11:
                     hashedPassword2 = _a.sent();
                     return [4 /*yield*/, bcrypt.hash('student', 12)];
-                case 11:
+                case 12:
                     hashedPassword3 = _a.sent();
                     return [4 /*yield*/, bcrypt.hash('useraccount', 12)];
-                case 12:
+                case 13:
                     hashedPassword4 = _a.sent();
                     usersData = [
                         {
@@ -123,14 +127,14 @@ function runMigration() {
                         },
                     ];
                     return [4 /*yield*/, users_model_1.UserModel.create(usersData)];
-                case 13:
+                case 14:
                     createdUser = _a.sent();
                     console.log('Users created:', createdUser);
                     return [4 /*yield*/, users_model_1.UserModel.findOne({ email: 'student@student.com' })];
-                case 14:
+                case 15:
                     student = _a.sent();
                     return [4 /*yield*/, users_model_1.UserModel.findOne({ email: 'teacher@teacher.com' })];
-                case 15:
+                case 16:
                     teacher = _a.sent();
                     classesData = [
                         {
@@ -149,11 +153,11 @@ function runMigration() {
                         },
                     ];
                     return [4 /*yield*/, class_model_1.ClassModel.create(classesData)];
-                case 16:
+                case 17:
                     createdClass = _a.sent();
                     console.log('Class created:', createdClass);
                     return [4 /*yield*/, class_model_1.ClassModel.findOne({ name: 'Class 1' })];
-                case 17:
+                case 18:
                     classDocument = _a.sent();
                     gradeCompositionData = [
                         {
@@ -166,17 +170,17 @@ function runMigration() {
                         },
                     ];
                     return [4 /*yield*/, grade_composition_model_1.GradeCompositionModel.create(gradeCompositionData)];
-                case 18:
+                case 19:
                     createdGradeComposition = _a.sent();
                     console.log('Grade composition created:', createdGradeComposition);
                     return [4 /*yield*/, grade_composition_model_1.GradeCompositionModel.findOne({
                             name: 'Composition 1 Class 1',
                         })];
-                case 19:
+                case 20:
                     gradeCompositionDocument = _a.sent();
                     classDocument.gradeComposition.push(gradeCompositionDocument._id.toString());
                     return [4 /*yield*/, classDocument.save()];
-                case 20:
+                case 21:
                     _a.sent();
                     gradeData = [
                         {
@@ -189,29 +193,29 @@ function runMigration() {
                         },
                     ];
                     return [4 /*yield*/, grade_model_1.GradeModel.create(gradeData)];
-                case 21:
+                case 22:
                     createdGrade = _a.sent();
                     console.log('Grade created:', createdGrade);
                     return [4 /*yield*/, grade_model_1.GradeModel.findOne({ name: 'Grade 1 Composition 1 Class 1' })];
-                case 22:
+                case 23:
                     gradeDocument = _a.sent();
                     gradeCompositionDocument.grades.push(gradeDocument._id.toString());
                     return [4 /*yield*/, gradeCompositionDocument.save()];
-                case 23:
-                    _a.sent();
-                    return [3 /*break*/, 27];
                 case 24:
+                    _a.sent();
+                    return [3 /*break*/, 28];
+                case 25:
                     error_1 = _a.sent();
                     console.error('Migration error:', error_1);
-                    return [3 /*break*/, 27];
-                case 25:
+                    return [3 /*break*/, 28];
+                case 26:
                     // Close the connection
                     console.log('Closing connection...');
                     return [4 /*yield*/, mongoose_1.connection.close()];
-                case 26:
+                case 27:
                     _a.sent();
                     return [7 /*endfinally*/];
-                case 27: return [2 /*return*/];
+                case 28: return [2 /*return*/];
             }
         });
     });
