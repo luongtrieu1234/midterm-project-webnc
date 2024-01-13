@@ -27,4 +27,5 @@ export const GRADE = {
   POST_UPDATE_GRADE: '/grade/update-grade',
   POST_MARK_GRADE_COMPOSITION_FINAL: '/grade/mark-grade-composition-final',
   GET_GRADE_OF_STUDENT: '/grade/grade-of-student',
+  GET_GRADE_COMPOSITION_DETAIL_BY_ID: '/grade/grade-composition-detail-by-id',
 };

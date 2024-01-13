@@ -55,3 +55,8 @@ export const markGradeCompositionFinal = (body = {}) =>
       params: { gradeCompositionId: body.gradeCompositionId },
     }
   );
+
+export const getGradeCompositionDetailById = (gradeId) =>
+  instance.get(GRADE.GET_GRADE_COMPOSITION_DETAIL_BY_ID, {
+    params: { gradeId: gradeId },
+  });
