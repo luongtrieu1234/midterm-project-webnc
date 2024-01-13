@@ -46,7 +46,7 @@ function runMigration() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 9, 10, 12]);
+                    _a.trys.push([0, 10, 11, 13]);
                     return [4 /*yield*/, (0, mongoose_1.connect)("".concat(process.env.DATABASE_URL, "/").concat(process.env.DATABASE_NAME))];
                 case 1:
                     _a.sent();
@@ -71,19 +71,22 @@ function runMigration() {
                     return [4 /*yield*/, mongoose_1.connection.db.dropCollection('comments')];
                 case 8:
                     _a.sent();
-                    return [3 /*break*/, 12];
+                    return [4 /*yield*/, mongoose_1.connection.db.dropCollection('notifications')];
                 case 9:
+                    _a.sent();
+                    return [3 /*break*/, 13];
+                case 10:
                     error_1 = _a.sent();
                     console.error('Migration error:', error_1);
-                    return [3 /*break*/, 12];
-                case 10:
+                    return [3 /*break*/, 13];
+                case 11:
                     // Close the connection
                     console.log('Closing connection...');
                     return [4 /*yield*/, mongoose_1.connection.close()];
-                case 11:
+                case 12:
                     _a.sent();
                     return [7 /*endfinally*/];
-                case 12: return [2 /*return*/];
+                case 13: return [2 /*return*/];
             }
         });
     });

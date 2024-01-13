@@ -55,8 +55,8 @@ export class GradeService {
     private readonly gradeModel: Model<GradeModel>,
     @InjectModel('Comment')
     private readonly commentModel: Model<CommentModel>, // @InjectModel('User')
-    // private readonly userModel: Model<UserModel>,
-  ) {}
+  ) // private readonly userModel: Model<UserModel>,
+  {}
   async showGradeStructure(classId: string) {
     try {
       // const classDocument = await this.classModel
@@ -438,6 +438,7 @@ export class GradeService {
       _id: gradeCompositionId,
     });
     console.log('gradeCompositionDocument ', gradeCompositionDocument);
+    const classDocument = await this.classModel.findOne({ gradeComposition: gradeCompositionId });
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(buffer);
 
@@ -499,6 +500,7 @@ export class GradeService {
         value: element.Grade,
         gradeComposition: gradeCompositionDocument._id.toString(),
         student: student._id.toString(),
+        class: classDocument._id.toString(),
       });
       gradeCompositionDocument.grades.push(gradeDocument._id.toString());
       console.log('element.StudentId ', element.StudentId);
@@ -998,9 +1000,12 @@ export class GradeService {
       },
       { new: true }, // This option returns the updated document
     );
+    const gradeCompositionDocument = await this.gradeCompositionModel.findById(
+      updatedGradeDocument.gradeComposition,
+    );
 
     const teachers = await this.classModel
-      .findById(updatedGradeDocument.class)
+      .findById(gradeCompositionDocument.class)
       .populate('teachers');
     const teacherIds = teachers.teachers.map((teacher) => teacher.user.toString());
     console.log('teacherIds ', teacherIds);

@@ -8,7 +8,7 @@ export const GradeSchema = new mongoose.Schema({
   class: { type: mongoose.Schema.Types.ObjectId, ref: 'Class' },
   requestReview: { type: Boolean, default: false },
   expectedGrade: { type: Number },
-  explanation: { type: String },
+  explanation: { type: String, default: '' },
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
   finalDecision: { type: Boolean, default: false },
 });

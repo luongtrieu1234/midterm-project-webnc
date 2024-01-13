@@ -140,6 +140,7 @@ function runMigration() {
                         {
                             name: 'Class 1',
                             code: '123456',
+                            owner: teacher._id.toString(),
                             students: [
                                 {
                                     user: student._id.toString(),
