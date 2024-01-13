@@ -1,19 +1,18 @@
-import { Inject, Injectable, Logger, Query, StreamableFile } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  Query,
+  StreamableFile,
+  BadRequestException,
+  HttpStatus,
+} from '@nestjs/common';
 import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 import * as bcrypt from 'bcrypt';
 import { AuthService } from '../../others/auth/auth.service';
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Get,
-  Post,
-  Req,
-  Res,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { Response, Request } from 'express';
 import * as ExcelJS from 'exceljs';
 
@@ -844,12 +843,18 @@ export class GradeService {
       if (!classDocument) {
         throw new BadRequestException('Class not existed', 'Class not existed');
       }
+      console.log('classDocument ', classDocument);
       // const gradeCompositionDocuments = await classDocument.gradeComposition;
       const gradeCompositionDocuments = await this.gradeCompositionModel.find({ class: classId });
       const studentDocument = await this.userModel.findById(userId);
       console.log('studentDocument ', studentDocument);
       if (!studentDocument) {
         throw new BadRequestException('Student not existed');
+      }
+      const student = classDocument.students.find((student) => student.user.toString() === userId);
+
+      if (!student) {
+        return { message: 'You not in this class', statusCode: HttpStatus.BAD_REQUEST };
       }
       const result = await this.classModel.aggregate([
         {
@@ -972,7 +977,7 @@ export class GradeService {
       // studentData['grade'] = gradeData;
 
       dataReturn.push(studentData);
-      return { result: dataReturn, statusCode: 200, message: 'success' };
+      return { result: studentData, statusCode: 200, message: 'success' };
       // return { result, statusCode: 200, message: 'success' };
     } catch (error) {
       console.log('Error retrieving data ', error);
