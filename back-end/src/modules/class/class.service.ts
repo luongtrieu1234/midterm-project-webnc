@@ -44,8 +44,8 @@ export class ClassService {
     private readonly classModel: Model<ClassModel>,
     @InjectModel('Role')
     private readonly roleModel: Model<RoleModel>, // @InjectModel('Grade')
-    // private readonly gradeModel: Model<GradeModel>,
-  ) // @InjectModel('GradeStructure')
+    // @InjectModel('GradeStructure')
+  ) // private readonly gradeModel: Model<GradeModel>,
   // private readonly gradeStructureModel: Model<GradeStructureModel>,
   {}
 
@@ -108,21 +108,21 @@ export class ClassService {
         });
         // const isExisting = currentClass.students.includes(studentAdd)
         //   console.log('isExisting ', isExisting)
-        const isExisting2 = currentClass.students.some(
-          (existingStudent) =>
-            existingStudent?.user?.toString() === studentAdd._id.toString() &&
-            existingStudent?.classRole?.toString() === 'student',
-        );
-        console.log('isExisting2 ', isExisting2);
+        // const isExisting2 = currentClass.students.some(
+        //   (existingStudent) =>
+        //     existingStudent?.user?.toString() === studentAdd._id.toString() &&
+        //     existingStudent?.classRole?.toString() === 'student',
+        // );
+        // console.log('isExisting2 ', isExisting2);
 
         if (
           studentAdd &&
-          !currentClass.students.some(
+          !currentClass?.students?.some(
             (existingStudent) =>
               existingStudent?.user?.toString() === studentAdd._id.toString() &&
               existingStudent?.classRole?.toString() === 'student',
           ) &&
-          !currentClass.teachers.some(
+          !currentClass?.teachers?.some(
             (existingTeacher) =>
               existingTeacher?.user?.toString() === studentAdd._id.toString() &&
               existingTeacher?.classRole?.toString() === 'teacher',
@@ -147,12 +147,12 @@ export class ClassService {
         });
         if (
           teacherAdd &&
-          !currentClass.teachers.some(
+          !currentClass.teachers?.some(
             (existingTeacher) =>
               existingTeacher?.user?.toString() === teacherAdd._id.toString() &&
               existingTeacher?.classRole?.toString() === 'teacher',
           ) &&
-          !currentClass.students.some(
+          !currentClass.students?.some(
             (existingStudent) =>
               existingStudent?.user?.toString() === teacherAdd._id.toString() &&
               existingStudent?.classRole?.toString() === 'student',
@@ -359,14 +359,15 @@ export class ClassService {
   async getUserRoleInClass(classId, userId) {
     // Check in the students array
     const classDocument = await this.classModel.findById(classId);
-    const student = classDocument.students.find((student) => student.user.toString() === userId);
+    console.log('check classDocument ', classDocument);
+    const student = classDocument?.students?.find((student) => student.user.toString() === userId);
 
     if (student) {
       return { message: 'success', statusCode: HttpStatus.OK, role: 'student' };
     }
 
     // Check in the teachers array
-    const teacher = classDocument.teachers.find((teacher) => teacher.user.toString() === userId);
+    const teacher = classDocument?.teachers?.find((teacher) => teacher.user.toString() === userId);
 
     if (teacher) {
       return {
@@ -442,11 +443,12 @@ export class ClassService {
     if (classDocument.classCode !== classCode) {
       throw new BadRequestException('Class code is not correct');
     }
-    await this.addUsersToClass({
+    const ad = await this.addUsersToClass({
       name: classDocument.name,
       students: [{ email: email }],
       teachers: [],
     });
+    // console.log('ad ', ad);
     return {
       message: 'Verify success',
       statusCode: HttpStatus.OK,

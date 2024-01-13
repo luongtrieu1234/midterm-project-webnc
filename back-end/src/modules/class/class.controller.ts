@@ -198,9 +198,12 @@ export class ClassController {
   @HttpCode(200)
   @UseGuards(AuthGuardCustom)
   async confirmClassCode(@Body() dto: ConfirmClassCodeDto, @Req() req, @Res() res: Response) {
-    // return await this.classService.confirmClassCode(dto, req.user.email);
-    await this.classService.confirmClassCode(dto, req.user.email);
+    // console.log('aass');
+    const dataReturn = await this.classService.confirmClassCode(dto, req.user.email);
+    // await this.classService.confirmClassCode(dto, req.user.email);
     // const urlJoinClass = `${process.env.CLIENT_URL}/home-page`;
-    return 'urlJoinClass';
+    // return 'urlJoinClass';
+    // return urlJoinClass;
+    return res.send(dataReturn);
   }
 }

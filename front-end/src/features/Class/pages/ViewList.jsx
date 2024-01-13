@@ -19,7 +19,7 @@ const ViewListClass = () => {
     toast.current.show({
       severity: 'success',
       summary: 'Success',
-      detail: 'Class created successfully!',
+      detail: 'Action Successfully!',
       life: 3000,
     });
   };
@@ -27,7 +27,7 @@ const ViewListClass = () => {
     toast.current.show({
       severity: 'error',
       summary: 'Error',
-      detail: 'Class created error',
+      detail: 'Action error',
       life: 3000,
     });
   };
@@ -98,10 +98,53 @@ const ViewListClass = () => {
     </div>
   );
 
+  //Join class
+  const [visibleCode, setVisibleCode] = useState(false);
+  const JoinClassByCode = async (data) => {
+    try {
+      const token = localStorage.getItem('token'); // replace 'token' with your actual key
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/class/confirm-class-code`,
+        data,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      // Handle successful response
+      if (response.status === 200) {
+        console.log(response);
+        setVisibleCode(false);
+        reset();
+        showSuccess();
+      } else {
+        showError();
+      }
+    } catch (error) {
+      showError();
+    }
+  };
+
+  const ActionJoinClass = (
+    <div>
+      <Button
+        label='Cancel'
+        icon='pi pi-times'
+        onClick={() => setVisibleCode(false)}
+        className='p-button-text'
+      />
+      <Button label='Join' icon='pi pi-check' onClick={handleSubmit(JoinClassByCode)} autoFocus />
+    </div>
+  );
+
   return (
     <div className='grid mb-5'>
       <Toast ref={toast} />
-      <div className='col-12'>
+
+      {/* // Create Class */}
+      <div className='col-2'>
         <Button label='Create Class' icon='pi pi-plus' onClick={() => setVisible(true)} />
         <Dialog
           header='Create Class'
@@ -131,6 +174,34 @@ const ViewListClass = () => {
           {errors.description && <p className='text-red-500'>{errors.description.message}</p>}
         </Dialog>
       </div>
+
+      {/* // Join class by code */}
+      <div className='col-2'>
+        <Button
+          label='Join Class'
+          icon='pi pi-arrow-circle-right'
+          onClick={() => setVisibleCode(true)}
+        />
+        <Dialog
+          header='Join Class'
+          visible={visibleCode}
+          style={{ width: '50vw' }}
+          onHide={() => setVisibleCode(false)}
+          footer={ActionJoinClass}
+        >
+          <p className='mb-3'>Class Code</p>
+          <Controller
+            name='code'
+            control={control}
+            defaultValue=''
+            rules={{ required: 'This field is required' }}
+            render={({ field }) => <InputText {...field} style={{ width: '70%' }} />}
+          />
+          {errors.code && <p className='text-red-500'>{errors.code.message}</p>}
+        </Dialog>
+      </div>
+
+      {/* // Class list */}
       <ScrollPanel style={{ width: '100%', height: '550px' }}>
         <div className='grid'>
           {classList.map((course) => (
