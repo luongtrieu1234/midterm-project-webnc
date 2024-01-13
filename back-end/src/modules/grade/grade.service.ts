@@ -713,7 +713,7 @@ export class GradeService {
         let gradeCompositionData = {};
         let gradeTotalOfStudent = 0;
         for (const gradeComposition of gradeCompositionDocuments) {
-          const a = await this.gradeCompositionModel.findById(gradeComposition).select('name');
+          const a = await this.gradeCompositionModel.findById(gradeComposition);
           // gradeCompositionData.push(a);
           const gradeDocument = await this.gradeModel.findOne({
             gradeComposition: gradeComposition['_id'].toString(),
@@ -725,6 +725,7 @@ export class GradeService {
           let gradeData = { name: a?.name };
           gradeData['grade'] = gradeDocument?.value;
           gradeData['gradeId'] = gradeDocument?.id;
+          gradeData['isFinal'] = a?.isFinal;
           console.log('value ', gradeDocument?.value ?? null);
           // studentData['grade'] = gradeDocument;
           // gradeCompositionData.push(gradeData);
@@ -941,24 +942,26 @@ export class GradeService {
       ]);
       let dataReturn = [];
       let studentData = { studentDetails: studentDocument };
-      let gradeCompositionData = {};
+      let gradeCompositionData = [];
       let gradeTotalData = 0;
       for (const gradeComposition of gradeCompositionDocuments) {
-        const a = await this.gradeCompositionModel.findById(gradeComposition).select('name');
+        const a = await this.gradeCompositionModel.findById(gradeComposition);
         // gradeCompositionData.push(a);
         const gradeDocument = await this.gradeModel.findOne({
           gradeComposition: gradeComposition['_id'].toString(),
           student: studentDocument['_id'].toString(),
         });
-        // if (gradeComposition['isFinal'] === false) {
-        //   continue;
-        // }
+        if (gradeComposition['isFinal'] === false) {
+          continue;
+        }
         // gradeData.push(gradeDocument);
         let gradeData = { name: a?.name };
         gradeData['grade'] = gradeDocument?.value;
+        gradeData['gradeId'] = gradeDocument?.id;
+        gradeData['isFinal'] = a?.isFinal;
         console.log('value ', gradeDocument?.value ?? null);
         // studentData['grade'] = gradeDocument;
-        // gradeCompositionData.push(gradeData);
+        gradeCompositionData.push(gradeData);
         // console.log('studentData ', studentData);
         // console.log('gradeDocument ', gradeDocument);
         gradeCompositionData[gradeComposition['_id'].toString()] = gradeData;
