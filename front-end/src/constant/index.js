@@ -15,3 +15,6 @@ export const GRADE_PAGE_TAB_ENUM = {
   GRADE_STRUCTURE: 0,
   GRADE_LIST: 1,
 };
+export const GRADE_PAGE_STUDENT_TAB_ENUM = {
+  GRADE_LIST_STUDENT: 0,
+};

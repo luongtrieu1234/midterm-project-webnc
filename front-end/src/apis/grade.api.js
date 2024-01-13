@@ -40,5 +40,18 @@ export const getClassGrades = (classId) =>
   instance.get(GRADE.GET_CLASS_GRADES, {
     params: { classId: classId },
   });
+export const getGradeOfStudent = (classId) =>
+  instance.get(GRADE.GET_GRADE_OF_STUDENT, {
+    params: { classId: classId },
+  });
 
 export const updateGrade = (body = {}) => instance.post(GRADE.POST_UPDATE_GRADE, body);
+
+export const markGradeCompositionFinal = (body = {}) =>
+  instance.post(
+    GRADE.POST_MARK_GRADE_COMPOSITION_FINAL,
+    {},
+    {
+      params: { gradeCompositionId: body.gradeCompositionId },
+    }
+  );

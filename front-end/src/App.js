@@ -16,6 +16,7 @@ import {
   TestPage,
   GradePage,
   HomePageAdminPage,
+  GradeStudentPage,
 } from './pages';
 import { PageError, Loading, NotLogged } from './components';
 
@@ -46,6 +47,7 @@ function App() {
       {token && <Route path='/home-page' element={<HomePage />} />}
       {token && <Route path='/course/:id' element={<ClassDetailPage />} />}
       <Route path='/course/:classId/grade' element={<GradePage />} />
+      <Route path='/course/:classId/grade-student' element={<GradeStudentPage />} />
       {!token && <Route path='/home-page' element={<NotLogged />} />}
       <Route path='*' element={<PageError />} />
 

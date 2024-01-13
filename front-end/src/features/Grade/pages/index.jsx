@@ -1,2 +1,3 @@
 import CurrentGradeStructure from './CurrentGradeStructure';
-export { CurrentGradeStructure };
+import GradeStudent from './GradeStudent';
+export { CurrentGradeStructure, GradeStudent };
