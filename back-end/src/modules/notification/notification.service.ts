@@ -89,13 +89,18 @@ export class NotificationService {
     };
   }
 
-  async notifyStudentFinalMarkReviewDecision(studentId: string, gradeId: string) {
+  async notifyStudentFinalMarkReviewDecision(
+    studentId: string,
+    gradeId: string,
+    currentPath: string,
+  ) {
     const message = 'Your final mark review request has been decided';
     const notification = {
       type: NotificationType.TEACHER_FINALIZES_GRADE,
       recipient: studentId,
       relatedGrade: gradeId,
       message,
+      currentPath,
     };
     await this.notificationModel.create(notification);
   }
@@ -121,21 +126,28 @@ export class NotificationService {
     return {
       message: 'Notifications sent successfully',
       statusCode: HttpStatus.OK,
+      currentPath,
     };
   }
 
-  async notifyTeacherStudentGradeReviewReply(teacherId: string, gradeId: string) {
+  async notifyTeacherStudentGradeReviewReply(
+    teacherId: string,
+    gradeId: string,
+    currentPath: string,
+  ) {
     const message = 'A student has replied to your review';
     const notification = {
       type: NotificationType.STUDENT_REPLIES_TO_REVIEW,
       recipient: teacherId,
       relatedGrade: gradeId,
       message,
+      currentPath,
     };
     await this.notificationModel.create(notification);
     return {
       message: 'Notification sent successfully',
       statusCode: HttpStatus.OK,
+      currentPath,
     };
   }
 
