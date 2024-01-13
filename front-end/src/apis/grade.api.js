@@ -60,3 +60,5 @@ export const getGradeCompositionDetailById = (gradeId) =>
   instance.get(GRADE.GET_GRADE_COMPOSITION_DETAIL_BY_ID, {
     params: { gradeId: gradeId },
   });
+
+export const postComment = (body = {}) => instance.post(GRADE.POST_COMMENT, body);
