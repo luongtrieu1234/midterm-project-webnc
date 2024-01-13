@@ -36,10 +36,11 @@ function Body() {
   };
   useEffect(() => {
     setValue('fullname', userInfo?.fullname);
-    setValue('email', userInfo?.email);
+    // setValue('email', userInfo?.email);
     setValue('phone', userInfo?.phone);
     setValue('dob', userInfo?.dob);
     setGender(userInfo?.gender);
+    setValue('studentId', userInfo?.studentId);
   }, [userInfo]);
   return (
     <form
@@ -80,12 +81,12 @@ function Body() {
               />
             </div>
           </li>
-          <li className='flex align-items-center py-3 px-2 border-top-1 surface-border flex-wrap'>
+          {/* <li className='flex align-items-center py-3 px-2 border-top-1 surface-border flex-wrap'>
             <div className='text-500 w-6 md:w-2 font-medium'>Email</div>
             <div className='text-900 w-full md:w-8 md:flex-order-0 flex-order-1'>
               <InputText name='email' control={control} disabled={disabled} />
             </div>
-          </li>
+          </li> */}
           <li className='flex align-items-center py-3 px-2 border-top-1 surface-border flex-wrap'>
             <div className='text-500 w-6 md:w-2 font-medium'>Phone Number</div>
             <div className='text-900 w-full md:w-8 md:flex-order-0 flex-order-1'>
@@ -98,8 +99,14 @@ function Body() {
               <InputText name='dob' control={control} disabled={disabled} />
             </div>
           </li>
+          <li className='flex align-items-center py-3 px-2 border-top-1 border-bottom-1 surface-border flex-wrap'>
+            <div className='text-500 w-6 md:w-2 font-medium'>Member ID</div>
+            <div className='text-900 w-full md:w-8 md:flex-order-0 flex-order-1 line-height-3'>
+              <InputText name='studentId' control={control} disabled={disabled} />
+            </div>
+          </li>
         </ul>
-        <div className='flex justify-content-end mt-2'>
+        <div className='flex justify-content-end mt-2 gap-2'>
           <div className='md:w-2 flex justify-content-end '>
             <Button
               onClick={() => setIsEdit(true)}

@@ -11,12 +11,14 @@ import { UserModel, UserSchema } from './users.model';
 import { AuthModule } from 'src/others/auth/auth.module';
 import { MailModule } from 'src/others/mail/mail.module';
 import { SharedService } from 'src/others/auth/shared.service';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
     // DatabaseModule,
     AuthModule,
     MailModule,
+    NotificationModule,
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     // JwtModule,
     // JwtModule.register({

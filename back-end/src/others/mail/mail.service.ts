@@ -23,6 +23,9 @@ export class MailService {
       <p>
         <b>${token}</b>
       </p>
+      <p>
+        <a href=${url}>Kich hoat tai khoan<a/>
+      </p>
       <p>Mã xác nhận có hiệu lực trong vòng 15 phút</p>
       `,
     });
@@ -44,6 +47,9 @@ export class MailService {
       <p>Vui lòng nhập mã xác nhận bên dưới để đặt lại mật khẩu:</p>
       <p>
           <b>${token}</b>
+      </p>
+      <p>
+        <a href=${url}>Xác nhận đặt mặt khẩu<a/>
       </p>
       <p>Mã xác nhận có hiệu lực trong vòng 15 phút</p>
       `,

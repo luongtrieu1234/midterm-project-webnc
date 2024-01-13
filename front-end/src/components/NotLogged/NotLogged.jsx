@@ -1,6 +1,7 @@
 import React from 'react';
 
 import './NotLogged.css';
+import { Link } from 'react-router-dom';
 
 const NotLogged = () => {
   return (
@@ -13,12 +14,10 @@ const NotLogged = () => {
             </h1>
           </div>
           <h2>You are not logged in, please log in before entering this page!</h2>
-          <form className='notlogged-search'>
-            <input type='text' placeholder='Search...' />
-            <button type='button'>
-              <span></span>
-            </button>
-          </form>
+          <Link to='/sign-in' className='link-style'>
+            {' '}
+            Go to sign-in page
+          </Link>
         </div>
       </div>
     </div>

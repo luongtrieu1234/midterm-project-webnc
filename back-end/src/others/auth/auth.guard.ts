@@ -47,7 +47,7 @@ export class AuthGuardCustom implements CanActivate {
       email: user.email,
     });
     console.log('check user  ', userRequest);
-    return requiredRoles.some((role) => user.roles?.includes(role));
+    return requiredRoles.some((role) => user.role?.includes(role));
     // return true;
   }
 

@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { Model } from 'mongoose';
+import { Model, SortOrder } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 import * as bcrypt from 'bcrypt';
@@ -24,6 +24,10 @@ import { UserModel } from '../users/users.model';
 import { ClassModel } from './class.model';
 import { SendInvitationDto } from './dto/send-invitation.dto';
 import { RoleModel } from '../role/role.model';
+import { GradeModel } from '../grade/grade.model';
+import { GradeStructureModel } from '../grade/grade-structure.model';
+import { ConfirmClassCodeDto } from './dto/confirm-class-code.dto';
+import { UpdateInformationClassDto } from './dto/update-name-description.dto';
 
 @Injectable()
 export class ClassService {
@@ -39,8 +43,11 @@ export class ClassService {
     @InjectModel('Class')
     private readonly classModel: Model<ClassModel>,
     @InjectModel('Role')
-    private readonly roleModel: Model<RoleModel>,
-  ) {}
+    private readonly roleModel: Model<RoleModel>, // @InjectModel('Grade')
+    // @InjectModel('GradeStructure')
+  ) // private readonly gradeModel: Model<GradeModel>,
+  // private readonly gradeStructureModel: Model<GradeStructureModel>,
+  {}
 
   async createClass(ownerId: string, createClassDto: CreateClassDto) {
     const currentClass = await this.classModel.findOne({
@@ -53,10 +60,32 @@ export class ClassService {
     const classOwner = await this.userModel.findOne({
       _id: ownerId,
     });
+    let classCode = Math.floor(100000 + Math.random() * 900000).toString();
+    while (1) {
+      const isClassCode = await this.classModel.findOne({ classCode: classCode });
+      if (isClassCode) {
+        classCode = Math.floor(100000 + Math.random() * 900000).toString();
+      } else {
+        break;
+      }
+    }
     const newClass = await this.classModel.create({
       owner: classOwner._id,
       name: createClassDto.name,
+      classCode: classCode,
+      description: createClassDto.description ?? '',
     });
+    // const owner = await this.userModel.findById(ownerId);
+    const teacherRole = await this.roleModel.findOne({
+      name: 'teacher',
+    });
+    newClass.teachers.push({ user: ownerId, classRole: 'teacher' });
+    newClass.save();
+    // const gradeStructure = await this.gradeStructureModel.create({
+    //   name: Grade structure of class ${createClassDto.name},
+    // });
+    // newClass.gradeStructure = gradeStructure._id.toString();
+    // newClass.save();
     return newClass;
   }
 
@@ -79,24 +108,29 @@ export class ClassService {
         });
         // const isExisting = currentClass.students.includes(studentAdd)
         //   console.log('isExisting ', isExisting)
-        const isExisting2 = currentClass.students.some(
-          (existingStudent) =>
-            existingStudent?.user?.toString() === studentAdd._id.toString() &&
-            existingStudent?.role?.toString() === studentRole._id.toString(),
-        );
-        console.log('isExisting2 ', isExisting2);
+        // const isExisting2 = currentClass.students.some(
+        //   (existingStudent) =>
+        //     existingStudent?.user?.toString() === studentAdd._id.toString() &&
+        //     existingStudent?.classRole?.toString() === 'student',
+        // );
+        // console.log('isExisting2 ', isExisting2);
 
         if (
           studentAdd &&
-          !currentClass.students.some(
+          !currentClass?.students?.some(
             (existingStudent) =>
               existingStudent?.user?.toString() === studentAdd._id.toString() &&
-              existingStudent?.role?.toString() === studentRole._id.toString(),
+              existingStudent?.classRole?.toString() === 'student',
+          ) &&
+          !currentClass?.teachers?.some(
+            (existingTeacher) =>
+              existingTeacher?.user?.toString() === studentAdd._id.toString() &&
+              existingTeacher?.classRole?.toString() === 'teacher',
           )
         ) {
           currentClass.students.push({
             user: studentAdd._id.toString(),
-            role: studentRole._id.toString(),
+            classRole: 'student',
           });
           return currentClass.save();
         }
@@ -113,15 +147,20 @@ export class ClassService {
         });
         if (
           teacherAdd &&
-          !currentClass.teachers.some(
+          !currentClass.teachers?.some(
             (existingTeacher) =>
               existingTeacher?.user?.toString() === teacherAdd._id.toString() &&
-              existingTeacher?.role?.toString() === teacherRole._id.toString(),
+              existingTeacher?.classRole?.toString() === 'teacher',
+          ) &&
+          !currentClass.students?.some(
+            (existingStudent) =>
+              existingStudent?.user?.toString() === teacherAdd._id.toString() &&
+              existingStudent?.classRole?.toString() === 'student',
           )
         ) {
           currentClass.teachers.push({
             user: teacherAdd._id.toString(),
-            role: teacherRole._id.toString(),
+            classRole: 'teacher',
           });
           return currentClass.save();
         }
@@ -145,8 +184,50 @@ export class ClassService {
     };
   }
 
-  async getListClasses() {
-    const classes = await this.classModel.find();
+  async updateInformationClass(updateInformationClassDto: UpdateInformationClassDto) {
+    const currentClass = await this.classModel.findOneAndUpdate(
+      {
+        _id: updateInformationClassDto.classId,
+      },
+      {
+        $set: {
+          name: updateInformationClassDto?.name,
+          description: updateInformationClassDto?.description,
+        },
+      },
+      { new: true },
+    );
+
+    if (!currentClass) {
+      throw new BadRequestException('Grade not found');
+    }
+    return {
+      message: 'success',
+      statusCode: HttpStatus.OK,
+      class: currentClass,
+    };
+  }
+
+  async getListClasses(sortType: string, filterOption: string) {
+    console.log('sortType ', sortType);
+    console.log('filterOption ', filterOption);
+    let sort: SortOrder = 1;
+    if (sortType === 'desc') {
+      sort = 'desc' as SortOrder;
+    } else {
+      sort = 'asc' as SortOrder;
+    }
+    let filter = {};
+    if (filterOption === 'active') {
+      filter = { active: true };
+    } else if (filterOption === 'inactive') {
+      filter = { active: false };
+    }
+
+    const classes = await this.classModel
+      .find(filter)
+      .sort({ createdAt: sort as SortOrder })
+      .exec();
     const promises = classes?.map(async (classDocument) => {
       return await this.getClassWithUserInfo(classDocument._id.toString());
     });
@@ -183,6 +264,21 @@ export class ClassService {
     return await Promise.all(promises);
   }
 
+  async getAllClassesOfUser(userId: string) {
+    const classes = await this.classModel.find({
+      $or: [{ owner: userId }, { 'teachers.user': userId }, { 'students.user': userId }],
+    });
+    const promises = classes?.map(async (classDocument) => {
+      return await this.getClassWithUserInfo(classDocument._id.toString());
+    });
+    const classesReturn = await Promise.all(promises);
+    return {
+      message: 'success',
+      statusCode: HttpStatus.OK,
+      classes: classesReturn,
+    };
+  }
+
   async getListUsersOfClass(classId: string) {
     console.log('check dto ', classId);
     const classDocument = await this.classModel.findById(classId);
@@ -191,7 +287,7 @@ export class ClassService {
     const userRoleInfo = await this.getUserRoleInClass(classDocument, userIdToCheck);
 
     if (userRoleInfo) {
-      console.log(`User has the role '${userRoleInfo.role}' as a ${userRoleInfo.userType}.`);
+      console.log(`User has the role '${userRoleInfo.role}' as a ${userRoleInfo.role}.`);
     } else {
       console.log('User not found in the class.');
     }
@@ -263,23 +359,21 @@ export class ClassService {
   async getUserRoleInClass(classId, userId) {
     // Check in the students array
     const classDocument = await this.classModel.findById(classId);
-    const student = classDocument.students.find((student) => student.user.toString() === userId);
+    console.log('check classDocument ', classDocument);
+    const student = classDocument?.students?.find((student) => student.user.toString() === userId);
 
     if (student) {
-      const studentRole = await this.getRoleById(student.role);
-      return { role: studentRole, userType: 'student' };
+      return { message: 'success', statusCode: HttpStatus.OK, role: 'student' };
     }
 
     // Check in the teachers array
-    const teacher = classDocument.teachers.find((teacher) => teacher.user.toString() === userId);
+    const teacher = classDocument?.teachers?.find((teacher) => teacher.user.toString() === userId);
 
     if (teacher) {
-      const teacherRole = await this.getRoleById(teacher.role);
       return {
         message: 'success',
         statusCode: HttpStatus.OK,
-        role: teacherRole,
-        userType: 'teacher',
+        role: 'teacher',
       };
     }
 
@@ -287,10 +381,27 @@ export class ClassService {
     return null;
   }
 
-  async getRoleById(roleId) {
-    // Assume you have a Mongoose model for the Role schema
-    const role = await this.roleModel.findById(roleId);
-    return role ? role.name : null;
+  async getLinkInvitation(email, classId) {
+    try {
+      const classDocument = await this.classModel.findById(classId);
+
+      if (!classDocument) {
+        throw new Error('Class not found');
+      }
+      const emailToken = await this.authService.signVerifyToken(email);
+      const link = `${
+        process.env.SERVER_URL
+      }/class/accept-join-class-by-student?className=${classDocument.name.replace(
+        / /g,
+        '+',
+      )}&token=${emailToken}`;
+
+      return link;
+    } catch (error) {
+      // Handle errors
+      console.error('Error retrieving class information:', error.message);
+      throw error;
+    }
   }
 
   async getClassWithUserInfo(classId: string) {
@@ -323,23 +434,24 @@ export class ClassService {
     }
   }
 
-  async getLinkInvitation(email, classId) {
-    try {
-      const classDocument = await this.classModel.findById(classId);
-
-      if (!classDocument) {
-        throw new Error('Class not found');
-      }
-      const emailToken = await this.authService.signVerifyToken(email);
-      const link = `${
-        process.env.SERVER_URL
-      }/class/accept-join-class-by-student?className=${classDocument.name.replace(/ /g, '+')}&token=${emailToken}`;
-      
-      return link;
-    } catch (error) {
-      // Handle errors
-      console.error('Error retrieving class information:', error.message);
-      throw error;
+  async confirmClassCode(dto: ConfirmClassCodeDto, email: string) {
+    const classCode = dto.code;
+    const classDocument = await this.classModel.findOne({ classCode: classCode });
+    if (!classDocument) {
+      throw new BadRequestException('Class not found');
     }
+    if (classDocument.classCode !== classCode) {
+      throw new BadRequestException('Class code is not correct');
+    }
+    const ad = await this.addUsersToClass({
+      name: classDocument.name,
+      students: [{ email: email }],
+      teachers: [],
+    });
+    // console.log('ad ', ad);
+    return {
+      message: 'Verify success',
+      statusCode: HttpStatus.OK,
+    };
   }
 }

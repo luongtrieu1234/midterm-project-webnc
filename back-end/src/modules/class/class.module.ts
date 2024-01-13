@@ -11,6 +11,7 @@ import { SharedService } from 'src/others/auth/shared.service';
 import { UserModule } from '../users/users.module';
 import { UserModel, UserSchema } from '../users/users.model';
 import { RoleModule } from '../role/role.module';
+import { GradeModule } from '../grade/grade.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { RoleModule } from '../role/role.module';
     MailModule,
     UserModule,
     RoleModule,
+    // GradeModule,
     MongooseModule.forFeature([{ name: 'Class', schema: ClassSchema }]),
     // JwtModule.register({
     //   secret: 'secret-key',
@@ -26,5 +28,6 @@ import { RoleModule } from '../role/role.module';
   ],
   controllers: [ClassController],
   providers: [ClassService, SharedService],
+  exports: [MongooseModule, ClassService],
 })
 export class ClassModule {}

@@ -13,7 +13,7 @@ export default function ButtonLoginFacebook() {
           })}
           type='button'
           className='mx-2'
-          style={{ minWidth: '10rem' }}
+          style={{ minWidth: '10rem', minHeight: '45px' }}
         />
       </a>
     </div>

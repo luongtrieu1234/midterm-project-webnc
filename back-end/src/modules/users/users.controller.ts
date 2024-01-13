@@ -29,6 +29,8 @@ import { UserModel } from './users.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserConfirmCodeDto } from './dto/user-confirm-code.dto';
 import { AuthGuardCustom } from 'src/others/auth/auth.guard';
+import { MapStudentIdToAccountDto } from './dto/map-student-account.dto';
+import { NotificationService } from '../notification/notification.service';
 
 @Controller('users')
 @ApiTags('users')
@@ -55,42 +57,17 @@ export class UsersController {
     return await this.usersService.userSignupActivate();
   }
 
-  @Post('/reactivate')
+  @Post('reactivate')
   async reactivateSignupRequest(@Body() userResetPasswordRequestDto: UserResetPasswordRequestDto) {
     return await this.usersService.reactivateSignupRequest(userResetPasswordRequestDto);
   }
 
-  // @Get('/confirm-signup')
-  // async verifyEmailSignUp(@Query() query) {
-  //   console.log('check query controller verifyEmailSignUp ', JSON.stringify(query));
-  //   // return await this.usersService.verifyEmail(query.token);
-  //   // console.log('check query service ', JSON.stringify(query));
-  //   // const isValid = await this.authService.confirmVerifyToken();
-  //   const isValid = await this.jwtService.verifyAsync(query.token);
-  //   if (isValid) {
-  //     console.log('isValid');
-  //     // const currentUser = await this.userModel.findOne({
-  //     //   email: isValid.email,
-  //     // });
-  //     // currentUser.active = true;
-  //     // currentUser.save();
-
-  //     // return {
-  //     //   message: 'Verify success',
-  //     //   statusCode: HttpStatus.OK,
-  //     // };
-  //     return await this.usersService.userSignupActivate(isValid);
-  //     // this.sharedService.setToken(query.token);
-  //     // return {
-  //     //   message: 'Verify successfully',
-  //     //   statusCode: HttpStatus.OK,
-  //     // };
-  //   }
-  //   return {
-  //     message: 'Verify fail',
-  //     statusCode: HttpStatus.BAD_REQUEST,
-  //   };
-  // }
+  @Get('/confirm-signup')
+  async verifyEmailSignUp(@Res() res: Response, @Query('token') token) {
+    await this.usersService.userSignup(token);
+    const urlJoinClass = `${process.env.CLIENT_URL}/sign-in`;
+    return res.redirect(urlJoinClass);
+  }
 
   @Post('login')
   @HttpCode(200)
@@ -163,23 +140,10 @@ export class UsersController {
   }
 
   @Get('/confirm-reset-password')
-  async verifyEmail(@Query() query) {
-    console.log('check query controller ', JSON.stringify(query));
-    // return await this.usersService.verifyEmail(query.token);
-    // console.log('check query service ', JSON.stringify(query));
-    // const isValid = await this.authService.confirmVerifyToken();
-    const isValid = await this.authService.verifyToken(query.token);
-    if (isValid) {
-      this.sharedService.setToken(query.token);
-      return {
-        message: 'Verify successfully',
-        statusCode: HttpStatus.OK,
-      };
-    }
-    return {
-      message: 'Verify fail',
-      statusCode: HttpStatus.BAD_REQUEST,
-    };
+  async confirmResetPassword(@Res() res: Response, @Query('token') token) {
+    await this.usersService.userResetPassword(token);
+    const urlJoinClass = `${process.env.CLIENT_URL}/reset-password?token=${token}`;
+    return res.redirect(urlJoinClass);
   }
 
   // @Get('/confirm')
@@ -203,7 +167,7 @@ export class UsersController {
 
   @Post('/reset')
   async resetPassword(@Body() userResetPasswordDto: UserResetPasswordDto) {
-    return await this.usersService.resetPassword(userResetPasswordDto);
+    return await this.usersService.resetPassword(userResetPasswordDto, userResetPasswordDto.token);
   }
 
   @Post('/confirm-code')
@@ -214,5 +178,20 @@ export class UsersController {
   @Post('/confirm-code-sign-up')
   async confirmCodeMailSignup(@Body() code: UserConfirmCodeDto) {
     return await this.usersService.verifyCodeEmailActivate(code);
+  }
+
+  @Post('map-student')
+  @HttpCode(200)
+  @UseGuards(AuthGuardCustom)
+  async mapStudentIdToAccount(@Body() dto: MapStudentIdToAccountDto, @Req() req) {
+    const userId = req.user.id;
+    return await this.usersService.mapStudentIdToAccount(dto.studentId, userId);
+  }
+
+  @Get('list-notifications')
+  @UseGuards(AuthGuardCustom)
+  @HttpCode(200)
+  async getListNotifications(@Req() req) {
+    return await this.usersService.getListNotifications(req.user.id);
   }
 }

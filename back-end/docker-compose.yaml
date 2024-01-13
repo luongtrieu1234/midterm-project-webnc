@@ -1,0 +1,42 @@
+# Docker Compose Configuration
+# visit https://docs.docker.com/compose/
+
+version: '3.8'
+services:
+  # start the mongodb service as container
+  database:
+    image: mongo:latest
+    env_file:
+      - .env.docker
+    container_name: mongodb
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME: admin1
+    #   MONGO_INITDB_ROOT_PASSWORD: admin1
+  # app service for your backend
+  app:
+    container_name: backend
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: npm run start:dev
+    # environment:
+    #   DATABASE_NAME: midterm
+    #   DATABASE_USER: admin1
+    #   DATABASE_PASS: admin1
+    #   DATABASE_URI: mongodb+srv://admin1:admin1@cluster0.1npefek.mongodb.net
+    env_file:
+      - .env.docker
+    ports:
+      - 5050:5050
+    depends_on:
+      - database
+    volumes:
+      - .:/app
+      - /app/node_modules
+volumes:
+  mongodb_data_container:

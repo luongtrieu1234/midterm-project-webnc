@@ -11,7 +11,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { ApiConsumes, ApiProperty, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiProperty, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Response, Request } from 'express';
 
 import { ClassService } from './class.service';
@@ -28,6 +28,8 @@ import { RoleGuard } from '../role/role.guard';
 import { AuthGuardCustom } from 'src/others/auth/auth.guard';
 import { SendInvitationDto } from './dto/send-invitation.dto';
 import { Param } from '@nestjs/common';
+import { ConfirmClassCodeDto } from './dto/confirm-class-code.dto';
+import { UpdateInformationClassDto } from './dto/update-name-description.dto';
 
 @Controller('class')
 @ApiTags('class')
@@ -41,7 +43,7 @@ export class ClassController {
 
   @Post()
   @UseGuards(AuthGuardCustom)
-  // @Roles(UserRole.TEACHER)
+  // @Roles(UserRole.USER)
   // @UseGuards(RoleGuard)
   @HttpCode(201)
   async createClass(@Req() req, @Body() createClassDto: CreateClassDto) {
@@ -55,13 +57,36 @@ export class ClassController {
     return await this.classService.addUsersToClass(updateClassDto);
   }
 
+  @Post('update-information')
+  @UseGuards(AuthGuardCustom)
+  @HttpCode(200)
+  async updateInformationClass(@Body() updateInformationClassDto: UpdateInformationClassDto) {
+    return await this.classService.updateInformationClass(updateInformationClassDto);
+  }
+
   @Get('all')
   @UseGuards(AuthGuardCustom)
   // @Roles(UserRole.TEACHER)
   @HttpCode(200)
-  async getListClasses(@Req() req) {
+  @ApiQuery({
+    name: 'sortType',
+    description:
+      'sortType dùng cho việc sắp xếp các lớp theo thứ tự tăng dần hoặc giảm dần có giá trị (asc, desc) theo thời gian tạo lớp',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'filterOption',
+    description:
+      'filterOption dùng cho việc lọc các lớp theo các tiêu chí có giá trị (all, active, inactive)',
+    required: false,
+  })
+  async getListClasses(
+    @Req() req,
+    @Query('filterOption') filterOption: string,
+    @Query('sortType') sortType: string,
+  ) {
     console.log('req ', req.user);
-    return await this.classService.getListClasses();
+    return await this.classService.getListClasses(sortType, filterOption);
   }
 
   @Get('class-detail')
@@ -105,6 +130,15 @@ export class ClassController {
   async getListStudentClasses(@Req() req) {
     console.log('req ', req.user);
     return await this.classService.getListStudentClassesByUserId(req.user.id);
+  }
+
+  @Get('all-classes-of-user')
+  @UseGuards(AuthGuardCustom)
+  // @Roles(UserRole.TEACHER)
+  @HttpCode(200)
+  async getAllClassesOfUser(@Req() req) {
+    console.log('req ', req.user);
+    return await this.classService.getAllClassesOfUser(req.user.id);
   }
 
   @Get('users-list')
@@ -158,5 +192,18 @@ export class ClassController {
     const inforClass = await this.classService.acceptJoinClassByStudent(token, className);
     const urlJoinClass = `${process.env.CLIENT_URL}/home-page`;
     return res.redirect(urlJoinClass);
+  }
+
+  @Post('confirm-class-code')
+  @HttpCode(200)
+  @UseGuards(AuthGuardCustom)
+  async confirmClassCode(@Body() dto: ConfirmClassCodeDto, @Req() req, @Res() res: Response) {
+    // console.log('aass');
+    const dataReturn = await this.classService.confirmClassCode(dto, req.user.email);
+    // await this.classService.confirmClassCode(dto, req.user.email);
+    // const urlJoinClass = `${process.env.CLIENT_URL}/home-page`;
+    // return 'urlJoinClass';
+    // return urlJoinClass;
+    return res.send(dataReturn);
   }
 }

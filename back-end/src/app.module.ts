@@ -16,6 +16,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { RoleGuard } from './modules/role/role.guard';
 import { JwtStrategy } from './others/auth/jwt.strategy';
 import { AuthGuardCustom } from './others/auth/auth.guard';
+import { AdminModule } from './modules/admin/admin.module';
+import { NotificationModule } from './modules/notification/notification.module';
 // import { ConfigModule } from './config/config.module';
 
 @Module({
@@ -26,11 +28,13 @@ import { AuthGuardCustom } from './others/auth/auth.guard';
     RoleModule,
     GradeModule,
     MailModule,
+    AdminModule,
+    NotificationModule,
     NestjsConfigModule.forRoot({
       envFilePath: ['.env', '.env.pro'],
       isGlobal: true,
     }),
-    MongooseModule.forRoot('mongodb+srv://admin1:admin1@cluster0.1npefek.mongodb.net/midterm'),
+    MongooseModule.forRoot(`${process.env.DATABASE_URL}/${process.env.DATABASE_NAME}`),
     JwtModule,
   ],
   controllers: [AppController],

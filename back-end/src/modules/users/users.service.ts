@@ -32,6 +32,8 @@ import { UserResetPasswordRequestDto } from './dto/user-reset-passowrd-request.d
 import { UserResetPasswordDto } from './dto/user-reset-passowrd.dto';
 import { SharedService } from 'src/others/auth/shared.service';
 import { UserConfirmCodeDto } from './dto/user-confirm-code.dto';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationModel } from '../notification/notification.model';
 
 @Injectable()
 export class UsersService {
@@ -42,10 +44,13 @@ export class UsersService {
     private authService: AuthService,
     private mailService: MailService,
     private sharedService: SharedService,
+    private notificationService: NotificationService,
     // @Inject('SEQUELIZE')
     // private readonly sequelize: Sequelize,
     @InjectModel('User')
     private readonly userModel: Model<UserModel>,
+    @InjectModel('Notification')
+    private readonly notificationModel: Model<NotificationModel>,
   ) {}
   async findUserByEmail(email: string) {
     return await this.userModel.findOne({
@@ -66,7 +71,7 @@ export class UsersService {
     // const emailToken = await this.authService.signVerifyToken(userResetPasswordRequestDto.email);
     const emailToken = await this.authService.signVerifyToken(userSignupRequestDto.email);
     this.sharedService.setToken(emailToken);
-    // await this.mailService.sendUserConfirmation(userSignupRequestDto.email, codeMail);
+    await this.mailService.sendUserConfirmation(userSignupRequestDto.email, emailToken);
     const hashedPassword = await bcrypt.hash(userSignupRequestDto.password, 12);
 
     const user = await this.userModel.create({
@@ -95,6 +100,42 @@ export class UsersService {
     console.log(`check user resetPassword ${JSON.stringify(user)}`);
     user.active = true;
     user.save();
+    return {
+      message: 'success',
+      statusCode: HttpStatus.OK,
+    };
+  }
+
+  async userSignup(token: string) {
+    const payload = await this.authService.verifyToken(token);
+    if (!payload) {
+      throw new UnauthorizedException();
+    }
+    if (payload) {
+      const user = await this.userModel.findOne({
+        email: payload['email'],
+      });
+      user.active = true;
+      user.save();
+    }
+    return {
+      message: 'success',
+      statusCode: HttpStatus.OK,
+    };
+  }
+
+  async userResetPassword(token: string) {
+    const payload = await this.authService.verifyToken(token);
+    if (!payload) {
+      throw new UnauthorizedException();
+    }
+    // if (payload) {
+    //   const user = await this.userModel.findOne({
+    //     email: payload['email'],
+    //   });
+    //   user.active = true;
+    //   user.save();
+    // }
     return {
       message: 'success',
       statusCode: HttpStatus.OK,
@@ -130,7 +171,7 @@ export class UsersService {
       throw new BadRequestException('Email not found');
     }
     if (user.active !== true) {
-      throw new BadRequestException('Email has registered but not active');
+      throw new BadRequestException('Email is not active');
     }
 
     if (!(await bcrypt.compare(userLoginRequestDto.password, user.password))) {
@@ -324,7 +365,7 @@ export class UsersService {
     this.sharedService.setCode(codeMail);
     const emailToken = await this.authService.signVerifyToken(userResetPasswordRequestDto.email);
     this.sharedService.setToken(emailToken);
-    await this.mailService.sendUserResetPassword(userResetPasswordRequestDto.email, codeMail);
+    await this.mailService.sendUserResetPassword(userResetPasswordRequestDto.email, emailToken);
     return {
       message: 'success',
       status: HttpStatus.OK,
@@ -356,8 +397,8 @@ export class UsersService {
     // };
   }
 
-  async resetPassword(userResetPasswordDto: UserResetPasswordDto) {
-    const token = this.sharedService.getToken();
+  async resetPassword(userResetPasswordDto: UserResetPasswordDto, token: string) {
+    // const token = this.sharedService.getToken();
     // if (!token) {
     //   throw new BadRequestException('Confirmation fail');
     // }
@@ -410,5 +451,34 @@ export class UsersService {
       message: 'success',
       statusCode: HttpStatus.OK,
     };
+  }
+
+  async mapStudentIdToAccount(studentId: string, userId: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    if (user.studentId) {
+      throw new BadRequestException('User already mapped');
+    }
+    const users = await this.userModel.find();
+    const studentIdExists = users.find((user) => user.studentId === studentId);
+    if (studentIdExists) {
+      throw new BadRequestException('Student Id already exists');
+    }
+    return await this.userModel.findByIdAndUpdate(userId, { studentId });
+  }
+
+  async getStudentById(studentId: string) {
+    const user = await this.userModel.findOne({ studentId });
+    if (!user) {
+      throw new BadRequestException('Student not found');
+    }
+    return user;
+  }
+
+  async getListNotifications(userId: string) {
+    const notifications = await this.notificationModel.find({ recipient: userId });
+    return { notifications, message: 'success', statusCode: HttpStatus.OK };
   }
 }
