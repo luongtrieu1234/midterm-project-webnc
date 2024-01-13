@@ -8,7 +8,7 @@ export default function Notification() {
   const navigate = useNavigate();
   const { data: notisData } = useQuery(['notisData'], () => getListNotifications());
   const notis = useMemo(() => notisData?.data?.notifications, [notisData]);
-
+  console.log('notis:', notis);
   return (
     <div style={{ height: '300px', overflowY: 'scroll' }}>
       {notis?.map(({ message, currentPath, _id }) => (
