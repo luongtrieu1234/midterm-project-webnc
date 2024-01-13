@@ -11,12 +11,12 @@ Lương Văn Triều 20120604
 
 # Hướng dẫn cài đặt
 1.	Hướng dẫn sử dụng và triển khai trên local
-a.	Triển khai phía Front-end
+1.1 Triển khai phía Front-end
 -	Sau khi clone code từ github: https://github.com/luongtrieu1234/midterm-project-webnc.git
 -	Mở một terminal mới tại folder front-end.
 -	Chạy câu lệnh: npm install - để install các packages.
 -	Chạy câu lệnh: npm start - để khởi chạy.
-b.	Triển khai phía Back-end
+1.2 Triển khai phía Back-end
 -	Sau khi clone code từ github: https://github.com/luongtrieu1234/midterm-project-webnc.git
 -	Mở một terminal mới tại folder back-end.
 -	Chạy câu lệnh: npm install - để install các packages.
