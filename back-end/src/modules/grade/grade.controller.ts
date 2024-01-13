@@ -18,7 +18,7 @@ import {
   UseInterceptors,
   Response,
 } from '@nestjs/common';
-import { ApiConsumes, ApiProperty, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiProperty, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Request, Express } from 'express';
 
 import { GradeService } from './grade.service';
@@ -314,11 +314,27 @@ export class GradeController {
   @Get('grade-of-student')
   @UseGuards(AuthGuardCustom)
   @HttpCode(200)
+  @ApiQuery({
+    name: 'classId',
+    // description:
+    //   'sortType dùng cho việc sắp xếp các lớp theo thứ tự tăng dần hoặc giảm dần có giá trị (asc, desc) theo thời gian tạo lớp',
+    required: true,
+  })
+  @ApiQuery({
+    name: 'userId',
+    // description:
+    //   'filterOption dùng cho việc lọc các lớp theo các tiêu chí có giá trị (all, active, inactive)',
+    required: false,
+  })
   async getGradesOfStudent(
     @Req() req,
     @Query('classId') classId: string,
-    @Query('userId') userId: string,
+    @Query('userId') userId?: string,
   ) {
+    console.log('req ', req.user);
+    console.log('userId ', userId);
+    if (userId === undefined || userId === '' || userId === null) userId = req.user.id;
+    console.log('userId2 ', userId);
     return await this.gradeService.getGradesOfStudent(classId, userId);
   }
 
