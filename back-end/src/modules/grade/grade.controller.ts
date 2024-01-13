@@ -374,6 +374,13 @@ export class GradeController {
     return await this.gradeService.getGradeDetailByGradeId(gradeId);
   }
 
+  @Get('grade-composition-detail-by-id')
+  @UseGuards(AuthGuardCustom)
+  @HttpCode(200)
+  async getGradeCompositionDetailById(@Req() req, @Query('gradeId') gradeId: string) {
+    return await this.gradeService.getGradeCompositionDetailById(gradeId);
+  }
+
   @Post('comment')
   @UseGuards(AuthGuardCustom)
   @HttpCode(200)

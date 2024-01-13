@@ -1141,6 +1141,15 @@ export class GradeService {
     };
   }
 
+  async getGradeCompositionDetailById(gradeId: string) {
+    const gradeCompositionDocument = await this.gradeCompositionModel.findOne({ grades: gradeId });
+    return {
+      message: 'success',
+      statusCode: 200,
+      result: gradeCompositionDocument,
+    };
+  }
+
   async commentReview(commentDto: CommentDto, userId: string) {
     const gradeDocument = await this.gradeModel.findById(commentDto.gradeId).populate('comments');
     if (!gradeDocument) {
