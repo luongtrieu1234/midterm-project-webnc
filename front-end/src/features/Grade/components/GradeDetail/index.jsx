@@ -13,10 +13,16 @@ export default function GradeDetail() {
     getGradeCompositionDetailById(gradeId)
   );
   const gradeDetail = useMemo(() => gradeDetailData?.data, [gradeDetailData]);
-
+  console.log('gradeDetail:', gradeDetail);
   return (
     <div>
-      <GradeCompositionCard gradeComposition={gradeDetail?.gradeComposition} />
+      <GradeCompositionCard
+        gradeComposition={gradeDetail?.gradeComposition}
+        explanation={{
+          explanation: gradeDetail?.grade?.explanation,
+          expectedGrade: gradeDetail?.grade?.expectedGrade,
+        }}
+      />
       <CommentList listComment={gradeDetail?.grade?.comments} refetch={refetch} />
     </div>
   );

@@ -63,3 +63,7 @@ export const getGradeCompositionDetailById = (gradeId) =>
 
 export const postComment = (body = {}) => instance.post(GRADE.POST_COMMENT, body);
 export const postReviewRequest = (body = {}) => instance.post(GRADE.POST_REVIEW_REQUEST, body);
+export const getListReviewRequest = (classId) =>
+  instance.get(GRADE.GET_LIST_REVIEW_REQUEST, {
+    params: { classId: classId },
+  });

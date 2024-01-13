@@ -43,7 +43,7 @@ export default function CommentList({ listComment, refetch }) {
   }
   return (
     <div>
-      <div style={{ height: '300px', overflowY: 'scroll' }}>
+      <div style={{ height: '260px', overflowY: 'scroll' }}>
         {listComment?.map(({ content, _id }) => (
           <div key={_id}>
             <Card subTitle={content} className='mt-1 border-1 surface-border' />

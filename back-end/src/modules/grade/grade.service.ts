@@ -1142,7 +1142,7 @@ export class GradeService {
       dataComposition['grade'] = [];
       const grades = await this.gradeModel.find({
         gradeComposition: gradeCompositionDocument._id.toString(),
-        // requestReview: true,
+        requestReview: true,
       });
       for (const grade of grades) {
         let dataGrade = {};

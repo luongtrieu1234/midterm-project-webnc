@@ -32,4 +32,5 @@ export const GRADE = {
   GET_GRADE_COMPOSITION_DETAIL_BY_ID: '/grade/grade-composition-detail-by-id',
   POST_COMMENT: '/grade/comment',
   POST_REVIEW_REQUEST: '/grade/review-request',
+  GET_LIST_REVIEW_REQUEST: '/grade/list-review-request',
 };
