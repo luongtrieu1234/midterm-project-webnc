@@ -32,6 +32,7 @@ export default function GradeListStudent() {
     () => gradeStudentListData?.data?.result,
     [gradeStudentListData]
   );
+  // const isStudent = useMemo(() => JSON.parse(localStorage.getItem('isStudent')), []);
 
   //form
   const {

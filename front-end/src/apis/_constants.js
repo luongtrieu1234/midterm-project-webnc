@@ -8,6 +8,7 @@ export const USER = {
 };
 
 export const CLASS = {
+  GET_USER_ROLE: '/class/user-role',
   POST_INVITE_TEACHER: '/class/invite-tearcher',
   POST_INVITE_STUDENT: '/class/invite-student',
   GET_ALL_CLASS: '/class/all',

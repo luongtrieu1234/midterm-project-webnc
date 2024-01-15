@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -9,8 +9,8 @@ import { useForm, Controller } from 'react-hook-form';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
-import { useMutation } from 'react-query';
-import { inviteTeacherToClass, inviteStudentToClass } from 'apis/class.api';
+import { useMutation, useQuery } from 'react-query';
+import { inviteTeacherToClass, inviteStudentToClass, getUserRole } from 'apis/class.api';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 // import { Toast } from 'primereact/toast';
@@ -19,13 +19,29 @@ const ClassDetail = () => {
   const [course, setCourse] = useState(null);
   const [link, setLink] = useState(null);
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('Infor Class');
   const [visibleAddTeacherDialog, setVisibleAddTeacherDialog] = useState(false);
   const [visibleAddStudentDialog, setVisibleAddStudentDialog] = useState(false);
   const { mutate: inviteTeacherMutate, isLoading: isInviteTeacherLoading } =
     useMutation(inviteTeacherToClass);
   const { mutate: inviteStudentMutate, isLoading: isInviteStudentLoading } =
     useMutation(inviteStudentToClass);
+  const { data: userRoleData } = useQuery(['userRole', id], () => getUserRole(id), {
+    enabled: !!id,
+  });
+  const getSelectedTab = () => {
+    const storedTab = localStorage.getItem('classDetailTab');
+    return JSON.parse(storedTab) || 'Infor Class';
+  };
+  const [activeTab, setActiveTab] = useState(getSelectedTab());
+
+  useEffect(() => {
+    localStorage.setItem('classDetailTab', JSON.stringify(activeTab));
+  }, [activeTab]);
+
+  const isStudent = useMemo(() => userRoleData?.data?.role === 'student', [userRoleData]);
+  useEffect(() => {
+    localStorage.setItem('isStudent', JSON.stringify(isStudent));
+  }, [isStudent]);
   const toast = useRef(null);
   const showSuccess = () => {
     toast.current.show({
@@ -49,27 +65,31 @@ const ClassDetail = () => {
     // reset,
     // formState: { errors },
   } = useForm();
-
+  const CLASS_DETAIL_ENUM = {
+    InforClass: 0,
+    People: 1,
+    Classwork: 3,
+  };
   const items = [
     {
       label: 'Stream',
       icon: 'pi pi-fw pi-users',
       command: () => {
-        setActiveTab('Infor Class');
+        setActiveTab(CLASS_DETAIL_ENUM.InforClass);
       },
     },
     {
       label: 'People',
       icon: 'pi pi-fw pi-users',
       command: () => {
-        setActiveTab('People');
+        setActiveTab(CLASS_DETAIL_ENUM.People);
       },
     },
     {
       label: 'Classwork',
       icon: 'pi pi-fw pi-file',
       command: () => {
-        setActiveTab('Classwork');
+        setActiveTab(CLASS_DETAIL_ENUM.Classwork);
       },
     },
   ];
@@ -205,7 +225,7 @@ const ClassDetail = () => {
         </Dialog>
       </div>
 
-      <TabMenu model={items} />
+      <TabMenu model={items} activeIndex={Number(activeTab)} />
       <div
         style={{
           display: 'flex',
@@ -214,7 +234,7 @@ const ClassDetail = () => {
         }}
       >
         {/* Infor class */}
-        {activeTab === 'Infor Class' && course && (
+        {activeTab === CLASS_DETAIL_ENUM.InforClass && course && (
           <div className='mr-8'>
             <div
               style={{
@@ -243,7 +263,7 @@ const ClassDetail = () => {
         )}
 
         {/* People */}
-        {activeTab === 'People' && (
+        {activeTab === CLASS_DETAIL_ENUM.People && (
           <div
             style={{
               // margin: '0 auto',
@@ -295,6 +315,7 @@ const ClassDetail = () => {
               <span style={{ fontSize: '25px', color: '#6E6BF1' }}>Students</span>
               <div className='card flex'>
                 <Button
+                  disabled={isStudent}
                   size='small'
                   label='Add Student'
                   onClick={() => setVisibleAddStudentDialog(true)}
@@ -324,7 +345,7 @@ const ClassDetail = () => {
         )}
 
         {/* Class work */}
-        {activeTab === 'Classwork' && (
+        {activeTab === CLASS_DETAIL_ENUM.Classwork && (
           <div>
             <h2>Classwork</h2>
           </div>

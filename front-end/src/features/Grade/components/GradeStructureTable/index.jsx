@@ -61,7 +61,7 @@ export default function GradeStructureTable() {
     enabled: !!classId,
   });
   const gradeStructure = useMemo(() => gradeStructureData?.data, [gradeStructureData]);
-
+  const isStudent = useMemo(() => JSON.parse(localStorage.getItem('isStudent')), []);
   const {
     control,
     setValue,
@@ -185,6 +185,7 @@ export default function GradeStructureTable() {
         <div className='card'>
           <Tooltip target='.add-grade-composition' className='text-sm' />
           <Button
+            disabled={isStudent}
             className='add-grade-composition'
             icon='pi pi-plus'
             data-pr-tooltip='Add Grade Composition'
@@ -198,6 +199,7 @@ export default function GradeStructureTable() {
     return (
       <div className='card flex flex-wrap justify-content-center gap-2'>
         <Button
+          disabled={isStudent}
           className='action'
           icon='pi pi-pencil'
           severity='warning'
@@ -211,6 +213,7 @@ export default function GradeStructureTable() {
           }}
         />
         <Button
+          disabled={isStudent}
           className='action'
           icon='pi pi-trash'
           severity='danger'
@@ -221,6 +224,7 @@ export default function GradeStructureTable() {
           }}
         />
         <Button
+          disabled={isStudent}
           className='action'
           icon='pi pi-download'
           severity='info'
@@ -229,6 +233,7 @@ export default function GradeStructureTable() {
           onClick={() => handleGetExcelTemplateGrade(value._id)}
         />
         <Button
+          disabled={isStudent}
           className='action'
           icon='pi pi-upload '
           severity='info'
@@ -240,6 +245,7 @@ export default function GradeStructureTable() {
           }}
         />
         <Button
+          disabled={isStudent}
           className='action'
           icon='pi pi-check'
           data-pr-tooltip='Mark as finalized'

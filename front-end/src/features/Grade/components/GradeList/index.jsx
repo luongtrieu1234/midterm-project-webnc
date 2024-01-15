@@ -209,13 +209,13 @@ export default function GradeList() {
           loading={isGradeListLoading || isGradeStructureLoading}
           showGridlines
           stripedRows
-          style={{ maxWidth: '50rem' }}
+          style={{ maxWidth: '60rem' }}
         >
           {/* <Column field='no' header='No' sortable style={{ width: '1rem' }} /> */}
           <Column
             field='studentDetails.studentId'
             header='Student Id'
-            style={{ maxWidth: '2.5rem' }}
+            style={{ maxWidth: '3rem' }}
             sortable
           />
           <Column field='studentDetails.fullname' header='Full Name' sortable />
