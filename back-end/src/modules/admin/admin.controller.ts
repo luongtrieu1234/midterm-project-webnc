@@ -15,13 +15,15 @@ import {
   UploadedFiles,
   UseGuards,
   UseInterceptors,
+  Response,
+  BadRequestException,
 } from '@nestjs/common';
 import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiProperty, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { AuthService } from '~/others/auth/auth.service';
 import { AdminService } from './admin.service';
 import { AdminLoginRequestDto } from './dto/admin-login-request.dto';
-import { Response, Request } from 'express';
+import { Request } from 'express';
 import { AuthGuardCustom } from '~/others/auth/auth.guard';
 import { UserRole } from '../role/roles.enum';
 import { Roles } from '../role/role.decorator';
@@ -40,7 +42,7 @@ export class AdminController {
   @HttpCode(200)
   async adminLogin(
     @Body() adminLoginRequestDto: AdminLoginRequestDto,
-    @Res({ passthrough: true }) response: Response,
+    @Res({ passthrough: true }) response,
   ) {
     return await this.adminService.adminLogin(adminLoginRequestDto, response);
   }
@@ -150,8 +152,22 @@ export class AdminController {
     return await this.adminService.activateClass(classId);
   }
 
+  @Get('excel-template-list')
+  @UseGuards(AuthGuardCustom)
+  @Roles(UserRole.ADMIN)
+  @Header('Access-Control-Expose-Headers', 'Content-Disposition')
+  async downloadTemplateFileList(@Response({ passthrough: true }) response, @Req() req) {
+    const buffer = await this.adminService.downloadTemplateFileList(response);
+    // response.set('Content-Disposition', `attachment; filename=${className}.xlsx`);
+    response.set({
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': `attachment; filename=template.xlsx`,
+    });
+    response.send(buffer);
+  }
+
   @ApiConsumes('multipart/form-data')
-  @Post('upload-file-grade')
+  @Post('upload-file-list')
   @HttpCode(200)
   @UseInterceptors(FileFieldsInterceptor([{ name: 'excelFile', maxCount: 1 }]))
   // @UseInterceptors(FileFieldsInterceptor([{ name: 'excelFile', maxCount: 1 }], multerOptions))

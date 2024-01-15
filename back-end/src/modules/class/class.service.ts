@@ -44,8 +44,8 @@ export class ClassService {
     private readonly classModel: Model<ClassModel>,
     @InjectModel('Role')
     private readonly roleModel: Model<RoleModel>, // @InjectModel('Grade')
-    // @InjectModel('GradeStructure')
-  ) // private readonly gradeModel: Model<GradeModel>,
+    // private readonly gradeModel: Model<GradeModel>,
+  ) // @InjectModel('GradeStructure')
   // private readonly gradeStructureModel: Model<GradeStructureModel>,
   {}
 
@@ -266,7 +266,12 @@ export class ClassService {
 
   async getAllClassesOfUser(userId: string) {
     const classes = await this.classModel.find({
-      $or: [{ owner: userId }, { 'teachers.user': userId }, { 'students.user': userId }],
+      $and: [
+        { active: true },
+        {
+          $or: [{ owner: userId }, { 'teachers.user': userId }, { 'students.user': userId }],
+        },
+      ],
     });
     const promises = classes?.map(async (classDocument) => {
       return await this.getClassWithUserInfo(classDocument._id.toString());
