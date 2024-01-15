@@ -167,9 +167,9 @@ export class GradeController {
       gradeCompositionDocument.result.class,
       req.user.id,
     );
-    // if (!userRole) throw new BadRequestException('You are not in this class');
-    // if (userRole.role !== 'teacher')
-    //   throw new BadRequestException('You are not a teacher of this class');
+    if (!userRole) throw new BadRequestException('You are not in this class');
+    if (userRole.role !== 'teacher')
+      throw new BadRequestException('You are not a teacher of this class');
     const { buffer, gradeCompositionName } = await this.gradeService.downloadTemplateFileGrade(
       response,
       gradeCompositionId,
@@ -257,9 +257,9 @@ export class GradeController {
   @UseGuards(AuthGuardCustom)
   async getClassGrades(@Query('classId') classId: string, @Req() req) {
     const userRole = await this.classService.getUserRoleInClass(classId, req.user.id);
-    // if (!userRole) throw new BadRequestException('You are not in this class');
-    // if (userRole.role !== 'teacher')
-    //   throw new BadRequestException('You are not a teacher of this class');
+    if (!userRole) throw new BadRequestException('You are not in this class');
+    if (userRole.role !== 'teacher')
+      throw new BadRequestException('You are not a teacher of this class');
     return await this.gradeService.getClassGrades(classId);
   }
 
@@ -271,9 +271,9 @@ export class GradeController {
       gradeDocument.result.class,
       req.user.id,
     );
-    // if (!userRole) throw new BadRequestException('You are not in this class');
-    // if (userRole.role !== 'teacher')
-    //   throw new BadRequestException('You are not a teacher of this class');
+    if (!userRole) throw new BadRequestException('You are not in this class');
+    if (userRole.role !== 'teacher')
+      throw new BadRequestException('You are not a teacher of this class');
     return await this.gradeService.addGrade(dto);
   }
 
