@@ -10,6 +10,8 @@ async function bootstrap() {
     origin: process.env.CLIENT_URL,
     credentials: true,
   });
+  console.log('process.env.SERVER_PORT ', process.env.SERVER_PORT);
+  console.log('process.env.CLIENT_URL ', process.env.CLIENT_URL);
   setupSwagger(app);
   await app.listen(process.env.SERVER_PORT);
 }

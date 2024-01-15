@@ -189,6 +189,20 @@ export class AdminService {
     };
   }
 
+  async downloadTemplateFileList(response: Response) {
+    const workbook = new ExcelJS.Workbook();
+    // create first sheet with file name exceljs-example
+    const worksheet = workbook.addWorksheet('exceljs-example');
+
+    worksheet.columns = [
+      { header: 'No', key: 'no' },
+      { header: 'StudentId', key: 'studentId' },
+      { header: 'Email', key: 'email' },
+    ];
+    const buffer = await workbook.xlsx.writeBuffer();
+    return buffer;
+  }
+
   async mapStudentAccountFromFile(buffer: Buffer, originalname: string) {
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(buffer);
