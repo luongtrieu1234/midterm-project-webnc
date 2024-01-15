@@ -11,6 +11,10 @@ export const CLASS = {
   POST_INVITE_TEACHER: '/class/invite-tearcher',
   POST_INVITE_STUDENT: '/class/invite-student',
   GET_ALL_CLASS: '/class/all',
+  GET_ALL_CLASSES_OF_USER: '/class/all-classes-of-user',
+};
+export const ADMIN = {
+  POST_UPLOAD_FILE_USER_LIST: '/admin/upload-file-grade',
 };
 
 export const GRADE = {

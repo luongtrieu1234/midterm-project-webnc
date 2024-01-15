@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useEffect, useState } from 'react';
 import { TabMenu } from 'primereact/tabmenu';
 import { DataTable } from 'primereact/datatable';
@@ -9,6 +9,14 @@ import { MultiSelect } from 'primereact/multiselect';
 import { Dialog } from 'primereact/dialog';
 import axios from 'axios';
 import { InputText } from 'primereact/inputtext';
+import { Tooltip } from 'primereact/tooltip';
+import { footerComfirm } from 'utils/func';
+import { useForm } from 'react-hook-form';
+import { useMutation } from 'react-query';
+import { uploadFileUserList } from 'apis/admin.api';
+import { toast } from 'layout';
+import { TOAST } from 'constant';
+import AddFileUserListDialog from '../components/Mapping/AddFileUserListDialog';
 
 function HomePageAdmin() {
   // Items for the tab menu
@@ -32,48 +40,50 @@ function HomePageAdmin() {
   const [filterOption, setFilterOption] = useState(null);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [studentIdInput, setStudentIdInput] = useState('');
-
+  const [visibleAddFileUserListDialog, setVisibleAddFileUserListDialog] = useState(false);
+  const { mutate: uploadFileUserListMutate, isLoading: isUploadFileUserListLoading } =
+    useMutation(uploadFileUserList);
+  const fetchUserList = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/admin/all-users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.status === 200) {
+        setUserList(response.data.users);
+      } else {
+        console.log('Error occurred while fetching user list');
+      }
+    } catch (error) {
+      console.error('An error occurred while fetching the user list:', error);
+    }
+  }, []);
+  const fetchClassList = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/admin/all-classes`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          filterOption: filterOption
+            ? filterOption.map((option) => option.code).join(',')
+            : undefined,
+        },
+      });
+      if (response.status === 200) {
+        setClassList(response.data);
+      } else {
+        console.log('Error occurred while fetching class list');
+      }
+    } catch (error) {
+      console.error('An error occurred while fetching the class list:', error);
+    }
+  }, []);
   // Fetch the user list and class list when the component is mounted
   useEffect(() => {
-    const fetchUserList = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/admin/all-users`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (response.status === 200) {
-          setUserList(response.data.users);
-        } else {
-          console.log('Error occurred while fetching user list');
-        }
-      } catch (error) {
-        console.error('An error occurred while fetching the user list:', error);
-      }
-    };
-    const fetchClassList = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/admin/all-classes`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          params: {
-            filterOption: filterOption
-              ? filterOption.map((option) => option.code).join(',')
-              : undefined,
-          },
-        });
-        if (response.status === 200) {
-          setClassList(response.data);
-        } else {
-          console.log('Error occurred while fetching class list');
-        }
-      } catch (error) {
-        console.error('An error occurred while fetching the class list:', error);
-      }
-    };
     fetchUserList();
     fetchClassList();
     if (filterOption) {
@@ -103,12 +113,52 @@ function HomePageAdmin() {
       </div>
     </div>
   );
-  const headerMapping = (
-    <div className='flex flex-wrap align-items-center justify-content-between gap-2'>
-      <span className='text-xl text-900 font-bold'>Mapping</span>
-    </div>
-  );
+  //form
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
 
+  function headerMapping() {
+    return (
+      <div className='flex align-items-center justify-content-between'>
+        <div className='text-xl'>Grade List</div>
+        <div className='card'>
+          <Tooltip target='.add-grade-composition' className='text-sm' />
+          <Button
+            className='add-grade-composition'
+            icon='pi pi-plus '
+            data-pr-tooltip='Mapping user'
+            data-pr-position='left'
+            onClick={() => setVisibleAddFileUserListDialog(true)}
+          />
+        </div>
+      </div>
+    );
+  }
+  const footerComfirmAddFileUserList = footerComfirm({
+    setVisible: setVisibleAddFileUserListDialog,
+    handleSubmit: handleSubmit(onAddUserExcelFileSubmit),
+    isLoading: isUploadFileUserListLoading,
+  });
+
+  async function onAddUserExcelFileSubmit(data) {
+    const addUserListExcelFileSubmitFormData = new FormData();
+    addUserListExcelFileSubmitFormData.append('excelFile', data.userListFile);
+    uploadFileUserListMutate(addUserListExcelFileSubmitFormData, {
+      onSuccess() {
+        toast(TOAST.SUCCESS, 'User list upload successfully!');
+        setVisibleAddFileUserListDialog(false);
+        reset();
+        fetchUserList();
+      },
+      onError() {
+        toast(TOAST.ERROR, 'User list upload srror!');
+      },
+    });
+  }
   //Template for active status account
   const activeStatusTemplateAccount = (rowData) => {
     return (
@@ -268,35 +318,44 @@ function HomePageAdmin() {
   };
 
   return (
-    <div className='card'>
-      <TabMenu model={items} activeItem={activeItem} />
-      {activeItem === 0 && (
-        <DataTable value={userList} header={headerAccounts} scrollable scrollHeight='450px'>
-          <Column field='fullname' header='User Name'></Column>
-          <Column field='email' header='Email'></Column>
-          <Column field='phone' header='Phone Number'></Column>
-          <Column field='role' header='Role'></Column>
-          <Column field='active' header='Active' body={activeStatusTemplateAccount}></Column>
-        </DataTable>
-      )}
-      {activeItem === 1 && (
-        <DataTable value={classList} header={headerClasses} scrollable scrollHeight='450px'>
-          <Column field='name' header='Class Name'></Column>
-          <Column field='owner.fullname' header='Owner'></Column>
-          <Column field='classCode' header='Class Code'></Column>
-          <Column field='createdAt' sortable header='Create Time' body={formatDate}></Column>
-          <Column field='active' header='Active' body={activeStatusTemplateClass}></Column>
-        </DataTable>
-      )}
-      {activeItem === 2 && (
-        <DataTable value={userList} header={headerMapping} scrollable scrollHeight='450px'>
-          <Column field='fullname' header='Username'></Column>
-          <Column field='email' header='Email'></Column>
-          <Column field='studentId' header='Student ID'></Column>
-          <Column header='Action' body={renderActionMapping}></Column>
-        </DataTable>
-      )}
-    </div>
+    <>
+      <div className='card'>
+        <TabMenu model={items} activeItem={activeItem} />
+        {activeItem === 0 && (
+          <DataTable value={userList} header={headerAccounts} scrollable scrollHeight='450px'>
+            <Column field='fullname' header='User Name'></Column>
+            <Column field='email' header='Email'></Column>
+            <Column field='phone' header='Phone Number'></Column>
+            <Column field='role' header='Role'></Column>
+            <Column field='active' header='Active' body={activeStatusTemplateAccount}></Column>
+          </DataTable>
+        )}
+        {activeItem === 1 && (
+          <DataTable value={classList} header={headerClasses} scrollable scrollHeight='450px'>
+            <Column field='name' header='Class Name'></Column>
+            <Column field='owner.fullname' header='Owner'></Column>
+            <Column field='classCode' header='Class Code'></Column>
+            <Column field='createdAt' sortable header='Create Time' body={formatDate}></Column>
+            <Column field='active' header='Active' body={activeStatusTemplateClass}></Column>
+          </DataTable>
+        )}
+        {activeItem === 2 && (
+          <DataTable value={userList} header={headerMapping} scrollable scrollHeight='450px'>
+            <Column field='fullname' header='Username'></Column>
+            <Column field='email' header='Email'></Column>
+            <Column field='studentId' header='Student ID'></Column>
+            <Column header='Action' body={renderActionMapping}></Column>
+          </DataTable>
+        )}
+      </div>
+      <AddFileUserListDialog
+        visible={visibleAddFileUserListDialog}
+        setVisible={setVisibleAddFileUserListDialog}
+        control={control}
+        errors={errors}
+        footer={footerComfirmAddFileUserList}
+      />
+    </>
   );
 }
 

@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { useForm, Controller } from 'react-hook-form';
 import { Link } from 'react-router-dom';
@@ -31,29 +31,29 @@ const ViewListClass = () => {
       life: 3000,
     });
   };
-  console.log(classList);
-  useEffect(() => {
-    const fetchClassList = async () => {
-      try {
-        const token = localStorage.getItem('token'); // replace 'token' with your actual key
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/class/all`, {
+  const fetchClassList = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token'); // replace 'token' with your actual key
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/class/all-classes-of-user`,
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        });
-        if (response.status === 200) {
-          setClassList(response.data);
-        } else {
-          console.log('Error occurred while fetching class list');
         }
-      } catch (error) {
-        console.error('An error occurred while fetching the class list:', error);
+      );
+      if (response.status === 200) {
+        setClassList(response.data.classes);
+      } else {
+        console.log('Error occurred while fetching class list');
       }
-    };
-
+    } catch (error) {
+      console.error('An error occurred while fetching the class list:', error);
+    }
+  }, []);
+  useEffect(() => {
     fetchClassList();
   }, []);
-
   //Add class
   const [visible, setVisible] = useState(false);
   const {
@@ -78,6 +78,7 @@ const ViewListClass = () => {
         setVisible(false);
         reset();
         showSuccess();
+        fetchClassList();
       } else {
         showError();
       }

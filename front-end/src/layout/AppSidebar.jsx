@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
 import { Menu } from 'primereact/menu';
 import { useQuery } from 'react-query';
-import { getAllClass } from 'apis/class.api';
+import { getAllClassesOfUser } from 'apis/class.api';
 import { Loading } from 'components';
 export default function Sidebar() {
-  const { data: classesData, isLoading } = useQuery(['classesData'], () => getAllClass());
-  const classes = useMemo(() => classesData?.data, [classesData]);
+  const { data: classesData, isLoading } = useQuery(['classesData'], () => getAllClassesOfUser());
+  const classes = useMemo(() => classesData?.data?.classes, [classesData]);
 
   const items = [
     { label: 'Home', icon: 'pi pi-home' },
