@@ -1,0 +1,17 @@
+version: '3'
+services:
+  client:
+    # image: scientist_frontend
+    container_name: frontend
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: >
+      bash -c "npm run start"
+    restart: on-failure:5
+    ports:
+      - 3030:3000
+    env_file: .env.docker
+    volumes:
+      - ./:/usr/app
+      - /usr/app/node_modules
