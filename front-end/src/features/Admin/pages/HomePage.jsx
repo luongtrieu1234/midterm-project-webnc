@@ -81,7 +81,7 @@ function HomePageAdmin() {
     } catch (error) {
       console.error('An error occurred while fetching the class list:', error);
     }
-  }, []);
+  }, [filterOption]);
   // Fetch the user list and class list when the component is mounted
   useEffect(() => {
     fetchUserList();
