@@ -55,8 +55,8 @@ export class GradeService {
     private readonly gradeModel: Model<GradeModel>,
     @InjectModel('Comment')
     private readonly commentModel: Model<CommentModel>, // @InjectModel('User')
-    // private readonly userModel: Model<UserModel>,
-  ) {}
+  ) // private readonly userModel: Model<UserModel>,
+  {}
   async showGradeStructure(classId: string) {
     try {
       // const classDocument = await this.classModel
@@ -388,6 +388,7 @@ export class GradeService {
     let notFoundStudents = [];
     let updatedStudents = [];
     let alreadyMappedStudents = [];
+    let existedStudentId = [];
     for (const element of result) {
       const student = await this.userModel.findOne({
         email: element.Email?.text ?? element.Email,
@@ -408,8 +409,13 @@ export class GradeService {
         alreadyMappedStudents.push({
           email: element.Email?.text ?? element.Email,
           studentId: element.StudentId,
-          existedStudentId: student.studentId,
+          mappedId: student.studentId,
         });
+        continue;
+      }
+      const studentIdExisted = await this.userModel.findOne({ studentId: element.StudentId });
+      if (studentIdExisted) {
+        existedStudentId.push(studentIdExisted.studentId);
         continue;
       }
       student.studentId = element.StudentId;
@@ -424,6 +430,7 @@ export class GradeService {
       notFoundStudents,
       updatedStudents,
       alreadyMappedStudents,
+      existedStudentId,
       message: 'success',
       statusCode: 200,
     };
