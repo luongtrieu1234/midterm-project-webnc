@@ -222,6 +222,7 @@ export class AdminService {
     let notFoundUsers = [];
     let updatedUsers = [];
     let alreadyMappedUsers = [];
+    let existedStudentId = [];
     for (const element of result) {
       const student = await this.userModel.findOne({
         email: element.Email?.text ?? element.Email,
@@ -234,6 +235,13 @@ export class AdminService {
         alreadyMappedUsers.push({
           email: element.Email?.text ?? element.Email,
           studentId: element.StudentId,
+        });
+        continue;
+      }
+      const studentIdExisted = await this.userModel.findOne({ studentId: element.StudentId });
+      if (studentIdExisted) {
+        existedStudentId.push({
+          existedStudentId: studentIdExisted.studentId,
         });
         continue;
       }
