@@ -267,11 +267,6 @@ export class UsersService {
 
     console.log('check google user ', req.user);
     const user = await this.findUserByEmail(req.user.email);
-    if (user) {
-      if (user.active !== true) {
-        throw new BadRequestException('Email is not active');
-      }
-    }
     let result = null;
     if (!user) {
       // throw new BadRequestException('User not found');
@@ -313,11 +308,6 @@ export class UsersService {
     console.log('check facebook user ', user);
     const userExits = await this.findUserByEmail(user.email);
     let result = null;
-    if (userExits) {
-      if (userExits.active !== true) {
-        throw new BadRequestException('Email is not active');
-      }
-    }
     if (!userExits) {
       // throw new BadRequestException('User not found');
       const fullname = `${user.firstName} ${user.lastName}`;
