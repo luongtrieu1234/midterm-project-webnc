@@ -15,7 +15,7 @@ export const CLASS = {
   GET_ALL_CLASSES_OF_USER: '/class/all-classes-of-user',
 };
 export const ADMIN = {
-  POST_UPLOAD_FILE_USER_LIST: '/admin/upload-file-grade',
+  POST_UPLOAD_FILE_USER_LIST: '/admin/upload-file-list',
 };
 
 export const GRADE = {
